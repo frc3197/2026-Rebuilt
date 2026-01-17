@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2025 Littleton Robotics
+// Copyright (c) 2021-2026 Littleton Robotics
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by a BSD
@@ -6,8 +6,6 @@
 // at the root directory of this project.
 
 package frc.robot;
-
-import static edu.wpi.first.units.Units.Degrees;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,10 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AlignCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.align.Align;
+import frc.robot.managersubsystems.RobotModeManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -38,9 +35,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Align align;
   private final Drive drive;
 
+  private RobotModeManager robotModeManager;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -61,8 +58,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-
-        align = new Align();
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -85,8 +80,6 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        align = new Align();
-
         drive =
             new Drive(
                 new GyroIO() {},
@@ -98,8 +91,6 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        align = new Align();
-
         drive =
             new Drive(
                 new GyroIO() {},
@@ -161,6 +152,9 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
+    controller.leftBumper().onTrue(Commands.runOnce(() -> setRobotMode("Left")));
+    controller.rightBumper().onTrue(Commands.runOnce(() -> setRobotMode("Right")));
+
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
@@ -171,11 +165,6 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
-
-    controller
-        .x()
-        .whileTrue(
-            new AlignCommand(align, drive, new Pose2d(4, 4, new Rotation2d(Degrees.of(45)))));
   }
 
   /**
@@ -185,5 +174,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public static void setRobotMode(String mode) {
+    RobotModeManager.setRobotMode(mode);
   }
 }
