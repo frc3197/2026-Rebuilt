@@ -1,7 +1,6 @@
 package frc.robot.managersubsystems;
 
 import frc.robot.util.VirtualSubsystem;
-
 import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
