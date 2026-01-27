@@ -10,16 +10,15 @@ public class Shooter extends SubsystemBase {
 
   private ShooterIO shooterIO;
 
-  // private Shooter
+  private ShooterInputsAutoLogged loggedShooter = new ShooterInputsAutoLogged();
 
   public Shooter(ShooterIO shooterIO) {
 
     this.shooterIO = shooterIO;
-    
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    shooterIO.updateInputs(loggedShooter);
   }
 }
