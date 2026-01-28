@@ -16,7 +16,10 @@ public class HardwareID {
     public static final int TURRET_ROTATION_ID = 11;
   }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
   public interface IntakeHardwareID {
     public static final int DEPLOY_MOTOR_ID = -1;
@@ -29,5 +32,8 @@ public class HardwareID {
     public static final int leftClimberMotorID = -1;
     public static final int rightClimberMotorID = -1;
   }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
