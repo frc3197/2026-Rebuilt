@@ -11,8 +11,6 @@ public interface IntakeIO {
     @AutoLog
     public static class IntakeInputs {
         public Angle deployAngle = Degrees.of(0);
-        public boolean isDeployed = false;
-
         public Double spinMotorSetSpeed = 0.0;
 
         public Double deployMotorSuppliedCurrent = 0.0;
