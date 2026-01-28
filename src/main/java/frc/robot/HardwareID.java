@@ -4,24 +4,15 @@ import com.ctre.phoenix6.CANBus;
 
 public class HardwareID {
 
-    public static final CANBus DRIVETRAIN_CANBUS = new CANBus("drivetrain");
-    public static final CANBus MAIN_CANBUS = CANBus.roboRIO();
+  public static final CANBus DRIVETRAIN_CANBUS = new CANBus("drivetrain");
+  public static final CANBus MAIN_CANBUS = CANBus.roboRIO();
 
-    public interface ShooterHardwareID {
-        // Encoders
-        public static final int TURRET_ENCODER_ID = 12;
+  public interface ShooterHardwareID {
+    // Encoders
+    public static final int TURRET_ENCODER_ID = 12;
 
-        // Motors
-        public static final int FLYWHEEL_MOTOR_ID = 10;
-        public static final int TURRET_ROTATION_ID = 11;
-    } 
-
-    public interface IntakeHardwareID {
-        public static final int DEPLOY_MOTOR_ID = -1;
-        public static final int DEPLOY_CANCODER_ID = -1;
-
-        public static final int SPIN_MOTOR_ID = -1;
-        public static final int SPIN_CANCODER_ID = -1;
-
-    }
+    // Motors
+    public static final int FLYWHEEL_MOTOR_ID = 10;
+    public static final int TURRET_ROTATION_ID = 11;
+  }
 }

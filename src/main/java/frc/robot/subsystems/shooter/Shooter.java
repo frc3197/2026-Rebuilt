@@ -4,22 +4,30 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
   private ShooterIO shooterIO;
 
-  // private Shooter
+  private ShooterInputsAutoLogged loggedShooter = new ShooterInputsAutoLogged();
+  private final Supplier<Pose3d> robotPoseSupplier;
 
-  public Shooter(ShooterIO shooterIO) {
+  public Shooter(ShooterIO shooterIO, Supplier<Pose3d> robotPoseSupplier) {
 
+    this.robotPoseSupplier = robotPoseSupplier;
     this.shooterIO = shooterIO;
-    
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    shooterIO.updateInputs(loggedShooter);
+
+    Logger.recordOutput(
+        "Shooter/Turret Location",
+        robotPoseSupplier.get().plus(ShooterConstants.ROBOT_TO_TURRET_CENTER));
   }
 }
