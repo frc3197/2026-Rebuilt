@@ -20,6 +20,13 @@ public interface IntakeIO {
     }
 
       public default void updateInputs(IntakeInputs inputs) {};
+      public default Angle GetSpinMotorAbsPos() { return null; };
+
+      public default Angle GetDeployMotorAbsPos() { return null; };
+
+      public default void SetDeployMotorSpeed(Double speed) {};
+
+      public default void SetSpinMotorSpeed(Double speed) {};
 
 
 }
