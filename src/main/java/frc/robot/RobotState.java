@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -15,10 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.RobotMode.ShooterMode;
-
+import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotState extends VirtualSubsystem {
@@ -34,8 +33,8 @@ public class RobotState extends VirtualSubsystem {
   private final MechanismLigament2d climberLigament2d;
 
   private final MechanismRoot2d robotBaseRoot;
-  private final MechanismLigament2d baseLigament2d = new MechanismLigament2d("RobotBase", 150, 0, 24,
-      new Color8Bit(Color.kBlue));
+  private final MechanismLigament2d baseLigament2d =
+      new MechanismLigament2d("RobotBase", 150, 0, 24, new Color8Bit(Color.kBlue));
 
   private final String key;
 
@@ -44,7 +43,8 @@ public class RobotState extends VirtualSubsystem {
     this.key = key;
 
     primaryMechanism2d = new Mechanism2d(500, 300);
-    climberLigament2d = new MechanismLigament2d("ClimberLigament", climberHeight.in(Centimeters), 90);
+    climberLigament2d =
+        new MechanismLigament2d("ClimberLigament", climberHeight.in(Centimeters), 90);
 
     robotBaseRoot = primaryMechanism2d.getRoot("2dBaseRoot", 225, 20);
     robotBaseRoot.append(baseLigament2d);
@@ -53,7 +53,6 @@ public class RobotState extends VirtualSubsystem {
     primaryMechanismRoot.append(climberLigament2d);
 
     SmartDashboard.putData("Mech2d", primaryMechanism2d);
-
   }
 
   public static RobotState instance() {
@@ -85,12 +84,11 @@ public class RobotState extends VirtualSubsystem {
   }
 
   private void visualize() {
-    Pose3d climberPose = new Pose3d(CLIMBER_ATTACH_OFFSET.getTranslation(), CLIMBER_ATTACH_OFFSET.getRotation())
-        .transformBy(
-            new Transform3d(
-                new Translation3d(
-                    0, 0, -this.climberHeight.in(Meters)),
-                new Rotation3d()));
+    Pose3d climberPose =
+        new Pose3d(CLIMBER_ATTACH_OFFSET.getTranslation(), CLIMBER_ATTACH_OFFSET.getRotation())
+            .transformBy(
+                new Transform3d(
+                    new Translation3d(0, 0, -this.climberHeight.in(Meters)), new Rotation3d()));
 
     climberLigament2d.setLength(climberHeight.in(Centimeters) + 103.5);
 
@@ -99,7 +97,8 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/ShooterMode", shooterMode);
   }
 
-  private static final Transform3d CLIMBER_ATTACH_OFFSET = new Transform3d(
-      new Translation3d(Inches.of(2.125), Inches.of(-11.5), Inches.of(3.5)),
-      new Rotation3d(Degrees.of(180), Degrees.of(0), Degrees.of(90)));
+  private static final Transform3d CLIMBER_ATTACH_OFFSET =
+      new Transform3d(
+          new Translation3d(Inches.of(2.125), Inches.of(-11.5), Inches.of(3.5)),
+          new Rotation3d(Degrees.of(180), Degrees.of(0), Degrees.of(90)));
 }

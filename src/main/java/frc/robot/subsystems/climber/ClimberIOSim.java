@@ -5,11 +5,8 @@
 package frc.robot.subsystems.climber;
 
 /** Add your docs here. */
-public class ClimberIOSim implements ClimberIO{
+public class ClimberIOSim implements ClimberIO {
 
-    @Override
-    public void updateInputs(ClimberInputs inputs) {
-        
-    }
-    
+  @Override
+  public void updateInputs(ClimberInputs inputs) {}
 }

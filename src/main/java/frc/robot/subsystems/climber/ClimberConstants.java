@@ -7,7 +7,4 @@ package frc.robot.subsystems.climber;
 import frc.robot.HardwareID;
 
 /** Add your docs here. */
-
-public class ClimberConstants implements HardwareID.ClimberHardwareID {
-
-}
+public class ClimberConstants implements HardwareID.ClimberHardwareID {}

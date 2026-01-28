@@ -6,15 +6,14 @@ package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
 
-@AutoLog
 /** Add your docs here. */
 public interface ClimberIO {
-    public static class ClimberInputs {
-        public double leftMotorCurrent = 0;
-        public double rightMotorCurrent = 0;
 
-    }
+  @AutoLog
+  public static class ClimberInputs {
+    public double leftMotorCurrent = 0;
+    public double rightMotorCurrent = 0;
+  }
 
-    public void updateInputs(ClimberInputs inputs);
-
+  public void updateInputs(ClimberInputs inputs);
 }
