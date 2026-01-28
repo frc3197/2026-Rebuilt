@@ -15,5 +15,9 @@ public interface ClimberIO {
     public double rightMotorCurrent = 0;
   }
 
-  public void updateInputs(ClimberInputs inputs);
+  public default void updateInputs(ClimberInputs inputs) {}
+  ;
+
+  public default void setClimbMotorSpeed(double speed) {}
+  ;
 }

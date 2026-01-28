@@ -29,4 +29,10 @@ public class ClimberIOTalonFX implements ClimberIO {
     inputs.leftMotorCurrent = leftMotor.getSupplyCurrent().getValueAsDouble();
     inputs.rightMotorCurrent = rightMotor.getSupplyCurrent().getValueAsDouble();
   }
+
+  @Override
+  public void setClimbMotorSpeed(double speed) {
+    leftMotor.set(speed);
+    rightMotor.set(speed);
+  }
 }

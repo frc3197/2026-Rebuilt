@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.managersubsystems.RobotModeManager;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberIOSim;
+import frc.robot.subsystems.climber.ClimberIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -44,6 +48,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
+  private final Climber climber;
   private final Drive drive;
   private final Shooter shooter;
   private final Vision vision;
@@ -58,11 +63,13 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    System.out.println("TEST");
     switch (LoggingConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
-        // a CANcoder
+
+        climber = new Climber(new ClimberIOTalonFX());
+
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -83,6 +90,9 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+
+        climber = new Climber(new ClimberIOSim());
+
         drive =
             new Drive(
                 new GyroIO() {},
@@ -105,6 +115,9 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
+
+        climber = new Climber(new ClimberIO() {});
+
         drive =
             new Drive(
                 new GyroIO() {},
@@ -158,21 +171,13 @@ public class RobotContainer {
             () -> -driveController.getLeftX(),
             () -> -driveController.getRightX()));
 
-    // Lock to 0° when A button is held
-    driveController
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driveController.getLeftY(),
-                () -> -driveController.getLeftX(),
-                () -> Rotation2d.kZero));
-
     // Switch to X pattern when X button is pressed
     driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     driveController.leftBumper().onTrue(Commands.runOnce(() -> setRobotMode("Left")));
     driveController.rightBumper().onTrue(Commands.runOnce(() -> setRobotMode("Right")));
+
+    driveController.a().onTrue(climber.setClimbSpeed(0.5)).onFalse(climber.setClimbSpeed(0.0));
 
     // Reset gyro to 0° when B button is pressed
     driveController
