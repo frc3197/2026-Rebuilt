@@ -38,6 +38,6 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    intakeIO.updateInputs(null);
+    //intakeIO.updateInputs(null);
   }
 }

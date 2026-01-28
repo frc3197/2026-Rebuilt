@@ -27,22 +27,17 @@ public class ShooterIOTalonFX extends RealSubsystem implements ShooterIO {
     flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID);
     turretRotationMotor = new TalonFX(ShooterConstants.TURRET_ROTATION_ID);
   }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
-  protected void configureHardware() {}
+  protected void configureHardware() {
+  }
 
   @Override
   public void updateInputs(ShooterInputs inputs) {
     inputs.turretSuppliedVoltage = turretRotationMotor.getSupplyVoltage().getValueAsDouble();
     inputs.turretSuppliedVoltage = turretRotationMotor.getSupplyVoltage().getValueAsDouble();
   }
-=======
 
-  protected void configureHardware() {}
->>>>>>> Stashed changes
-=======
-
-  protected void configureHardware() {}
->>>>>>> Stashed changes
 }
+  
+
+  

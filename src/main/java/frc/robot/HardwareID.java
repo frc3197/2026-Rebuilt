@@ -9,17 +9,12 @@ public class HardwareID {
 
   public interface ShooterHardwareID {
     // Encoders
-    public static final int TURRET_ENCODER_ID = 12;
+    public static final int TURRET_ENCODER_ID = -1;
 
     // Motors
-    public static final int FLYWHEEL_MOTOR_ID = 10;
-    public static final int TURRET_ROTATION_ID = 11;
+    public static final int FLYWHEEL_MOTOR_ID = -1;
+    public static final int TURRET_ROTATION_ID = -1;
   }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 
   public interface IntakeHardwareID {
     public static final int DEPLOY_MOTOR_ID = -1;
@@ -28,12 +23,9 @@ public class HardwareID {
     public static final int SPIN_MOTOR_ID = -1;
     public static final int SPIN_CANCODER_ID = -1;
   }
+
   public interface ClimberHardwareID {
     public static final int leftClimberMotorID = -1;
     public static final int rightClimberMotorID = -1;
   }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
