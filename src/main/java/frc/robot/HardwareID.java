@@ -15,4 +15,19 @@ public class HardwareID {
     public static final int FLYWHEEL_MOTOR_ID = 10;
     public static final int TURRET_ROTATION_ID = 11;
   }
+<<<<<<< Updated upstream
+=======
+
+  public interface IntakeHardwareID {
+    public static final int DEPLOY_MOTOR_ID = -1;
+    public static final int DEPLOY_CANCODER_ID = -1;
+
+    public static final int SPIN_MOTOR_ID = -1;
+    public static final int SPIN_CANCODER_ID = -1;
+  }
+  public interface ClimberHardwareID {
+    public static final int leftClimberMotorID = -1;
+    public static final int rightClimberMotorID = -1;
+  }
+>>>>>>> Stashed changes
 }

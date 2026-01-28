@@ -17,6 +17,10 @@ public interface ShooterIO {
     public double turretSuppliedVoltage = 0.0;
   }
 
+<<<<<<< Updated upstream
   public default void updateInputs(ShooterInputs inputs) {}
+=======
+  public default void updateInputs(ShooterIOInputs inputs) {}
+>>>>>>> Stashed changes
   ;
 }
