@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.climber;
 
+import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -19,5 +20,8 @@ public interface ClimberIO {
   ;
 
   public default void setClimbMotorSpeed(double speed) {}
+  ;
+
+  public default void setTarget(Distance target) {}
   ;
 }

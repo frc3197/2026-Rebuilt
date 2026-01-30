@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.managersubsystems.RobotModeManager;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -53,7 +55,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final Vision vision;
 
-  private RobotModeManager robotModeManager;
+  private RobotState robotModeManager;
 
   // Controllers
   private final CommandXboxController driveController = new CommandXboxController(0);
@@ -177,7 +179,10 @@ public class RobotContainer {
     driveController.leftBumper().onTrue(Commands.runOnce(() -> setRobotMode("Left")));
     driveController.rightBumper().onTrue(Commands.runOnce(() -> setRobotMode("Right")));
 
-    driveController.a().onTrue(climber.setClimbSpeed(0.5)).onFalse(climber.setClimbSpeed(0.0));
+    driveController
+        .a()
+        .onTrue(climber.setClimbPostion(Meters.of(1.0)))
+        .onFalse(climber.setClimbPostion(Meters.of(0.0)));
 
     // Reset gyro to 0° when B button is pressed
     driveController
@@ -201,6 +206,6 @@ public class RobotContainer {
   }
 
   public static void setRobotMode(String mode) {
-    RobotModeManager.setRobotMode(mode);
+    RobotState.setRobotMode(mode);
   }
 }

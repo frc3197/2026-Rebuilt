@@ -9,7 +9,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.util.VirtualSubsystem;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -41,6 +43,8 @@ public class Robot extends LoggedRobot {
           case 1 -> "Uncommitted changes";
           default -> "Unknown";
         });
+
+    AutoLogOutputManager.addObject(RobotState.instance());
 
     // Set up data receivers & replay source
     switch (LoggingConstants.currentMode) {

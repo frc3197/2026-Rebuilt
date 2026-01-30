@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.managersubsystems;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
@@ -20,26 +20,32 @@ import frc.robot.util.RobotMode.ShooterMode;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+/** Add your docs here. */
 public class RobotState extends VirtualSubsystem {
-  private static RobotState instance;
 
-  private Distance climberHeight = Inches.of(0);
-
+  // Robot Modes
+  private static String robotMode = "Hello";
   private ShooterMode shooterMode = ShooterMode.IDLE;
 
+  public static RobotState instance;
+
+  private final String key;
+
+  // Climber
+  private Distance climberHeight = Inches.of(0);
+  private final MechanismLigament2d climberLigament2d;
+
+  // Main mechanism
   private final Mechanism2d primaryMechanism2d;
 
   private final MechanismRoot2d primaryMechanismRoot;
-  private final MechanismLigament2d climberLigament2d;
 
+  // Robot base
   private final MechanismRoot2d robotBaseRoot;
   private final MechanismLigament2d baseLigament2d =
       new MechanismLigament2d("RobotBase", 150, 0, 24, new Color8Bit(Color.kBlue));
 
-  private final String key;
-
   private RobotState(String key) {
-
     this.key = key;
 
     primaryMechanism2d = new Mechanism2d(500, 300);
@@ -62,17 +68,14 @@ public class RobotState extends VirtualSubsystem {
     return instance;
   }
 
-  @Override
-  public void periodic() {
-    visualize();
+  // Robot mode setters & getters -----------------------------------------------
+
+  public String getRobotMode() {
+    return robotMode;
   }
 
-  public Distance getClimberHeight() {
-    return climberHeight;
-  }
-
-  public void setClimberHeight(Distance climberHeight) {
-    this.climberHeight = climberHeight;
+  public static void setRobotMode(String mode) {
+    robotMode = mode;
   }
 
   public ShooterMode getShooterMode() {
@@ -83,7 +86,30 @@ public class RobotState extends VirtualSubsystem {
     this.shooterMode = shooterMode;
   }
 
-  private void visualize() {
+  // Subsystems are below
+  // Climber getters & setters ------------------------------------------------
+
+  public Distance getClimberHeight() {
+    return climberHeight;
+  }
+
+  public void setClimberHeight(Distance climberHeight) {
+    this.climberHeight = climberHeight;
+  }
+
+  // Periodic & logging loops
+
+  @Override
+  public void periodic() {
+    visualize();
+  }
+
+  // Visualize the robot state, log modes, etc
+  public void visualize() {
+    // Log robot modes
+    Logger.recordOutput("RobotState/Shooter Mode", shooterMode);
+    Logger.recordOutput("RobotState/Robot Mode", robotMode);
+
     Pose3d climberPose =
         new Pose3d(CLIMBER_ATTACH_OFFSET.getTranslation(), CLIMBER_ATTACH_OFFSET.getRotation())
             .transformBy(
@@ -93,10 +119,9 @@ public class RobotState extends VirtualSubsystem {
     climberLigament2d.setLength(climberHeight.in(Centimeters) + 103.5);
 
     Logger.recordOutput("RobotState/Climber/" + key, climberPose);
-
-    Logger.recordOutput("RobotState/ShooterMode", shooterMode);
   }
 
+  // Mechanism offsets, TODO can be moved to their respective constants files
   private static final Transform3d CLIMBER_ATTACH_OFFSET =
       new Transform3d(
           new Translation3d(Inches.of(2.125), Inches.of(-11.5), Inches.of(3.5)),
