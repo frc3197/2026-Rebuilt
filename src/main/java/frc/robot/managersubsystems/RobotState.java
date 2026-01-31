@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.RobotMode.ShooterMode;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -37,9 +40,11 @@ public class RobotState extends VirtualSubsystem {
   private Distance climberHeight = Inches.of(0);
   private final MechanismLigament2d climberLigament2d;
 
+  // Turret
+  private Angle turretRotationAngle = Degrees.of(0.0);
+
   // Main mechanism
   private final Mechanism2d primaryMechanism2d;
-
   private final MechanismRoot2d primaryMechanismRoot;
 
   // Robot base
@@ -134,6 +139,15 @@ public class RobotState extends VirtualSubsystem {
     this.climberHeight = climberHeight;
   }
 
+  // Turret getters & setters --------------------------------------------------
+  public Angle getTurretRotationAngle() {
+    return turretRotationAngle;
+  }
+
+  public void setTurretRotationAngle(Angle angle) {
+    turretRotationAngle = angle;
+  }
+
   // Periodic & logging loops
 
   @Override
@@ -159,7 +173,18 @@ public class RobotState extends VirtualSubsystem {
 
     climberLigament2d.setLength(climberHeight.in(Centimeters) + 103.5);
 
+    // Climber
     Logger.recordOutput("RobotState/Climber/" + key, climberPose);
+
+    // Turret
+    Logger.recordOutput(
+        "RobotState/Turret/Turret Field Location Actual",
+        RobotState.instance()
+            .getRobotPose3d()
+            .plus(
+                ShooterConstants.ROBOT_TO_TURRET_CENTER.plus(
+                    new Transform3d(
+                        0, 0, 0, new Rotation3d(0, 0, turretRotationAngle.in(Radians))))));
   }
 
   // Mechanism offsets, TODO can be moved to their respective constants files
