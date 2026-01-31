@@ -18,6 +18,8 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
+
+    intakeIO.configureMotors();
   }
 
   /**
@@ -25,19 +27,19 @@ public class Intake extends SubsystemBase {
    *
    * @param angle The desired angle of the intaker
    * @param speed The speed to run the intaker
-   * @return None
+   * @return none There is no return
    */
-  public Command startIntake(Supplier<Angle> angle, DoubleSupplier speed) {
+  public Command startIntake(DoubleSupplier speed) {
     return Commands.runOnce(
         () -> {
-          Angle suppliedAngle = angle.get();
-          Double suppliedSpeed = speed.getAsDouble();
+          intakeIO.setSpinMotorSpeed(speed.getAsDouble());
+          intakeIO.setDeployMotorSpeed(.2); // Find more reasonable value
         },
         this);
   }
 
   @Override
   public void periodic() {
-    // intakeIO.updateInputs(null);
+    intakeIO.updateInputs(null);
   }
 }
