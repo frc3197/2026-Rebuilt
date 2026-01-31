@@ -80,7 +80,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        shooter = new Shooter(new ShooterIOTalonFX(), drive::getPose3d);
+        shooter = new Shooter(new ShooterIOTalonFX());
 
         vision =
             new Vision(
@@ -103,7 +103,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        shooter = new Shooter(new ShooterIOSim(), drive::getPose3d);
+        shooter = new Shooter(new ShooterIOSim());
 
         vision =
             new Vision(
@@ -128,7 +128,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        shooter = new Shooter(new ShooterIO() {}, drive::getPose3d);
+        shooter = new Shooter(new ShooterIO() {});
 
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
@@ -206,6 +206,6 @@ public class RobotContainer {
   }
 
   public static void setRobotMode(String mode) {
-    RobotState.setRobotMode(mode);
+    RobotState.instance().setRobotMode(mode);
   }
 }

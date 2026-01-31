@@ -7,11 +7,8 @@ package frc.robot.subsystems.climber;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.RealSubsystem;
@@ -32,7 +29,6 @@ public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
     rightMotor = new TalonFX(ClimberConstants.leftClimberMotorID);
 
     configureHardware();
-
   }
 
   @Override
@@ -40,7 +36,6 @@ public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
 
     leftMotor.getConfigurator().apply(ClimberConstants.climberTalonConfig);
     rightMotor.getConfigurator().apply(ClimberConstants.climberTalonConfig);
-
   }
 
   public void setLeftClimberMotorSpeed(double speed) {

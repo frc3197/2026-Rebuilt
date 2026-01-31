@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class IntakeIOTalonFX implements IntakeIO {
@@ -25,7 +24,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void configureMotors() {
-    deployMotor.getConfigurator().apply(IntakeConstants.motorConfigurationConstants.spinMotorConfig);
+    deployMotor
+        .getConfigurator()
+        .apply(IntakeConstants.motorConfigurationConstants.spinMotorConfig);
   }
 
   @Override

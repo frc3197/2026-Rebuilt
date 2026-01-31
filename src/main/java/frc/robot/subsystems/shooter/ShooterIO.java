@@ -9,7 +9,6 @@ public interface ShooterIO {
 
   @AutoLog
   public static class ShooterInputs {
-
     public Angle turretAngle = Degrees.of(0.0);
     public Angle hoodAngle = Degrees.of(45.0);
 

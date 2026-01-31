@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.managersubsystems.RobotState;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -74,6 +75,9 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+
+    ShotCalculator.instance();
+    RobotState.instance();
   }
 
   /** This function is called periodically during all modes. */

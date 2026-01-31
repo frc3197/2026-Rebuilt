@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LoggingConstants;
 import frc.robot.LoggingConstants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -201,8 +202,12 @@ public class Drive extends SubsystemBase {
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
 
-      // Apply update
-      poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      // Apply update & update robot state
+      Pose2d updatedPose =
+          poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      RobotState.instance().setRobotPose(updatedPose);
+      RobotState.instance().setRobotVelocity(getChassisSpeeds());
+      RobotState.instance().setRobotAccelerations(gyroInputs.accelerations);
     }
 
     // Update gyro alert

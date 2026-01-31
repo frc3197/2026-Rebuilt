@@ -5,10 +5,12 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -24,7 +26,7 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
-  private static String robotMode = "Hello";
+  private String robotMode = "Hello";
   private ShooterMode shooterMode = ShooterMode.IDLE;
 
   public static RobotState instance;
@@ -44,6 +46,11 @@ public class RobotState extends VirtualSubsystem {
   private final MechanismRoot2d robotBaseRoot;
   private final MechanismLigament2d baseLigament2d =
       new MechanismLigament2d("RobotBase", 150, 0, 24, new Color8Bit(Color.kBlue));
+
+  // Driving data
+  private Pose2d robotFieldPose = Pose2d.kZero;
+  private ChassisSpeeds robotVelocity = new ChassisSpeeds(0, 0, 0);
+  private ChassisSpeeds robotAcceleration = new ChassisSpeeds(0, 0, 0);
 
   private RobotState(String key) {
     this.key = key;
@@ -68,14 +75,44 @@ public class RobotState extends VirtualSubsystem {
     return instance;
   }
 
-  // Robot mode setters & getters -----------------------------------------------
+  // Robot pose getters & setters ----------------------------------------------
+
+  public Pose2d getRobotPose() {
+    return robotFieldPose;
+  }
+
+  public Pose3d getRobotPose3d() {
+    return new Pose3d(robotFieldPose);
+  }
+
+  public void setRobotPose(Pose2d pose) {
+    robotFieldPose = pose;
+  }
+
+  public ChassisSpeeds getRobotVelocity() {
+    return robotVelocity;
+  }
+
+  public void setRobotVelocity(ChassisSpeeds speeds) {
+    robotVelocity = speeds;
+  }
+
+  public ChassisSpeeds getRobotAcceleration() {
+    return robotAcceleration;
+  }
+
+  public void setRobotAccelerations(ChassisSpeeds accelerations) {
+    robotAcceleration = accelerations;
+  }
+
+  // Robot mode getters & setters -----------------------------------------------
 
   public String getRobotMode() {
     return robotMode;
   }
 
-  public static void setRobotMode(String mode) {
-    robotMode = mode;
+  public void setRobotMode(String mode) {
+    this.robotMode = mode;
   }
 
   public ShooterMode getShooterMode() {
@@ -109,6 +146,10 @@ public class RobotState extends VirtualSubsystem {
     // Log robot modes
     Logger.recordOutput("RobotState/Shooter Mode", shooterMode);
     Logger.recordOutput("RobotState/Robot Mode", robotMode);
+
+    Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
+    Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);
+    Logger.recordOutput("RobotState/Drivetrain/Robot Acceleration", robotAcceleration);
 
     Pose3d climberPose =
         new Pose3d(CLIMBER_ATTACH_OFFSET.getTranslation(), CLIMBER_ATTACH_OFFSET.getRotation())
