@@ -23,8 +23,7 @@ public class Intake extends SubsystemBase {
   /**
    * Starts the intaker at the desired params
    *
-   * @param angle The desired angle of the intaker
-   * @param speed The speed to run the intaker
+   * @param speed (DoubleSupplier) The speed to run the intaker
    * @return none There is no return
    */
   public Command startIntake(DoubleSupplier speed) {
