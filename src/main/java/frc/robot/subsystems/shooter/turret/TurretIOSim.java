@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.shooter.ShotCalculator;
 
 public class TurretIOSim implements TurretIO {
@@ -42,7 +44,17 @@ public class TurretIOSim implements TurretIO {
     Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
 
     TurretParameters params = new TurretParameters();
-    params.turretRotationError = currentTurretAngle.minus(targetTurretAngle);
+    Angle error = currentTurretAngle.minus(targetTurretAngle);
+    Angle clampedError = Degrees.of(error.in(Degrees) % 360);
+    if (clampedError.in(Degrees) > 180) {
+      params.turretRotationError = clampedError.minus(Degrees.of(360));
+    } else if (clampedError.in(Degrees) < -180) {
+      params.turretRotationError = clampedError.plus(Degrees.of(360));
+
+    } else {
+      params.turretRotationError = clampedError;
+    }
+    SmartDashboard.putNumber("ERROR TURRRR", params.turretRotationError.in(Degrees));
 
     return params;
   }

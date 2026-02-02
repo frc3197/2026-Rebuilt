@@ -105,6 +105,10 @@ public class ShotCalculator extends VirtualSubsystem {
                     * (robotToHub.get(1) < 0 ? -1.0 : 1.0))
             .minus(Radians.of(robotPose.getRotation().getRadians()));
 
+    if (robotToHub.get(1) < 0) {
+      potAngle = potAngle.plus(Degrees.of(360));
+    }
+
     targetTurretAngle = potAngle;
   }
 

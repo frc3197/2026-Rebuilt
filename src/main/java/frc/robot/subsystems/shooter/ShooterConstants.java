@@ -19,5 +19,5 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
       new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);
 
   public static final PIDController TURRET_ANGLE_P_PID_CONTROLLER =
-      new PIDController(0.5, 0.0, 0.0);
+      new PIDController(4.0, 0.0, 2.0);
 }
