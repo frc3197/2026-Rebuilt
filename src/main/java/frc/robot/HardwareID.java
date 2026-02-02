@@ -12,8 +12,13 @@ public class HardwareID {
     public static final int TURRET_ENCODER_ID = -1;
 
     // Motors
-    public static final int FLYWHEEL_MOTOR_ID = -1;
-    public static final int TURRET_ROTATION_ID = -1;
+    public static final int FLYWHEEL_MOTOR_ID = 12;
+    public static final int TURRET_ROTATION_ID = 11;
+  }
+
+  public interface IndexHardwareID {
+    // Motors
+    public static final int INDEX_MOTOR_ID = 10;
   }
 
   public interface IntakeHardwareID {

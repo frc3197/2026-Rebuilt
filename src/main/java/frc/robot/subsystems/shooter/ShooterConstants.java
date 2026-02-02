@@ -12,7 +12,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final PIDController FLYWHEEL_PID_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
 
-  public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(10.0);
+  public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(5.0);
 
   // Describes the turret's bottom opening relative to robot position
   public static final Transform3d ROBOT_TO_TURRET_CENTER =

@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +32,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.shooter.turret.DefaultTurretCommand;
+import frc.robot.subsystems.index.Index;
+import frc.robot.subsystems.index.IndexIO;
+import frc.robot.subsystems.index.IndexIOSim;
+import frc.robot.subsystems.index.IndexIOTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
@@ -54,6 +57,7 @@ public class RobotContainer {
   // Subsystems
   private final Climber climber;
   private final Drive drive;
+  private final Index index;
   private final Turret turret;
   private final Vision vision;
 
@@ -82,6 +86,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        index = new Index(new IndexIOTalonFX());
+
         turret = new Turret(new TurretIOTalonFX());
 
         vision =
@@ -104,6 +110,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        index = new Index(new IndexIOSim());
 
         turret = new Turret(new TurretIOSim());
 
@@ -129,6 +137,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        index = new Index(new IndexIO() {});
 
         turret = new Turret(new TurretIO() {});
 
@@ -168,29 +178,49 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -driveController.getLeftY(),
-            () -> -driveController.getLeftX(),
-            () -> -driveController.getRightX()));
+    /*
+     * drive.setDefaultCommand(
+     * DriveCommands.joystickDrive(
+     * drive,
+     * () -> -driveController.getLeftY(),
+     * () -> -driveController.getLeftX(),
+     * () -> -driveController.getRightX()));
+     */
 
-    turret.setDefaultCommand(new DefaultTurretCommand(turret));
+    // turret.setDefaultCommand(new DefaultTurretCommand(turret));
 
     // Switch to X pattern when X button is pressed
-    driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    driveController.leftBumper().onTrue(Commands.runOnce(() -> setRobotMode("Left")));
-    driveController.rightBumper().onTrue(Commands.runOnce(() -> setRobotMode("Right")));
+    // driveController.leftBumper().onTrue(Commands.runOnce(() ->
+    // setRobotMode("Left")));
+    // driveController.rightBumper().onTrue(Commands.runOnce(() ->
+    // setRobotMode("Right")));
+
+    /*
+     * driveController
+     * .a()
+     * .onTrue(climber.setClimbPostion(Meters.of(1.0)))
+     * .onFalse(climber.setClimbPostion(Meters.of(0.0)));
+     */
 
     driveController
-        .a()
-        .onTrue(climber.setClimbPostion(Meters.of(1.0)))
-        .onFalse(climber.setClimbPostion(Meters.of(0.0)));
-
-    // Reset gyro to 0° when B button is pressed
+        .leftTrigger(0.05)
+        .onTrue(turret.setTurretRotationVoltageCommand(() -> -driveController.getLeftTriggerAxis()))
+        .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
     driveController
-        .b()
+        .rightTrigger(0.05)
+        .onTrue(turret.setTurretRotationVoltageCommand(driveController::getRightTriggerAxis))
+        .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
+
+    driveController.leftBumper().onTrue(index.setIndexMotor(1.0)).onFalse(index.setIndexMotor(0.0));
+    driveController
+        .rightBumper()
+        .onTrue(index.setIndexMotor(-1.0))
+        .onFalse(index.setIndexMotor(0.0));
+
+    driveController
+        .start()
         .onTrue(
             Commands.runOnce(
                     () ->

@@ -8,10 +8,13 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
+import java.util.function.DoubleSupplier;
 
 public class Turret extends SubsystemBase {
 
@@ -37,5 +40,26 @@ public class Turret extends SubsystemBase {
   public void setTurretRotationMotorVoltage(Voltage volts) {
     double maxVolts = ShooterConstants.MAX_TURRET_ROTATION_MOTOR_VOLTS.magnitude();
     turretIO.setTurretMotorVolts(Volts.of(MathUtil.clamp(volts.magnitude(), -maxVolts, maxVolts)));
+  }
+
+  public Command setTurretRotationVoltageCommand(Voltage volts) {
+    return Commands.runOnce(
+        () -> {
+          double maxVolts = ShooterConstants.MAX_TURRET_ROTATION_MOTOR_VOLTS.magnitude();
+          turretIO.setTurretMotorVolts(
+              Volts.of(MathUtil.clamp(volts.magnitude(), -maxVolts, maxVolts)));
+        },
+        this);
+  }
+
+  public Command setTurretRotationVoltageCommand(DoubleSupplier value) {
+    return Commands.run(
+        () -> {
+          turretIO.setTurretMotorVolts(
+              Volts.of(
+                  ShooterConstants.MAX_TURRET_ROTATION_MOTOR_VOLTS.magnitude()
+                      * value.getAsDouble()));
+        },
+        this);
   }
 }
