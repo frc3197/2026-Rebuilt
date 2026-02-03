@@ -14,6 +14,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import frc.robot.RobotContainer;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.util.FieldConstants;
@@ -25,9 +27,9 @@ public class ShotCalculator extends VirtualSubsystem {
   private String key;
   public static ShotCalculator instance;
 
-  private Angle targetHoodAngle = Degrees.of(45.0);
-  private Angle targetTurretAngle = Degrees.of(0.0);
-  private AngularVelocity targetRPM = RotationsPerSecond.of(220);
+  private MutAngle targetHoodAngle = new MutAngle(45.0, 45.0, Degrees);
+  private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
+  private MutAngularVelocity targetRPM = new MutAngularVelocity(0.0, 0.0, RotationsPerSecond);
 
   public ShotCalculator(String key) {
     this.key = key;
@@ -109,7 +111,7 @@ public class ShotCalculator extends VirtualSubsystem {
       potAngle = potAngle.plus(Degrees.of(360));
     }
 
-    targetTurretAngle = potAngle;
+    targetTurretAngle.mut_replace(potAngle);
   }
 
   // Getters ---------------------------------------------------------------

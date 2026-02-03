@@ -1,19 +1,21 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.shooter.ShotCalculator;
 
 public class TurretIOSim implements TurretIO {
 
   private final DCMotor turretGearbox = DCMotor.getKrakenX60(1);
+  private TurretParameters params = new TurretParameters();
 
   // Random MOI guess
   private final DCMotorSim turretRotationMotor =
@@ -29,7 +31,9 @@ public class TurretIOSim implements TurretIO {
               * (turretRotationMotor.getInputVoltage() / 12));
     turretRotationMotor.update(0.02);
 
-    inputs.turretAngleSuppliedVoltage = turretRotationMotor.getInputVoltage();
+    inputs.turretAngleSuppliedVoltage.mut_replace(Volts.of(turretRotationMotor.getInputVoltage()));
+    inputs.turretAngleCurrentDraw.mut_replace(Amps.of(turretRotationMotor.getCurrentDrawAmps()));
+
     inputs.turretAngle = turretRotationMotor.getAngularPosition();
   }
 
@@ -43,7 +47,6 @@ public class TurretIOSim implements TurretIO {
     Angle currentTurretAngle = turretRotationMotor.getAngularPosition();
     Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
 
-    TurretParameters params = new TurretParameters();
     Angle error = currentTurretAngle.minus(targetTurretAngle);
     Angle clampedError = Degrees.of(error.in(Degrees) % 360);
     if (clampedError.in(Degrees) > 180) {
@@ -54,7 +57,6 @@ public class TurretIOSim implements TurretIO {
     } else {
       params.turretRotationError = clampedError;
     }
-    SmartDashboard.putNumber("ERROR TURRRR", params.turretRotationError.in(Degrees));
 
     return params;
   }

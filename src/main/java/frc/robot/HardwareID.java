@@ -18,7 +18,8 @@ public class HardwareID {
 
   public interface IndexHardwareID {
     // Motors
-    public static final int INDEX_MOTOR_ID = 10;
+    public static final int FEED_MOTOR_ID = 10;
+    public static final int INDEX_MOTOR_ID = 9;
   }
 
   public interface IntakeHardwareID {

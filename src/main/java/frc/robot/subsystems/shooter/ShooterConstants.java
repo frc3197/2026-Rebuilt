@@ -2,6 +2,11 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -18,6 +23,19 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final Transform3d ROBOT_TO_TURRET_CENTER =
       new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);
 
-  public static final PIDController TURRET_ANGLE_P_PID_CONTROLLER =
-      new PIDController(4.0, 0.0, 2.0);
+  // Turret rotation PID controller
+  public static final PIDController TURRET_ANGLE_PID_CONTROLLER = new PIDController(4.0, 0.0, 2.0);
+
+  public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
+      new TalonFXConfiguration()
+          .withCurrentLimits(
+              new CurrentLimitsConfigs()
+                  .withStatorCurrentLimit(100)
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimit(100.0)
+                  .withSupplyCurrentLimitEnable(true))
+          .withMotorOutput(
+              new MotorOutputConfigs()
+                  .withNeutralMode(NeutralModeValue.Brake)
+                  .withInverted(InvertedValue.CounterClockwise_Positive));
 }

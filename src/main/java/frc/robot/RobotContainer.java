@@ -36,6 +36,10 @@ import frc.robot.subsystems.index.Index;
 import frc.robot.subsystems.index.IndexIO;
 import frc.robot.subsystems.index.IndexIOSim;
 import frc.robot.subsystems.index.IndexIOTalonFX;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
+import frc.robot.subsystems.shooter.flywheel.FlywheelSim;
+import frc.robot.subsystems.shooter.flywheel.FlywheelTalonFX;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
@@ -57,6 +61,7 @@ public class RobotContainer {
   // Subsystems
   private final Climber climber;
   private final Drive drive;
+  private final Flywheel flywheel;
   private final Index index;
   private final Turret turret;
   private final Vision vision;
@@ -86,6 +91,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        flywheel = new Flywheel(new FlywheelTalonFX());
+
         index = new Index(new IndexIOTalonFX());
 
         turret = new Turret(new TurretIOTalonFX());
@@ -113,6 +120,8 @@ public class RobotContainer {
 
         index = new Index(new IndexIOSim());
 
+        flywheel = new Flywheel(new FlywheelSim());
+
         turret = new Turret(new TurretIOSim());
 
         vision =
@@ -139,6 +148,8 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         index = new Index(new IndexIO() {});
+
+        flywheel = new Flywheel(new FlywheelIO() {});
 
         turret = new Turret(new TurretIO() {});
 
@@ -208,16 +219,23 @@ public class RobotContainer {
         .leftTrigger(0.05)
         .onTrue(turret.setTurretRotationVoltageCommand(() -> -driveController.getLeftTriggerAxis()))
         .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
+
     driveController
         .rightTrigger(0.05)
         .onTrue(turret.setTurretRotationVoltageCommand(driveController::getRightTriggerAxis))
         .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
 
-    driveController.leftBumper().onTrue(index.setIndexMotor(1.0)).onFalse(index.setIndexMotor(0.0));
     driveController
-        .rightBumper()
-        .onTrue(index.setIndexMotor(-1.0))
-        .onFalse(index.setIndexMotor(0.0));
+        .leftBumper()
+        .onTrue(index.setFeedMotor(Volts.of(7.0)).andThen(index.setIndexMotor(Volts.of(-4.0))))
+        .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
+
+    /*
+     * driveController
+     * .rightBumper()
+     * .onTrue(index.setIndexMotor(Volts.of(-4.0)))
+     * .onFalse(index.setIndexMotor(Volts.of(0.0)));
+     */
 
     driveController
         .start()
@@ -228,6 +246,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    driveController
+        .rightBumper()
+        .onTrue(flywheel.setFlywheelVoltage(Volts.of(5.0)))
+        .onFalse(flywheel.setFlywheelVoltage(Volts.of(0.0)));
   }
 
   /**

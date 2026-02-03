@@ -16,7 +16,7 @@ import frc.robot.util.LoggedTunableNumber;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DefaultTurretCommand extends Command {
 
-  private PIDController turretAnglePIDController = ShooterConstants.TURRET_ANGLE_P_PID_CONTROLLER;
+  private PIDController turretAnglePIDController = ShooterConstants.TURRET_ANGLE_PID_CONTROLLER;
 
   // Logged tunable gains
   private LoggedTunableNumber turretAngle_kP =

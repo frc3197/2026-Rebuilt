@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.index;
 
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -13,9 +14,9 @@ public interface IndexIO {
     public double indexMotorSuppliedVoltage = 0.0;
   }
 
-  public default void updateInputs(IndexInputs inputs) {
-  }
+  public default void updateInputs(IndexInputs inputs) {}
 
-  public default void setIndexMotor(double speed) {
-  }
+  public default void setFeedMotorVoltage(Voltage volts) {}
+
+  public default void setIndexMotorVoltage(Voltage volts) {}
 }

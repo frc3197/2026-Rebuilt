@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.index;
 
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,7 +23,11 @@ public class Index extends SubsystemBase {
     indexIO.updateInputs(inputs);
   }
 
-  public Command setIndexMotor(double speed) {
-    return Commands.runOnce(() -> indexIO.setIndexMotor(speed), this);
+  public Command setFeedMotor(Voltage volts) {
+    return Commands.runOnce(() -> indexIO.setFeedMotorVoltage(volts), this);
+  }
+
+  public Command setIndexMotor(Voltage volts) {
+    return Commands.runOnce(() -> indexIO.setIndexMotorVoltage(volts), this);
   }
 }
