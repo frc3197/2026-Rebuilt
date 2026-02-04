@@ -21,10 +21,10 @@ public class HardwareID {
   }
 
   public interface IntakeHardwareID {
-    public static final int DEPLOY_MOTOR_ID = -1;
+    public static final int DEPLOY_MOTOR_ID = 13;
     public static final int DEPLOY_CANCODER_ID = -1;
 
-    public static final int SPIN_MOTOR_ID = -1;
+    public static final int SPIN_MOTOR_ID = 14;
     public static final int SPIN_CANCODER_ID = -1;
   }
 

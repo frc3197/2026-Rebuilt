@@ -36,11 +36,14 @@ import frc.robot.subsystems.index.Index;
 import frc.robot.subsystems.index.IndexIO;
 import frc.robot.subsystems.index.IndexIOSim;
 import frc.robot.subsystems.index.IndexIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelTalonFX;
-import frc.robot.subsystems.shooter.turret.DefaultTurretCommand;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
@@ -64,6 +67,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Flywheel flywheel;
   private final Index index;
+  private final Intake intake;
   private final Turret turret;
   private final Vision vision;
 
@@ -96,6 +100,8 @@ public class RobotContainer {
 
         index = new Index(new IndexIOTalonFX());
 
+        intake = new Intake(new IntakeIOTalonFX());
+
         turret = new Turret(new TurretIOTalonFX());
 
         vision =
@@ -120,6 +126,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
 
         index = new Index(new IndexIOSim());
+
+        intake = new Intake(new IntakeIOSim());
 
         flywheel = new Flywheel(new FlywheelSim());
 
@@ -149,6 +157,8 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         index = new Index(new IndexIO() {});
+
+        intake = new Intake(new IntakeIO() {});
 
         flywheel = new Flywheel(new FlywheelIO() {});
 
@@ -191,14 +201,16 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
 
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -driveController.getLeftY(),
-            () -> -driveController.getLeftX(),
-            () -> -driveController.getRightX()));
-
-    turret.setDefaultCommand(new DefaultTurretCommand(turret));
+    /*
+     * drive.setDefaultCommand(
+     * DriveCommands.joystickDrive(
+     * drive,
+     * () -> -driveController.getLeftY(),
+     * () -> -driveController.getLeftX(),
+     * () -> -driveController.getRightX()));
+     *
+     * turret.setDefaultCommand(new DefaultTurretCommand(turret));
+     */
 
     // Switch to X pattern when X button is pressed
     // driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -231,9 +243,13 @@ public class RobotContainer {
         .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
 
     driveController
-        .y()
+        .b()
         .onTrue(index.setFeedMotor(Volts.of(-7.0)).andThen(index.setIndexMotor(Volts.of(8.0))))
         .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
+    driveController
+        .x()
+        .onTrue(intake.setIntakeSpinSpeed(0.75))
+        .onFalse(intake.setIntakeSpinSpeed(0.0));
 
     /*
      * driveController
@@ -254,7 +270,7 @@ public class RobotContainer {
 
     driveController
         .rightBumper()
-        .onTrue(flywheel.setFlywheelVoltage(Volts.of(5.0)))
+        .onTrue(flywheel.setFlywheelVoltage(Volts.of(6.4)))
         .onFalse(flywheel.setFlywheelVoltage(Volts.of(0.0)));
   }
 

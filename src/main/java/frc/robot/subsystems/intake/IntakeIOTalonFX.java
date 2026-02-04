@@ -6,7 +6,6 @@ import frc.robot.HardwareID;
 public class IntakeIOTalonFX implements IntakeIO {
 
   private final TalonFX deployMotor;
-
   private final TalonFX spinMotor;
 
   public IntakeIOTalonFX() {

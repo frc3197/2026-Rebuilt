@@ -7,11 +7,11 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
 
 public class Intake extends SubsystemBase {
 
   private IntakeIO intakeIO;
+  private IntakeInputsAutoLogged loggedInputs = new IntakeInputsAutoLogged();
 
   /** Creates a new Intake. */
   public Intake(IntakeIO intakeIO) {
@@ -26,17 +26,16 @@ public class Intake extends SubsystemBase {
    * @param speed (DoubleSupplier) The speed to run the intaker
    * @return none There is no return
    */
-  public Command startIntake(DoubleSupplier speed) {
+  public Command setIntakeSpinSpeed(double speed) {
     return Commands.runOnce(
         () -> {
-          intakeIO.setSpinMotorSpeed(speed.getAsDouble());
-          intakeIO.setDeployMotorSpeed(.2); // Find more reasonable value
+          intakeIO.setSpinMotorSpeed(speed);
         },
         this);
   }
 
   @Override
   public void periodic() {
-    intakeIO.updateInputs(null);
+    intakeIO.updateInputs(loggedInputs);
   }
 }
