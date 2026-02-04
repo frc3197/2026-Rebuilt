@@ -19,22 +19,22 @@ public class IntakeIOSim implements IntakeIO {
   public void configureMotors() {}
 
   @Override
-  public Double getSpinMotorSpeed() {
+  public double getSpinMotorSpeed() {
     return spinMotorSpeed;
   }
 
   @Override
-  public Double getDeployMotorSpeed() {
+  public double getDeployMotorSpeed() {
     return deployMotorSpeed;
   }
 
   @Override
-  public void setSpinMotorSpeed(Double speed) {
+  public void setSpinMotorSpeed(double speed) {
     spinMotorSpeed = speed;
   }
 
   @Override
-  public void setDeployMotorSpeed(Double speed) {
+  public void setDeployMotorSpeed(double speed) {
     deployMotorSpeed = speed;
   }
 }

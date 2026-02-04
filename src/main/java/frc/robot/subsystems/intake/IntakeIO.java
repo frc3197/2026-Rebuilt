@@ -16,15 +16,15 @@ public interface IntakeIO {
 
   public default void configureMotors() {}
 
-  public default Double getSpinMotorSpeed() {
-    return null;
+  public default double getSpinMotorSpeed() {
+    return 0.0;
   }
 
-  public default Double getDeployMotorSpeed() {
-    return null;
+  public default double getDeployMotorSpeed() {
+    return 0.0;
   }
 
-  public default void setSpinMotorSpeed(Double speed) {}
+  public default void setSpinMotorSpeed(double speed) {}
 
-  public default void setDeployMotorSpeed(Double speed) {}
+  public default void setDeployMotorSpeed(double speed) {}
 }

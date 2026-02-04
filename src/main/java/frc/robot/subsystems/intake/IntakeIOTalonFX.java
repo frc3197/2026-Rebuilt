@@ -31,22 +31,22 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
-  public Double getSpinMotorSpeed() {
+  public double getSpinMotorSpeed() {
     return spinMotor.get();
   }
 
   @Override
-  public Double getDeployMotorSpeed() {
+  public double getDeployMotorSpeed() {
     return deployMotor.get();
   }
 
   @Override
-  public void setSpinMotorSpeed(Double speed) {
+  public void setSpinMotorSpeed(double speed) {
     spinMotor.set(speed);
   }
 
   @Override
-  public void setDeployMotorSpeed(Double speed) {
+  public void setDeployMotorSpeed(double speed) {
     deployMotor.set(speed);
   }
 }
