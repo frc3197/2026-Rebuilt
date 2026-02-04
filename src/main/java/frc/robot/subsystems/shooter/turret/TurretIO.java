@@ -14,7 +14,7 @@ public interface TurretIO {
 
   @AutoLog
   public static class TurretInputs {
-    public Angle turretAngle = Degrees.of(0.0);
+    public Angle turretMotorAngle = Degrees.of(0.0);
     public Angle hoodAngle = Degrees.of(45.0);
 
     public MutVoltage turretAngleSuppliedVoltage = new MutVoltage(0.0, 0.0, Volts);
@@ -23,9 +23,12 @@ public interface TurretIO {
 
   public class TurretParameters {
     public Angle turretRotationError = Degrees.of(0.0);
+    public Angle turretRotation = Degrees.of(0.0);
   }
 
   public default void setTurretMotorVolts(Voltage volts) {}
+
+  public default void zeroTurretEncoder() {}
 
   public default TurretParameters getTurretParameters() {
     return new TurretParameters();

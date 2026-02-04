@@ -30,7 +30,7 @@ public class Turret extends SubsystemBase {
   public void periodic() {
     turretIO.updateInputs(loggedShooter);
 
-    RobotState.instance().setTurretRotationAngle(loggedShooter.turretAngle);
+    RobotState.instance().setTurretRotationAngle(loggedShooter.turretMotorAngle);
   }
 
   public TurretParameters getTurretParameters() {
@@ -42,7 +42,7 @@ public class Turret extends SubsystemBase {
     turretIO.setTurretMotorVolts(Volts.of(MathUtil.clamp(volts.magnitude(), -maxVolts, maxVolts)));
   }
 
-  public Command setTurretRotationVoltageCommand(Voltage volts) {
+  public Command setTurretRotationVoltage(Voltage volts) {
     return Commands.runOnce(
         () -> {
           double maxVolts = ShooterConstants.MAX_TURRET_ROTATION_MOTOR_VOLTS.magnitude();
@@ -52,7 +52,7 @@ public class Turret extends SubsystemBase {
         this);
   }
 
-  public Command setTurretRotationVoltageCommand(DoubleSupplier value) {
+  public Command setTurretRotationVoltage(DoubleSupplier value) {
     return Commands.run(
         () -> {
           turretIO.setTurretMotorVolts(

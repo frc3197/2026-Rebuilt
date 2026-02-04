@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -37,11 +39,11 @@ public class RobotState extends VirtualSubsystem {
   private final String key;
 
   // Climber
-  private Distance climberHeight = Inches.of(0);
+  private MutDistance climberHeight = Inches.of(0).mutableCopy();
   private final MechanismLigament2d climberLigament2d;
 
   // Turret
-  private Angle turretRotationAngle = Degrees.of(0.0);
+  private MutAngle turretRotationAngle = Degrees.of(0.0).mutableCopy();
 
   // Main mechanism
   private final Mechanism2d primaryMechanism2d;
@@ -136,7 +138,7 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setClimberHeight(Distance climberHeight) {
-    this.climberHeight = climberHeight;
+    this.climberHeight.mut_replace(climberHeight);
   }
 
   // Turret getters & setters --------------------------------------------------
@@ -145,7 +147,7 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setTurretRotationAngle(Angle angle) {
-    turretRotationAngle = angle;
+    turretRotationAngle.mut_replace(angle);
   }
 
   // Periodic & logging loops
@@ -185,6 +187,8 @@ public class RobotState extends VirtualSubsystem {
                 ShooterConstants.ROBOT_TO_TURRET_CENTER.plus(
                     new Transform3d(
                         0, 0, 0, new Rotation3d(0, 0, turretRotationAngle.in(Radians))))));
+    Logger.recordOutput(
+        "RobotState/Turret/Turret Motor Rotations", turretRotationAngle.in(Degrees));
   }
 
   // Mechanism offsets, TODO can be moved to their respective constants files

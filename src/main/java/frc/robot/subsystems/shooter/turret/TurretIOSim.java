@@ -19,7 +19,7 @@ public class TurretIOSim implements TurretIO {
 
   // Random MOI guess
   private final DCMotorSim turretRotationMotor =
-      new DCMotorSim(LinearSystemId.createDCMotorSystem(turretGearbox, 2, 0.7), turretGearbox);
+      new DCMotorSim(LinearSystemId.createDCMotorSystem(turretGearbox, 0.25, 0.7), turretGearbox);
 
   public TurretIOSim() {}
 
@@ -34,7 +34,7 @@ public class TurretIOSim implements TurretIO {
     inputs.turretAngleSuppliedVoltage.mut_replace(Volts.of(turretRotationMotor.getInputVoltage()));
     inputs.turretAngleCurrentDraw.mut_replace(Amps.of(turretRotationMotor.getCurrentDrawAmps()));
 
-    inputs.turretAngle = turretRotationMotor.getAngularPosition();
+    inputs.turretMotorAngle = turretRotationMotor.getAngularPosition();
   }
 
   @Override
@@ -47,17 +47,35 @@ public class TurretIOSim implements TurretIO {
     Angle currentTurretAngle = turretRotationMotor.getAngularPosition();
     Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
 
-    Angle error = currentTurretAngle.minus(targetTurretAngle);
-    Angle clampedError = Degrees.of(error.in(Degrees) % 360);
-    if (clampedError.in(Degrees) > 180) {
-      params.turretRotationError = clampedError.minus(Degrees.of(360));
-    } else if (clampedError.in(Degrees) < -180) {
-      params.turretRotationError = clampedError.plus(Degrees.of(360));
-
-    } else {
-      params.turretRotationError = clampedError;
+    /*
+     * Angle error = currentTurretAngle.minus(targetTurretAngle);
+     * Angle clampedError = Degrees.of(error.in(Degrees) % 360);
+     * if (clampedError.in(Degrees) > 180) {
+     * params.turretRotationError = clampedError.minus(Degrees.of(360));
+     * } else if (clampedError.in(Degrees) < -180) {
+     * params.turretRotationError = clampedError.plus(Degrees.of(360));
+     *
+     * } else {
+     * params.turretRotationError = clampedError;
+     * }
+     */
+    if (targetTurretAngle.gt(Degrees.of(180))) {
+      targetTurretAngle = targetTurretAngle.minus(Degrees.of(360));
     }
 
+    if (targetTurretAngle.lt(Degrees.of(-180))) {
+      targetTurretAngle = targetTurretAngle.plus(Degrees.of(360));
+    }
+
+    params.turretRotationError = turretRotationMotor.getAngularPosition().minus(targetTurretAngle);
+
+    params.turretRotation = turretRotationMotor.getAngularPosition();
+
     return params;
+  }
+
+  @Override
+  public void zeroTurretEncoder() {
+    turretRotationMotor.setAngle(0.0);
   }
 }

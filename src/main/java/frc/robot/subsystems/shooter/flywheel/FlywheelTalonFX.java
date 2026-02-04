@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.HardwareID;
 import frc.robot.RealSubsystem;
 import frc.robot.subsystems.shooter.ShooterConstants;
 
@@ -21,7 +22,7 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   private FlywheelParameters params = new FlywheelParameters();
 
   public FlywheelTalonFX() {
-    this.flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID);
+    this.flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID, HardwareID.MAIN_CANBUS);
 
     configureHardware();
   }
@@ -29,6 +30,7 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   @Override
   protected void configureHardware() {
     flywheelMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_TALON_FX_CONFIG);
+    flywheelMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_SLOT0_CONFIGS);
   }
 
   @Override

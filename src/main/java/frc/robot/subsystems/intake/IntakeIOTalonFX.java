@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.HardwareID;
 
 public class IntakeIOTalonFX implements IntakeIO {
 
@@ -9,9 +10,9 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final TalonFX spinMotor;
 
   public IntakeIOTalonFX() {
-    deployMotor = new TalonFX(IntakeConstants.DEPLOY_MOTOR_ID);
+    deployMotor = new TalonFX(IntakeConstants.DEPLOY_MOTOR_ID, HardwareID.MAIN_CANBUS);
 
-    spinMotor = new TalonFX(IntakeConstants.SPIN_MOTOR_ID);
+    spinMotor = new TalonFX(IntakeConstants.SPIN_MOTOR_ID, HardwareID.MAIN_CANBUS);
   }
 
   @Override

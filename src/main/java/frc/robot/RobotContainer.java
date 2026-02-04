@@ -40,6 +40,7 @@ import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelTalonFX;
+import frc.robot.subsystems.shooter.turret.DefaultTurretCommand;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
@@ -189,16 +190,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    /*
-     * drive.setDefaultCommand(
-     * DriveCommands.joystickDrive(
-     * drive,
-     * () -> -driveController.getLeftY(),
-     * () -> -driveController.getLeftX(),
-     * () -> -driveController.getRightX()));
-     */
 
-    // turret.setDefaultCommand(new DefaultTurretCommand(turret));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -driveController.getLeftY(),
+            () -> -driveController.getLeftX(),
+            () -> -driveController.getRightX()));
+
+    turret.setDefaultCommand(new DefaultTurretCommand(turret));
 
     // Switch to X pattern when X button is pressed
     // driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -217,17 +217,22 @@ public class RobotContainer {
 
     driveController
         .leftTrigger(0.05)
-        .onTrue(turret.setTurretRotationVoltageCommand(() -> -driveController.getLeftTriggerAxis()))
-        .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
+        .onTrue(turret.setTurretRotationVoltage(() -> -driveController.getLeftTriggerAxis()))
+        .onFalse(turret.setTurretRotationVoltage(Volts.of(0.0)));
 
     driveController
         .rightTrigger(0.05)
-        .onTrue(turret.setTurretRotationVoltageCommand(driveController::getRightTriggerAxis))
-        .onFalse(turret.setTurretRotationVoltageCommand(Volts.of(0.0)));
+        .onTrue(turret.setTurretRotationVoltage(driveController::getRightTriggerAxis))
+        .onFalse(turret.setTurretRotationVoltage(Volts.of(0.0)));
 
     driveController
         .leftBumper()
-        .onTrue(index.setFeedMotor(Volts.of(7.0)).andThen(index.setIndexMotor(Volts.of(-4.0))))
+        .onTrue(index.setFeedMotor(Volts.of(12.0)).andThen(index.setIndexMotor(Volts.of(-12.0))))
+        .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
+
+    driveController
+        .y()
+        .onTrue(index.setFeedMotor(Volts.of(-7.0)).andThen(index.setIndexMotor(Volts.of(8.0))))
         .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
 
     /*

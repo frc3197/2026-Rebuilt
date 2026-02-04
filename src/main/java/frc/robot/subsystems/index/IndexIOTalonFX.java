@@ -6,6 +6,7 @@ package frc.robot.subsystems.index;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.HardwareID;
 import frc.robot.RealSubsystem;
 
 /** Add your docs here. */
@@ -15,8 +16,8 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   private final TalonFX indexMotor;
 
   public IndexIOTalonFX() {
-    feedMotor = new TalonFX(IndexConstants.FEED_MOTOR_ID);
-    indexMotor = new TalonFX(IndexConstants.INDEX_MOTOR_ID);
+    feedMotor = new TalonFX(IndexConstants.FEED_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    indexMotor = new TalonFX(IndexConstants.INDEX_MOTOR_ID, HardwareID.MAIN_CANBUS);
   }
 
   protected void configureHardware() {}

@@ -49,8 +49,16 @@ public class DefaultTurretCommand extends Command {
       turretAnglePIDController.setD(turretAngle_kD.getAsDouble());
 
     TurretParameters params = turret.getTurretParameters();
-    turret.setTurretRotationMotorVoltage(
-        Volts.of(turretAnglePIDController.calculate(params.turretRotationError.in(Degrees))));
+    double calculatedVoltage =
+        turretAnglePIDController.calculate(params.turretRotationError.in(Degrees));
+
+    if (params.turretRotation.gt(ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD)) {
+      calculatedVoltage = calculatedVoltage > 0 ? 0 : calculatedVoltage;
+    } else if (params.turretRotation.lt(ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE)) {
+      calculatedVoltage = calculatedVoltage < 0 ? 0 : calculatedVoltage;
+    }
+
+    turret.setTurretRotationMotorVoltage(Volts.of(calculatedVoltage));
   }
 
   // Called once the command ends or is interrupted.

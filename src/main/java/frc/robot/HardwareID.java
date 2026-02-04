@@ -8,8 +8,6 @@ public class HardwareID {
   public static final CANBus MAIN_CANBUS = CANBus.roboRIO();
 
   public interface ShooterHardwareID {
-    // Encoders
-    public static final int TURRET_ENCODER_ID = -1;
 
     // Motors
     public static final int FLYWHEEL_MOTOR_ID = 12;
