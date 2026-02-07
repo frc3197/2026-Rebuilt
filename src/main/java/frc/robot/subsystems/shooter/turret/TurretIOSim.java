@@ -25,10 +25,8 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void updateInputs(TurretInputs inputs) {
-    if (turretRotationMotor.getInputVoltage() == 0.0)
-      turretRotationMotor.setAngularVelocity(
-          turretRotationMotor.getAngularVelocity().in(RadiansPerSecond)
-              * (turretRotationMotor.getInputVoltage() / 12));
+    turretRotationMotor.setAngularVelocity(
+        turretRotationMotor.getAngularVelocity().in(RadiansPerSecond) * (0.85));
     turretRotationMotor.update(0.02);
 
     inputs.turretAngleSuppliedVoltage.mut_replace(Volts.of(turretRotationMotor.getInputVoltage()));

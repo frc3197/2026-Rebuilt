@@ -4,13 +4,14 @@ public class Modes {
   public static enum ShooterMode {
     TRACKING_HUB,
     PASSING,
-    IDLE
+    IDLE,
+    MANUAL
   }
 
   public static enum IntakeMode {
     INTAKING,
     OUTTAKING,
     IDLE_RETRACTED,
-    IDLE_DEPLOYED 
+    IDLE_DEPLOYED
   }
 }

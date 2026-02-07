@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 11.453,
-        "y": 5.516476462196862
+        "x": 4.168,
+        "y": 2.398
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.466282910175673,
-        "y": 5.043974881304361
+        "x": 5.168000000000001,
+        "y": 2.398
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.519557774607703,
-        "y": 3.5756776034236806
+        "x": 8.399386590584879,
+        "y": 2.398259629101284
       },
       "prevControl": {
-        "x": 6.519557774607703,
-        "y": 4.575677603423681
+        "x": 7.399386590584879,
+        "y": 2.398259629101284
       },
       "nextControl": {
-        "x": 8.519557774607701,
-        "y": 2.5756776034236806
+        "x": 9.399386590584879,
+        "y": 2.398259629101284
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.0,
-        "y": 1.0
+        "x": 3.2886162624821687,
+        "y": 2.398259629101284
       },
       "prevControl": {
-        "x": 6.75,
-        "y": 2.5
+        "x": 6.3310627674750375,
+        "y": 2.3723823109843085
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,10 +61,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right Bump",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -10,6 +10,8 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -138,6 +140,9 @@ public class Drive extends SubsystemBase {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+
+    FollowPathCommand.warmupCommand().schedule();
+    PathfindingCommand.warmupCommand().schedule();
 
     // Configure SysId
     sysId =

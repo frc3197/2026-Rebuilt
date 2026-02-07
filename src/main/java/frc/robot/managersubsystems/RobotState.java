@@ -16,6 +16,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.enums.Modes.ShooterMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.FieldConstants;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -139,6 +142,14 @@ public class RobotState extends VirtualSubsystem {
 
   public void setTurretRotationAngle(Angle angle) {
     turretRotationAngle.mut_replace(angle);
+  }
+
+  // Trigger helpers
+  public boolean inAllianceZone() {
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    return isRed
+        ? robotFieldPose.getX() > FieldConstants.Red.MIN_HUB_TRACKING_X
+        : robotFieldPose.getX() < FieldConstants.Blue.MAX_HUB_TRACKING_X;
   }
 
   // Periodic & logging loops
