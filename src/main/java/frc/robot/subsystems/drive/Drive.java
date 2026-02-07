@@ -205,10 +205,11 @@ public class Drive extends SubsystemBase {
       // Apply update & update robot state
       Pose2d updatedPose =
           poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
-      RobotState.instance().setRobotPose(updatedPose);
-      RobotState.instance().setRobotVelocity(getChassisSpeeds());
-      RobotState.instance().setRobotAccelerations(gyroInputs.accelerations);
     }
+
+    RobotState.instance().setRobotPose(poseEstimator.getEstimatedPosition());
+    RobotState.instance().setRobotVelocity(getChassisSpeeds());
+    RobotState.instance().setRobotAccelerations(gyroInputs.accelerations);
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && LoggingConstants.currentMode != Mode.SIM);

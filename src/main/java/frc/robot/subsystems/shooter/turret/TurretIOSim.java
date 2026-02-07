@@ -44,9 +44,6 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public TurretParameters getTurretParameters() {
-    Angle currentTurretAngle = turretRotationMotor.getAngularPosition();
-    Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
-
     /*
      * Angle error = currentTurretAngle.minus(targetTurretAngle);
      * Angle clampedError = Degrees.of(error.in(Degrees) % 360);
@@ -59,6 +56,9 @@ public class TurretIOSim implements TurretIO {
      * params.turretRotationError = clampedError;
      * }
      */
+    Angle currentTurretAngle = turretRotationMotor.getAngularPosition();
+    Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
+
     if (targetTurretAngle.gt(Degrees.of(180))) {
       targetTurretAngle = targetTurretAngle.minus(Degrees.of(360));
     }

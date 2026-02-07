@@ -25,10 +25,13 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   public TurretIOTalonFX() {
     // Initialize motors
     turretRotationMotor = new TalonFX(ShooterConstants.TURRET_ROTATION_ID, HardwareID.MAIN_CANBUS);
+
+    configureHardware();
   }
 
   protected void configureHardware() {
-    turretRotationMotor.getConfigurator().apply(ShooterConstants.TURRET_FEEDBACK_CONFIGS);
+    // turretRotationMotor.getConfigurator().apply(ShooterConstants.TURRET_FEEDBACK_CONFIGS);
+    turretRotationMotor.getConfigurator().apply(ShooterConstants.TURRET_MOTOR_CONFIG);
   }
 
   @Override
@@ -36,6 +39,7 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     inputs.turretAngleSuppliedVoltage.mut_replace(
         turretRotationMotor.getSupplyVoltage().getValue());
     inputs.turretAngleCurrentDraw.mut_replace(turretRotationMotor.getSupplyCurrent().getValue());
+    inputs.turretMotorAngle = getTurretAngularPosition();
   }
 
   @Override
@@ -53,16 +57,15 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     Angle currentTurretAngle = getTurretAngularPosition();
     Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
 
-    Angle error = currentTurretAngle.minus(targetTurretAngle);
-    Angle clampedError = Degrees.of(error.in(Degrees) % 360);
-    if (clampedError.in(Degrees) > 180) {
-      params.turretRotationError = clampedError.minus(Degrees.of(360));
-    } else if (clampedError.in(Degrees) < -180) {
-      params.turretRotationError = clampedError.plus(Degrees.of(360));
-
-    } else {
-      params.turretRotationError = clampedError;
+    if (targetTurretAngle.gt(Degrees.of(180))) {
+      targetTurretAngle = targetTurretAngle.minus(Degrees.of(360));
     }
+
+    if (targetTurretAngle.lt(Degrees.of(-180))) {
+      targetTurretAngle = targetTurretAngle.plus(Degrees.of(360));
+    }
+
+    params.turretRotationError = getTurretAngularPosition().minus(targetTurretAngle);
 
     params.turretRotation = getTurretAngularPosition();
 

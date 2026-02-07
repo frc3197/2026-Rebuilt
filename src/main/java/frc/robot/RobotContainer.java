@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,12 +18,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.enums.Modes.ShooterMode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.managersubsystems.RobotState;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberIO;
-import frc.robot.subsystems.climber.ClimberIOSim;
-import frc.robot.subsystems.climber.ClimberIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -56,14 +51,17 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // Subsystems
-  private final Climber climber;
+  // private final Climber climber;
   private final Drive drive;
   private final Flywheel flywheel;
   private final Index index;
@@ -71,30 +69,30 @@ public class RobotContainer {
   private final Turret turret;
   private final Vision vision;
 
-  private RobotState robotModeManager;
-
   // Controllers
   private final CommandXboxController driveController = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     System.out.println("TEST");
     switch (LoggingConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
 
-        climber = new Climber(new ClimberIOTalonFX());
+        // TODO FIX THIS WHEN CLIMBER IS ADDED
+        // climber = new Climber(new ClimberIOSim());
 
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
 
         flywheel = new Flywheel(new FlywheelTalonFX());
 
@@ -104,26 +102,25 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOTalonFX());
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+            new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
 
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
 
-        climber = new Climber(new ClimberIOSim());
+        // climber = new Climber(new ClimberIOSim());
 
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight));
 
         index = new Index(new IndexIOSim());
 
@@ -133,38 +130,47 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOSim());
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOPhotonVisionSim(
+                VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+            new VisionIOPhotonVisionSim(
+                VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
 
         break;
 
       default:
         // Replayed robot, disable IO implementations
 
-        climber = new Climber(new ClimberIO() {});
+        // climber = new Climber(new ClimberIO() {});
 
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            });
 
-        index = new Index(new IndexIO() {});
+        index = new Index(new IndexIO() {
+        });
 
-        intake = new Intake(new IntakeIO() {});
+        intake = new Intake(new IntakeIO() {
+        });
 
-        flywheel = new Flywheel(new FlywheelIO() {});
+        flywheel = new Flywheel(new FlywheelIO() {
+        });
 
-        turret = new Turret(new TurretIO() {});
+        turret = new Turret(new TurretIO() {
+        });
 
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
+        }, new VisionIO() {
+        });
 
         break;
     }
@@ -193,24 +199,24 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
 
-    /*
-     * drive.setDefaultCommand(
-     * DriveCommands.joystickDrive(
-     * drive,
-     * () -> -driveController.getLeftY(),
-     * () -> -driveController.getLeftX(),
-     * () -> -driveController.getRightX()));
-     *
-     * turret.setDefaultCommand(new DefaultTurretCommand(turret));
-     */
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -driveController.getLeftY(),
+            () -> -driveController.getLeftX(),
+            () -> -driveController.getRightX()));
+
+    // turret.setDefaultCommand(new DefaultTurretCommand(turret));
 
     // Switch to X pattern when X button is pressed
     // driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -227,30 +233,6 @@ public class RobotContainer {
      * .onFalse(climber.setClimbPostion(Meters.of(0.0)));
      */
 
-    driveController
-        .leftTrigger(0.05)
-        .onTrue(turret.setTurretRotationVoltage(() -> -driveController.getLeftTriggerAxis()))
-        .onFalse(turret.setTurretRotationVoltage(Volts.of(0.0)));
-
-    driveController
-        .rightTrigger(0.05)
-        .onTrue(turret.setTurretRotationVoltage(driveController::getRightTriggerAxis))
-        .onFalse(turret.setTurretRotationVoltage(Volts.of(0.0)));
-
-    driveController
-        .leftBumper()
-        .onTrue(index.setFeedMotor(Volts.of(12.0)).andThen(index.setIndexMotor(Volts.of(-12.0))))
-        .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
-
-    driveController
-        .b()
-        .onTrue(index.setFeedMotor(Volts.of(-7.0)).andThen(index.setIndexMotor(Volts.of(8.0))))
-        .onFalse(index.setFeedMotor(Volts.of(0.0)).andThen(index.setIndexMotor(Volts.of(0.0))));
-    driveController
-        .x()
-        .onTrue(intake.setIntakeSpinSpeed(0.75))
-        .onFalse(intake.setIntakeSpinSpeed(0.0));
-
     /*
      * driveController
      * .rightBumper()
@@ -259,19 +241,21 @@ public class RobotContainer {
      */
 
     driveController
+        .x()
+        .onTrue(intake.setIntakeSpinSpeed(0.5))
+        .onFalse(intake.setIntakeSpinSpeed(0.0));
+
+    driveController.povUp().onTrue(setShooterMode(ShooterMode.TRACKING_HUB));
+    driveController.povDown().onTrue(setShooterMode(ShooterMode.IDLE));
+
+    driveController
         .start()
         .onTrue(
             Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
+                () -> drive.setPose(
+                    new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                drive)
                 .ignoringDisable(true));
-
-    driveController
-        .rightBumper()
-        .onTrue(flywheel.setFlywheelVoltage(Volts.of(6.4)))
-        .onFalse(flywheel.setFlywheelVoltage(Volts.of(0.0)));
   }
 
   /**
@@ -283,8 +267,8 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public static void setRobotMode(String mode) {
-    RobotState.instance().setRobotMode(mode);
+  public static Command setShooterMode(ShooterMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setShooterMode(mode));
   }
 
   public static boolean isRed() {

@@ -19,18 +19,18 @@ import frc.robot.HardwareID;
 
 public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
-  public static final double FX_TO_TURRET_RATIO = 10.0;
+  public static final double FX_TO_TURRET_RATIO = (1 * 12 * (100 / 20));
 
   public static final PIDController FLYWHEEL_PID_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
 
-  public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(5.0);
+  public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
   // Describes the turret's bottom opening relative to robot position
   public static final Transform3d ROBOT_TO_TURRET_CENTER =
       new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);
 
   // Turret rotation PID controller
-  public static final PIDController TURRET_ANGLE_PID_CONTROLLER = new PIDController(4.0, 0.0, 2.0);
+  public static final PIDController TURRET_ANGLE_PID_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
 
   public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
       new TalonFXConfiguration()
@@ -62,6 +62,11 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static FeedbackConfigs TURRET_FEEDBACK_CONFIGS =
       new FeedbackConfigs().withSensorToMechanismRatio(FX_TO_TURRET_RATIO);
+
+  public static TalonFXConfiguration TURRET_MOTOR_CONFIG =
+      new TalonFXConfiguration()
+          .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
+          .withFeedback(TURRET_FEEDBACK_CONFIGS);
 
   public static final Angle TURRET_ROTATION_LIMIT_FORWARD = Degrees.of(180);
   public static final Angle TURRET_ROTATION_LIMIT_REVERSE = Degrees.of(-180);

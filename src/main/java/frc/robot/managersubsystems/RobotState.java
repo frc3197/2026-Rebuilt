@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.enums.Modes.ShooterMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
-import frc.robot.util.RobotMode.ShooterMode;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -31,7 +31,6 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
-  private String robotMode = "Hello";
   private ShooterMode shooterMode = ShooterMode.IDLE;
 
   public static RobotState instance;
@@ -114,14 +113,6 @@ public class RobotState extends VirtualSubsystem {
 
   // Robot mode getters & setters -----------------------------------------------
 
-  public String getRobotMode() {
-    return robotMode;
-  }
-
-  public void setRobotMode(String mode) {
-    this.robotMode = mode;
-  }
-
   public ShooterMode getShooterMode() {
     return shooterMode;
   }
@@ -161,7 +152,6 @@ public class RobotState extends VirtualSubsystem {
   public void visualize() {
     // Log robot modes
     Logger.recordOutput("RobotState/Shooter Mode", shooterMode);
-    Logger.recordOutput("RobotState/Robot Mode", robotMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);

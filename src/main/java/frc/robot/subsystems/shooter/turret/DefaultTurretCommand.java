@@ -34,7 +34,9 @@ public class DefaultTurretCommand extends Command {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    this.turret.zeroTurretPosition();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

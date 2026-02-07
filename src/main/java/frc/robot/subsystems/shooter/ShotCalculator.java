@@ -111,6 +111,7 @@ public class ShotCalculator extends VirtualSubsystem {
     }
 
     targetTurretAngle.mut_replace(potAngle);
+    // targetTurretAngle.mut_replace(Degrees.of(45));
   }
 
   // Getters ---------------------------------------------------------------
