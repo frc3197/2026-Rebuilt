@@ -18,11 +18,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.autos.AutoLookup;
+import frc.robot.auto.AutoLookup;
 import frc.robot.commands.DriveCommands;
-import frc.robot.enums.Modes.ShooterMode;
+import frc.robot.constants.LoggingConstants;
+import frc.robot.constants.TunerConstants;
+import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
-import frc.robot.generated.TunerConstants;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -222,8 +223,8 @@ public class RobotContainer {
         new DefaultTurretCommand(turret)
             .onlyWhile(
                 () ->
-                    RobotState.instance().getShooterMode() == ShooterMode.TRACKING_HUB
-                        || RobotState.instance().getShooterMode() == ShooterMode.PASSING));
+                    RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
+                        || RobotState.instance().getTurretMode() == TurretMode.PASSING));
 
     // Switch to X pattern when X button is pressed
     // driveController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -252,8 +253,8 @@ public class RobotContainer {
         .onTrue(intake.setIntakeSpinSpeed(0.5))
         .onFalse(intake.setIntakeSpinSpeed(0.0));
 
-    driveController.povUp().onTrue(setShooterMode(ShooterMode.TRACKING_HUB));
-    driveController.povDown().onTrue(setShooterMode(ShooterMode.IDLE));
+    driveController.povUp().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
+    driveController.povDown().onTrue(setTurretMode(TurretMode.IDLE));
 
     driveController
         .start()
@@ -269,15 +270,15 @@ public class RobotContainer {
   private void configureTriggerCallbacks() {
     enteredAllianceZoneTrigger
         .onTrue(
-            setShooterMode(
-                RobotState.instance().getShooterMode() == ShooterMode.IDLE
-                    ? ShooterMode.TRACKING_HUB
-                    : RobotState.instance().getShooterMode()))
+            setTurretMode(
+                RobotState.instance().getTurretMode() == TurretMode.IDLE
+                    ? TurretMode.TRACKING_HUB
+                    : RobotState.instance().getTurretMode()))
         .onFalse(
-            setShooterMode(
-                RobotState.instance().getShooterMode() == ShooterMode.TRACKING_HUB
-                    ? ShooterMode.IDLE
-                    : RobotState.instance().getShooterMode()));
+            setTurretMode(
+                RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
+                    ? TurretMode.IDLE
+                    : RobotState.instance().getTurretMode()));
   }
 
   /**
@@ -289,8 +290,8 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public static Command setShooterMode(ShooterMode mode) {
-    return Commands.runOnce(() -> RobotState.instance().setShooterMode(mode));
+  public static Command setTurretMode(TurretMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setTurretMode(mode));
   }
 
   public static boolean isRed() {

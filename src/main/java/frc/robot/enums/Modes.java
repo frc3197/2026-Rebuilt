@@ -1,7 +1,8 @@
 package frc.robot.enums;
 
 public class Modes {
-  public static enum ShooterMode {
+
+  public static enum TurretMode {
     TRACKING_HUB,
     PASSING,
     IDLE,
@@ -12,6 +13,15 @@ public class Modes {
     INTAKING,
     OUTTAKING,
     IDLE_RETRACTED,
-    IDLE_DEPLOYED
+    IDLE_DEPLOYED,
+    MANUAL
+  }
+
+  public static enum FlywheelMode {
+    IDLE,
+    PREPARE,
+    SHOOTING,
+    FRENZY,
+    MANUAL
   }
 }

@@ -74,6 +74,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void zeroTurretEncoder() {
+    System.out.println("ZEROEDDDD");
     turretRotationMotor.setAngle(0.0);
   }
 }

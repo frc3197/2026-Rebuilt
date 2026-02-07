@@ -1,13 +1,16 @@
-package frc.robot.autos;
+package frc.robot.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotContainer;
 import frc.robot.enums.RealAutos;
 import frc.robot.subsystems.drive.Drive;
 import java.io.IOException;
@@ -28,8 +31,8 @@ public class AutoLookup {
 
   private Command getRightBumpAuto() {
     return new SequentialCommandGroup(
-        setRobotPose(getStartingPose("Start-Neutral-Shoot")),
-        new WaitCommand(1),
+        setRobotPoseWithFlipping(new Pose2d(4.168, 2.398, Rotation2d.kZero)),
+        new WaitCommand(0.2),
         loadPath("Start-Neutral-Shoot"));
   }
 
@@ -40,8 +43,10 @@ public class AutoLookup {
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED");
   }
 
-  private Command setRobotPose(Pose2d pose) {
-    return Commands.runOnce(() -> drive.setPose(pose), drive);
+  private Command setRobotPoseWithFlipping(Pose2d pose) {
+    return Commands.runOnce(
+        () -> drive.setPose(RobotContainer.isRed() ? FlippingUtil.flipFieldPose(pose) : pose),
+        drive);
   }
 
   private Pose2d getStartingPose(String name) {

@@ -11,7 +11,7 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.RealSubsystem;
+import frc.robot.util.RealSubsystem;
 
 /** Add your docs here. */
 public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {

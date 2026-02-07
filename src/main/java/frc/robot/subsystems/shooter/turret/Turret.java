@@ -24,6 +24,8 @@ public class Turret extends SubsystemBase {
 
   public Turret(TurretIO turretIO) {
     this.turretIO = turretIO;
+
+    turretIO.zeroTurretEncoder();
   }
 
   @Override

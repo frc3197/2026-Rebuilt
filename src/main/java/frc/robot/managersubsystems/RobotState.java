@@ -24,7 +24,9 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.enums.Modes.ShooterMode;
+import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.IntakeMode;
+import frc.robot.enums.Modes.TurretMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.VirtualSubsystem;
@@ -34,9 +36,11 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
-  private ShooterMode shooterMode = ShooterMode.IDLE;
+  private IntakeMode intakeMode = IntakeMode.IDLE_RETRACTED;
+  private FlywheelMode flywheelMode = FlywheelMode.IDLE;
+  private TurretMode turretMode = TurretMode.IDLE;
 
-  public static RobotState instance;
+  private static RobotState instance;
 
   private final String key;
 
@@ -116,12 +120,28 @@ public class RobotState extends VirtualSubsystem {
 
   // Robot mode getters & setters -----------------------------------------------
 
-  public ShooterMode getShooterMode() {
-    return shooterMode;
+  public IntakeMode getIntakeMode() {
+    return intakeMode;
   }
 
-  public void setShooterMode(ShooterMode shooterMode) {
-    this.shooterMode = shooterMode;
+  public void setIntakeMode(IntakeMode intakeMode) {
+    this.intakeMode = intakeMode;
+  }
+
+  public FlywheelMode getFlywheelMode() {
+    return flywheelMode;
+  }
+
+  public void setFlywheelMode(FlywheelMode flywheelMode) {
+    this.flywheelMode = flywheelMode;
+  }
+
+  public TurretMode getTurretMode() {
+    return turretMode;
+  }
+
+  public void setTurretMode(TurretMode turretMode) {
+    this.turretMode = turretMode;
   }
 
   // Subsystems are below
@@ -162,7 +182,7 @@ public class RobotState extends VirtualSubsystem {
   // Visualize the robot state, log modes, etc
   public void visualize() {
     // Log robot modes
-    Logger.recordOutput("RobotState/Shooter Mode", shooterMode);
+    Logger.recordOutput("RobotState/Shooter Mode", turretMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);
@@ -188,6 +208,7 @@ public class RobotState extends VirtualSubsystem {
                 ShooterConstants.ROBOT_TO_TURRET_CENTER.plus(
                     new Transform3d(
                         0, 0, 0, new Rotation3d(0, 0, turretRotationAngle.in(Radians))))));
+
     Logger.recordOutput(
         "RobotState/Turret/Turret Motor Rotations", turretRotationAngle.in(Degrees));
   }
