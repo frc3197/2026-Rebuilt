@@ -7,6 +7,7 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 
 public class Intake extends SubsystemBase {
 
@@ -36,6 +37,15 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    switch (RobotState.instance().getIntakeMode()) {
+      case IDLE_RETRACTED:
+      
+      default:
+        System.out.println("Invalid intake mode: " + RobotState.instance().getIntakeMode());
+        break;
+    }
+
     intakeIO.updateInputs(loggedInputs);
   }
 }

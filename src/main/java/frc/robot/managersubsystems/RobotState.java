@@ -48,6 +48,10 @@ public class RobotState extends VirtualSubsystem {
   private MutDistance climberHeight = Inches.of(0).mutableCopy();
   private final MechanismLigament2d climberLigament2d;
 
+  // Intake
+  private boolean intakeFullyReatracted = false;
+  private boolean intakeFullyExtended = false;
+
   // Turret
   private MutAngle turretRotationAngle = Degrees.of(0.0).mutableCopy();
 
