@@ -1,8 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 
 public class IntakeIOTalonFX implements IntakeIO {
 

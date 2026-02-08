@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +23,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.AutoLookup;
 import frc.robot.commands.DriveCommands;
 import frc.robot.constants.LoggingConstants;
+import frc.robot.constants.LoggingConstants.Mode;
 import frc.robot.constants.TunerConstants;
+import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.IntakeMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
 import frc.robot.managersubsystems.RobotState;
@@ -52,7 +57,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -80,8 +84,19 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Triggers
+  // -------------------------------------------------------------------------
+  // Trigger for when robot enters the alliance zone, used to automatically begin
+  // tracking hub
   private final Trigger enteredAllianceZoneTrigger =
       new Trigger(() -> RobotState.instance().inAllianceZone());
+
+  // Triggers only during autonomous period, deploys intake and begins spinning
+  // when robot enters neutral zone
+  private final Trigger enteredNeutralZoneAuto =
+      new Trigger(
+          () ->
+              (RobotState.instance().inNeutralZone()
+                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())));
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -137,13 +152,17 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOSim());
 
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+        /*
+         * vision =
+         * new Vision(
+         * drive::addVisionMeasurement,
+         * new VisionIOPhotonVisionSim(
+         * VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+         * new VisionIOPhotonVisionSim(
+         * VisionConstants.camera1Name, VisionConstants.robotToCamera1,
+         * drive::getPose));
+         */
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         break;
 
@@ -173,10 +192,13 @@ public class RobotContainer {
         break;
     }
 
-    this.autoLookup = new AutoLookup(drive);
+    this.autoLookup = new AutoLookup(drive, turret);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Real auto routines
+    autoChooser.addOption("Right Bump Auto", autoLookup.getAuto(RealAutos.Right_Bump));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -194,8 +216,6 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Right Bump Auto", autoLookup.getAuto(RealAutos.Right_Bump));
-
     // Configure the button bindings
     configureButtonBindings();
 
@@ -212,12 +232,14 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
 
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -driveController.getLeftY(),
-            () -> -driveController.getLeftX(),
-            () -> -driveController.getRightX()));
+    /*
+     * drive.setDefaultCommand(
+     * DriveCommands.joystickDrive(
+     * drive,
+     * () -> -driveController.getLeftY(),
+     * () -> -driveController.getLeftX(),
+     * () -> -driveController.getRightX()));
+     */
 
     turret.setDefaultCommand(
         new DefaultTurretCommand(turret)
@@ -241,13 +263,6 @@ public class RobotContainer {
      * .onFalse(climber.setClimbPostion(Meters.of(0.0)));
      */
 
-    /*
-     * driveController
-     * .rightBumper()
-     * .onTrue(index.setIndexMotor(Volts.of(-4.0)))
-     * .onFalse(index.setIndexMotor(Volts.of(0.0)));
-     */
-
     driveController
         .x()
         .onTrue(intake.setIntakeSpinSpeed(0.5))
@@ -255,6 +270,24 @@ public class RobotContainer {
 
     driveController.povUp().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
     driveController.povDown().onTrue(setTurretMode(TurretMode.IDLE));
+
+    driveController
+        .a()
+        .onTrue(
+            index
+                .setSpindexMotor(Volts.of(-1.65))
+                .andThen(index.setFeedMotor(Volts.of(12.0)))
+                .andThen(flywheel.setFlywheelVoltage(Volts.of(5.0))))
+        .onFalse(
+            index
+                .setSpindexMotor(Volts.of(0.0))
+                .andThen(index.setFeedMotor(Volts.of(0.0)))
+                .andThen(flywheel.setFlywheelVoltage(Volts.of(0.0))));
+
+    driveController
+        .b()
+        .onTrue(flywheel.setFlywheelVoltage(Volts.of(5.0)))
+        .onFalse(flywheel.setFlywheelVoltage(Volts.of(0.0)));
 
     driveController
         .start()
@@ -279,6 +312,12 @@ public class RobotContainer {
                 RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
                     ? TurretMode.IDLE
                     : RobotState.instance().getTurretMode()));
+
+    enteredNeutralZoneAuto
+        .onTrue(setIntakeMode(IntakeMode.INTAKING).andThen(setFlywheelMode(FlywheelMode.IDLE)))
+        .onFalse(
+            setIntakeMode(IntakeMode.IDLE_RETRACTED)
+                .andThen(setFlywheelMode(FlywheelMode.PREPARE)));
   }
 
   /**
@@ -288,6 +327,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public static Command setIntakeMode(IntakeMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setIntakeMode(mode));
+  }
+
+  public static Command setFlywheelMode(FlywheelMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setFlywheelMode(mode));
   }
 
   public static Command setTurretMode(TurretMode mode) {

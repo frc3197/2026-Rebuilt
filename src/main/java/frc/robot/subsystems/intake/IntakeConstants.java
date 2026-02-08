@@ -2,8 +2,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 
 public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final class intakeNumericalConstants {

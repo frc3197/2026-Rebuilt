@@ -172,17 +172,26 @@ public class RobotState extends VirtualSubsystem {
         : robotFieldPose.getX() < FieldConstants.Blue.MAX_HUB_TRACKING_X;
   }
 
+  public boolean inNeutralZone() {
+    return robotFieldPose.getX() < FieldConstants.Red.MIN_HUB_TRACKING_X
+        && robotFieldPose.getX() > FieldConstants.Blue.MAX_HUB_TRACKING_X;
+  }
+
   // Periodic & logging loops
 
   @Override
   public void periodic() {
     visualize();
+    Logger.recordOutput("IN NEUTRAL ZONE", inNeutralZone());
+    Logger.recordOutput("IN ALLIANCE ZONE", inAllianceZone());
   }
 
   // Visualize the robot state, log modes, etc
   public void visualize() {
     // Log robot modes
-    Logger.recordOutput("RobotState/Shooter Mode", turretMode);
+    Logger.recordOutput("RobotState/Modes/Flywheel Mode", flywheelMode);
+    Logger.recordOutput("RobotState/Modes/Intake Mode", intakeMode);
+    Logger.recordOutput("RobotState/Modes/Turret Mode", turretMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);

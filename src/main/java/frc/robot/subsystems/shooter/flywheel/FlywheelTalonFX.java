@@ -7,7 +7,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.RealSubsystem;
 

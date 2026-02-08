@@ -1,4 +1,4 @@
-package frc.robot.constants;
+package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -8,7 +8,6 @@ public class HardwareID {
   public static final CANBus MAIN_CANBUS = CANBus.roboRIO();
 
   public interface ShooterHardwareID {
-
     // Motors
     public static final int FLYWHEEL_MOTOR_ID = 12;
     public static final int TURRET_ROTATION_ID = 11;
@@ -17,7 +16,7 @@ public class HardwareID {
   public interface IndexHardwareID {
     // Motors
     public static final int FEED_MOTOR_ID = 10;
-    public static final int INDEX_MOTOR_ID = 9;
+    public static final int SPINDEX_MOTOR_ID = 16;
   }
 
   public interface IntakeHardwareID {

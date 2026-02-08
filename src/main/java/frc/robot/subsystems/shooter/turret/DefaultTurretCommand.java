@@ -20,11 +20,14 @@ public class DefaultTurretCommand extends Command {
 
   // Logged tunable gains
   private LoggedTunableNumber turretAngle_kP =
-      new LoggedTunableNumber("turretAngle_kP", turretAnglePIDController.getP());
+      new LoggedTunableNumber(
+          "turretAngle_kP", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getP());
   private LoggedTunableNumber turretAngle_kI =
-      new LoggedTunableNumber("turretAngle_kI", turretAnglePIDController.getI());
+      new LoggedTunableNumber(
+          "turretAngle_kI", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getI());
   private LoggedTunableNumber turretAngle_kD =
-      new LoggedTunableNumber("turretAngle_kD", turretAnglePIDController.getD());
+      new LoggedTunableNumber(
+          "turretAngle_kD", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getD());
 
   private Turret turret;
 

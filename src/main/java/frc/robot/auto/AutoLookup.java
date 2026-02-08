@@ -11,8 +11,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.IntakeMode;
+import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.turret.Turret;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
@@ -24,16 +28,27 @@ import org.json.simple.parser.ParseException;
 public class AutoLookup {
 
   private final Drive drive;
+  private final Turret turret;
 
-  public AutoLookup(Drive drive) {
+  public AutoLookup(Drive drive, Turret turret) {
     this.drive = drive;
+    this.turret = turret;
   }
 
   private Command getRightBumpAuto() {
     return new SequentialCommandGroup(
+        getCommonCommands(),
         setRobotPoseWithFlipping(new Pose2d(4.168, 2.398, Rotation2d.kZero)),
-        new WaitCommand(0.2),
-        loadPath("Start-Neutral-Shoot"));
+        new WaitCommand(0.5),
+        loadPath("Start-Neutral-Shoot"),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        new WaitCommand(5.0),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        loadPath("Neutral-Shoot-2"),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        new WaitCommand(5.0),
+        loadPath("Shoot-Tower"),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
   }
 
   public Command getAuto(RealAutos auto) {
@@ -49,17 +64,12 @@ public class AutoLookup {
         drive);
   }
 
-  private Pose2d getStartingPose(String name) {
-    try {
-      return PathPlannerPath.fromPathFile(name).getStartingDifferentialPose();
-    } catch (FileVersionException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-    return Pose2d.kZero;
+  private SequentialCommandGroup getCommonCommands() {
+    return new SequentialCommandGroup(
+        turret.zeroTurretPositionCommand(),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        RobotContainer.setIntakeMode(IntakeMode.IDLE_RETRACTED),
+        RobotContainer.setTurretMode(TurretMode.IDLE));
   }
 
   private Command loadPath(String name) {

@@ -27,7 +27,7 @@ public class Index extends SubsystemBase {
     return Commands.runOnce(() -> indexIO.setFeedMotorVoltage(volts), this);
   }
 
-  public Command setIndexMotor(Voltage volts) {
-    return Commands.runOnce(() -> indexIO.setIndexMotorVoltage(volts), this);
+  public Command setSpindexMotor(Voltage volts) {
+    return Commands.runOnce(() -> indexIO.setSpindexMotorVoltage(volts), this);
   }
 }

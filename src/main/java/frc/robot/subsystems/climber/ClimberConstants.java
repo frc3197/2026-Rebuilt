@@ -10,7 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 
 /** Add your docs here. */
 public class ClimberConstants implements HardwareID.ClimberHardwareID {

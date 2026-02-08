@@ -33,7 +33,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.TunerConstants;
-
 import java.util.Queue;
 
 /**

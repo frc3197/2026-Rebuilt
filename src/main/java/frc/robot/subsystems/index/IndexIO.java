@@ -18,5 +18,5 @@ public interface IndexIO {
 
   public default void setFeedMotorVoltage(Voltage volts) {}
 
-  public default void setIndexMotorVoltage(Voltage volts) {}
+  public default void setSpindexMotorVoltage(Voltage volts) {}
 }

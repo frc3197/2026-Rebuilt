@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 
 public class ShooterConstants implements HardwareID.ShooterHardwareID {
 

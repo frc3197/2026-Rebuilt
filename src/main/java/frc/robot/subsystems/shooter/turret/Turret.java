@@ -68,4 +68,8 @@ public class Turret extends SubsystemBase {
   public void zeroTurretPosition() {
     turretIO.zeroTurretEncoder();
   }
+
+  public Command zeroTurretPositionCommand() {
+    return Commands.runOnce(() -> turretIO.zeroTurretEncoder());
+  }
 }

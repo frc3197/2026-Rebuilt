@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.constants.HardwareID;
+import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.RealSubsystem;
