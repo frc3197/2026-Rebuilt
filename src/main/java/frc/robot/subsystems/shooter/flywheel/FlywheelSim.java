@@ -41,8 +41,6 @@ public class FlywheelSim implements FlywheelIO {
         flywheelMotorSim.getAngularVelocity().in(RadiansPerSecond) * (0.85));
     flywheelMotorSim.update(0.02);
 
-    // inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
-    // inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
     inputs.flywheelVelocity = getFlywheelVelocity();
     inputs.flywheelCurrentDraw.mut_replace(Amps.of(flywheelMotorSim.getCurrentDrawAmps()));
     inputs.flywheelSuppliedVoltage.mut_replace(Volts.of(flywheelMotorSim.getInputVoltage()));

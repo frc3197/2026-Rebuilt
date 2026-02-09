@@ -278,8 +278,8 @@ public class RobotContainer {
 
     driveController
         .a()
-        .onTrue(index.setSpindexMotor(Volts.of(-1.65)).andThen(index.setFeedMotor(Volts.of(12.0))))
-        .onFalse(index.setSpindexMotor(Volts.of(0.0)).andThen(index.setFeedMotor(Volts.of(0.0))));
+        .onTrue(index.setSpindexMotorCommand(Volts.of(-1.65)).andThen(index.setFeedMotorCommand(Volts.of(12.0))))
+        .onFalse(index.setSpindexMotorCommand(Volts.of(0.0)).andThen(index.setFeedMotorCommand(Volts.of(0.0))));
 
     driveController
         .start()

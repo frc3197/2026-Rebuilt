@@ -26,11 +26,19 @@ public class Index extends SubsystemBase {
     Logger.processInputs("Index", inputs);
   }
 
-  public Command setFeedMotor(Voltage volts) {
+  public Command setFeedMotorCommand(Voltage volts) {
     return Commands.runOnce(() -> indexIO.setFeedMotorVoltage(volts), this);
   }
 
-  public Command setSpindexMotor(Voltage volts) {
+  public Command setSpindexMotorCommand(Voltage volts) {
     return Commands.runOnce(() -> indexIO.setSpindexMotorVoltage(volts), this);
+  }
+
+  public void setFeedMotor(Voltage volts) {
+    indexIO.setFeedMotorVoltage(volts);
+  }
+
+  public void setSpindexMotor(Voltage volts) {
+    indexIO.setSpindexMotorVoltage(volts);
   }
 }
