@@ -25,6 +25,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
+  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(6.0);
+
   // Describes the turret's bottom opening relative to robot position
   public static final Transform3d ROBOT_TO_TURRET_CENTER =
       new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);

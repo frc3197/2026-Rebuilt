@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.AutoLookup;
+import frc.robot.commands.DefaultFlywheelCommand;
+import frc.robot.commands.DefaultTurretCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.constants.LoggingConstants.Mode;
@@ -48,7 +50,6 @@ import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSim;
 import frc.robot.subsystems.shooter.flywheel.FlywheelTalonFX;
-import frc.robot.subsystems.shooter.turret.DefaultTurretCommand;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO;
 import frc.robot.subsystems.shooter.turret.TurretIOSim;
@@ -57,6 +58,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -232,14 +234,17 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
 
-    /*
-     * drive.setDefaultCommand(
-     * DriveCommands.joystickDrive(
-     * drive,
-     * () -> -driveController.getLeftY(),
-     * () -> -driveController.getLeftX(),
-     * () -> -driveController.getRightX()));
-     */
+    // TODO REMOVE MANUAL CONTROLS FOR LATER
+    setFlywheelMode(FlywheelMode.MANUAL);
+
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -driveController.getLeftY(),
+            () -> -driveController.getLeftX(),
+            () -> -driveController.getRightX()));
+
+    flywheel.setDefaultCommand(new DefaultFlywheelCommand(flywheel, getManualFlywheelButton()));
 
     turret.setDefaultCommand(
         new DefaultTurretCommand(turret)
@@ -273,21 +278,8 @@ public class RobotContainer {
 
     driveController
         .a()
-        .onTrue(
-            index
-                .setSpindexMotor(Volts.of(-1.65))
-                .andThen(index.setFeedMotor(Volts.of(12.0)))
-                .andThen(flywheel.setFlywheelVoltage(Volts.of(5.0))))
-        .onFalse(
-            index
-                .setSpindexMotor(Volts.of(0.0))
-                .andThen(index.setFeedMotor(Volts.of(0.0)))
-                .andThen(flywheel.setFlywheelVoltage(Volts.of(0.0))));
-
-    driveController
-        .b()
-        .onTrue(flywheel.setFlywheelVoltage(Volts.of(5.0)))
-        .onFalse(flywheel.setFlywheelVoltage(Volts.of(0.0)));
+        .onTrue(index.setSpindexMotor(Volts.of(-1.65)).andThen(index.setFeedMotor(Volts.of(12.0))))
+        .onFalse(index.setSpindexMotor(Volts.of(0.0)).andThen(index.setFeedMotor(Volts.of(0.0))));
 
     driveController
         .start()
@@ -318,6 +310,11 @@ public class RobotContainer {
         .onFalse(
             setIntakeMode(IntakeMode.IDLE_RETRACTED)
                 .andThen(setFlywheelMode(FlywheelMode.PREPARE)));
+  }
+
+  // HELPER FUNCTIONS
+  private BooleanSupplier getManualFlywheelButton() {
+    return () -> driveController.getRightTriggerAxis() > 0.25;
   }
 
   /**

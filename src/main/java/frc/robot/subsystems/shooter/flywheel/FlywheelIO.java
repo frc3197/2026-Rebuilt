@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelIO {
 
   @AutoLog
-  public class FlywheelInputs {
+  public static class FlywheelInputs {
     public AngularVelocity flywheelVelocity = RotationsPerSecond.of(0.0);
 
     public MutVoltage flywheelSuppliedVoltage = new MutVoltage(0.0, 0.0, Volts);

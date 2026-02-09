@@ -15,12 +15,13 @@ import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
 
   private TurretIO turretIO;
 
-  private TurretInputsAutoLogged loggedShooter = new TurretInputsAutoLogged();
+  private TurretInputsAutoLogged loggedTurret = new TurretInputsAutoLogged();
 
   public Turret(TurretIO turretIO) {
     this.turretIO = turretIO;
@@ -30,9 +31,11 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    turretIO.updateInputs(loggedShooter);
+    turretIO.updateInputs(loggedTurret);
 
-    RobotState.instance().setTurretRotationAngle(loggedShooter.turretMotorAngle);
+    Logger.processInputs("Shooter/Turret", loggedTurret);
+
+    RobotState.instance().setTurretRotationAngle(loggedTurret.turretMotorAngle);
   }
 
   public TurretParameters getTurretParameters() {

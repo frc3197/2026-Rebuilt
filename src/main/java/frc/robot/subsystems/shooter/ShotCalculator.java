@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import frc.robot.RobotContainer;
@@ -121,6 +122,10 @@ public class ShotCalculator extends VirtualSubsystem {
 
   public Angle getTargetTurretAngle() {
     return targetTurretAngle;
+  }
+
+  public AngularVelocity getTargetFlywheelVelocity() {
+    return RotationsPerSecond.of(20.0);
   }
 
   // Helper functions ------------------------------------------------------

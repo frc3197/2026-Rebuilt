@@ -37,7 +37,7 @@ public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
   private IntakeMode intakeMode = IntakeMode.IDLE_RETRACTED;
-  private FlywheelMode flywheelMode = FlywheelMode.IDLE;
+  private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
   private TurretMode turretMode = TurretMode.IDLE;
 
   private static RobotState instance;

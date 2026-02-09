@@ -5,9 +5,8 @@
 package frc.robot.subsystems.shooter.flywheel;
 
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
@@ -21,9 +20,17 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     flywheelIO.updateInputs(loggedInputs);
+
+    Logger.processInputs("Shooter/Flywheel", loggedInputs);
   }
 
-  public Command setFlywheelVoltage(Voltage volts) {
-    return Commands.runOnce(() -> flywheelIO.setFlywheelMotorVolts(volts), this);
+  /*
+   * public Command setFlywheelVoltage(Voltage volts) {
+   * return Commands.runOnce(() -> flywheelIO.setFlywheelMotorVolts(volts), this);
+   * }
+   */
+
+  public void setFlywheelVoltage(Voltage volts) {
+    flywheelIO.setFlywheelMotorVolts(volts);
   }
 }
