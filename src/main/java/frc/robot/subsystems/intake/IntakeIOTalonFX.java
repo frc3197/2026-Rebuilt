@@ -1,6 +1,11 @@
 package frc.robot.subsystems.intake;
 
+import java.util.function.Supplier;
+
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.HardwareID;
 
 public class IntakeIOTalonFX implements IntakeIO {
@@ -8,10 +13,14 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final TalonFX deployMotor;
   private final TalonFX spinMotor;
 
+  private final CANcoder deployEncoder;
+
   public IntakeIOTalonFX() {
     deployMotor = new TalonFX(IntakeConstants.DEPLOY_MOTOR_ID, HardwareID.MAIN_CANBUS);
 
     spinMotor = new TalonFX(IntakeConstants.SPIN_MOTOR_ID, HardwareID.MAIN_CANBUS);
+
+    deployEncoder = new CANcoder(IntakeConstants.DEPLOY_CANCODER_ID, HardwareID.MAIN_CANBUS);
   }
 
   @Override
@@ -24,9 +33,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void configureMotors() {
-    deployMotor
-        .getConfigurator()
-        .apply(IntakeConstants.motorConfigurationConstants.spinMotorConfig);
+    //deployMotor
+    //    .getConfigurator()
+    //    .apply(IntakeConstants.motorConfigurationConstants.spinMotorConfig);
   }
 
   @Override
@@ -37,6 +46,11 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public double getDeployMotorSpeed() {
     return deployMotor.get();
+  }
+
+  @Override
+  public Supplier<Angle> getDeployMotorAbsPos() {
+    return deployEncoder.getAbsolutePosition().asSupplier();
   }
 
   @Override

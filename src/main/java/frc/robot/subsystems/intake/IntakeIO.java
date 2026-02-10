@@ -1,6 +1,11 @@
 package frc.robot.subsystems.intake;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLog;
+
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.measure.Angle;
 
 public interface IntakeIO {
 
@@ -22,6 +27,10 @@ public interface IntakeIO {
 
   public default double getDeployMotorSpeed() {
     return 0.0;
+  }
+
+  public default Supplier<Angle> getDeployMotorAbsPos() {
+    return null;
   }
 
   public default void setSpinMotorSpeed(double speed) {}
