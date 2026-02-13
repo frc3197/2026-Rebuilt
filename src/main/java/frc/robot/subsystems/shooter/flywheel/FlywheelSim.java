@@ -38,7 +38,7 @@ public class FlywheelSim implements FlywheelIO {
   public void updateInputs(FlywheelInputs inputs) {
 
     flywheelMotorSim.setAngularVelocity(
-        flywheelMotorSim.getAngularVelocity().in(RadiansPerSecond) * (0.85));
+        flywheelMotorSim.getAngularVelocity().in(RadiansPerSecond) * (.85));
     flywheelMotorSim.update(0.02);
 
     inputs.flywheelVelocity = getFlywheelVelocity();

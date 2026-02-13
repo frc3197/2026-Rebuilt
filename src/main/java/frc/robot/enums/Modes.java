@@ -9,11 +9,18 @@ public class Modes {
     MANUAL
   }
 
-  public static enum IntakeMode {
-    INTAKING,
-    OUTTAKING,
+  public static enum IntakeDeployMode {
+    RETRACTING,
+    DEPLOYING,
     IDLE_RETRACTED,
     IDLE_DEPLOYED,
+    MANUAL
+  }
+
+  public static enum IntakeSpinMode {
+    INTAKING,
+    OUTTAKING,
+    IDLE,
     MANUAL
   }
 

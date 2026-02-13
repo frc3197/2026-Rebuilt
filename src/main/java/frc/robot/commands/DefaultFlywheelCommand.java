@@ -23,6 +23,12 @@ public class DefaultFlywheelCommand extends Command {
   private final Flywheel flywheel;
   private final BooleanSupplier isTriggerPressed;
 
+  /**
+   * Creates a new DefaultFlywheelCommand.
+   *
+   * @param flywheel The flywheel subsystem.
+   * @param isTriggerPressed Determines if manual backup button is pressed.
+   */
   public DefaultFlywheelCommand(Flywheel flywheel, BooleanSupplier isTriggerPressed) {
 
     this.isTriggerPressed = isTriggerPressed;
@@ -79,6 +85,7 @@ public class DefaultFlywheelCommand extends Command {
         if (isTriggerPressed.getAsBoolean())
           flywheel.setFlywheelVoltage(ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN);
         else flywheel.setFlywheelVoltage(Volts.of(0.0));
+        break;
 
         // Invalid mode or unassigned behavior
       default:

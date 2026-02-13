@@ -25,7 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.enums.Modes.FlywheelMode;
-import frc.robot.enums.Modes.IntakeMode;
+import frc.robot.enums.Modes.IntakeDeployMode;
+import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.FieldConstants;
@@ -36,9 +37,10 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
-  private IntakeMode intakeMode = IntakeMode.IDLE_RETRACTED;
+  private IntakeDeployMode intakeDeployMode = IntakeDeployMode.MANUAL;
+  private IntakeSpinMode intakeSpinMode = IntakeSpinMode.MANUAL;
   private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
-  private TurretMode turretMode = TurretMode.IDLE;
+  private TurretMode turretMode = TurretMode.TRACKING_HUB;
 
   private static RobotState instance;
 
@@ -123,13 +125,24 @@ public class RobotState extends VirtualSubsystem {
   }
 
   // Robot mode getters & setters -----------------------------------------------
+  // If robot is test mode, guard against automatic controls
 
-  public IntakeMode getIntakeMode() {
-    return intakeMode;
+  public IntakeDeployMode getIntakeDeployMode() {
+    return intakeDeployMode;
   }
 
-  public void setIntakeMode(IntakeMode intakeMode) {
-    this.intakeMode = intakeMode;
+  public void setIntakeDeployMode(IntakeDeployMode intakeMode) {
+    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.intakeDeployMode = IntakeDeployMode.MANUAL;
+    else this.intakeDeployMode = intakeMode;
+  }
+  
+  public IntakeSpinMode getIntakeSpinMode() {
+    return intakeSpinMode;
+  }
+
+  public void setIntakeSpinMode(IntakeSpinMode intakeMode) {
+    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.intakeSpinMode = IntakeSpinMode.MANUAL;
+    else this.intakeSpinMode = intakeMode;
   }
 
   public FlywheelMode getFlywheelMode() {
@@ -137,7 +150,8 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setFlywheelMode(FlywheelMode flywheelMode) {
-    this.flywheelMode = flywheelMode;
+    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.flywheelMode = FlywheelMode.MANUAL;
+    else this.flywheelMode = flywheelMode;
   }
 
   public TurretMode getTurretMode() {
@@ -145,7 +159,8 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setTurretMode(TurretMode turretMode) {
-    this.turretMode = turretMode;
+    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.turretMode = TurretMode.MANUAL;
+    else this.turretMode = turretMode;
   }
 
   // Subsystems are below
@@ -194,7 +209,8 @@ public class RobotState extends VirtualSubsystem {
   public void visualize() {
     // Log robot modes
     Logger.recordOutput("RobotState/Modes/Flywheel Mode", flywheelMode);
-    Logger.recordOutput("RobotState/Modes/Intake Mode", intakeMode);
+    Logger.recordOutput("RobotState/Modes/Intake Deploy Mode", intakeDeployMode);
+    Logger.recordOutput("RobotState/Modes/Intake Spin Mode", intakeSpinMode);
     Logger.recordOutput("RobotState/Modes/Turret Mode", turretMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);

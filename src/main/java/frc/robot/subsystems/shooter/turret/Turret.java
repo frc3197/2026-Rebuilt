@@ -6,6 +6,8 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
@@ -57,15 +58,12 @@ public class Turret extends SubsystemBase {
         this);
   }
 
-  public Command setTurretRotationVoltage(DoubleSupplier value) {
-    return Commands.run(
-        () -> {
-          turretIO.setTurretMotorVolts(
-              Volts.of(
-                  ShooterConstants.MAX_TURRET_ROTATION_MOTOR_VOLTS.magnitude()
-                      * value.getAsDouble()));
-        },
-        this);
+  public void setTurretRotationMotorGains(Slot0Configs configs) {
+    turretIO.updateTurretSlot0Configs(configs);
+  }
+
+  public void setTurretControlRequest(ControlRequest request) {
+    turretIO.setTurretControlRequest(request);
   }
 
   public void zeroTurretPosition() {

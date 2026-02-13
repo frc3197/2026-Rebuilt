@@ -4,35 +4,40 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.LoggingConstants;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
 import frc.robot.util.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DefaultTurretCommand extends Command {
 
-  private PIDController turretAnglePIDController = ShooterConstants.TURRET_ANGLE_PID_CONTROLLER;
-
   // Logged tunable gains
   private LoggedTunableNumber turretAngle_kP =
-      new LoggedTunableNumber(
-          "turretAngle_kP", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getP());
+      new LoggedTunableNumber("turretAngle_kP", ShooterConstants.TURRET_SLOT0_CONFIGS.kP);
   private LoggedTunableNumber turretAngle_kI =
-      new LoggedTunableNumber(
-          "turretAngle_kI", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getI());
+      new LoggedTunableNumber("turretAngle_kI", ShooterConstants.TURRET_SLOT0_CONFIGS.kI);
   private LoggedTunableNumber turretAngle_kD =
-      new LoggedTunableNumber(
-          "turretAngle_kD", ShooterConstants.TURRET_ANGLE_PID_CONTROLLER.getD());
+      new LoggedTunableNumber("turretAngle_kD", ShooterConstants.TURRET_SLOT0_CONFIGS.kD);
 
-  private Turret turret;
+  private final Turret turret;
+  private final DoubleSupplier turretMotorVoltageSupplier;
 
-  public DefaultTurretCommand(Turret turret) {
+  /**
+   * Creates a new DefaultFlywheelCommand.
+   *
+   * @param turret The turret subsystem.
+   * @param turretMotorVoltageSupplier Supplies turret motor voltage magnitude.
+   */
+  public DefaultTurretCommand(Turret turret, DoubleSupplier turretMotorVoltageSupplier) {
+    this.turretMotorVoltageSupplier = turretMotorVoltageSupplier;
     this.turret = turret;
     addRequirements(this.turret);
   }
@@ -45,24 +50,61 @@ public class DefaultTurretCommand extends Command {
   public void execute() {
 
     // Check for gain updates
-    if (turretAngle_kP.hasChanged(hashCode()))
-      turretAnglePIDController.setP(turretAngle_kP.getAsDouble());
-    if (turretAngle_kI.hasChanged(hashCode()))
-      turretAnglePIDController.setI(turretAngle_kI.getAsDouble());
-    if (turretAngle_kD.hasChanged(hashCode()))
-      turretAnglePIDController.setD(turretAngle_kD.getAsDouble());
-
-    TurretParameters params = turret.getTurretParameters();
-    double calculatedVoltage =
-        turretAnglePIDController.calculate(params.turretRotationError.in(Degrees));
-
-    if (params.turretRotation.gt(ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD)) {
-      calculatedVoltage = calculatedVoltage > 0 ? 0 : calculatedVoltage;
-    } else if (params.turretRotation.lt(ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE)) {
-      calculatedVoltage = calculatedVoltage < 0 ? 0 : calculatedVoltage;
+    if (LoggingConstants.tuningMode
+            && (turretAngle_kP.hasChanged(hashCode()) || turretAngle_kI.hasChanged(hashCode()))
+        || turretAngle_kD.hasChanged(hashCode())) {
+      Slot0Configs newConfigs = new Slot0Configs();
+      newConfigs.kP = turretAngle_kP.getAsDouble();
+      newConfigs.kI = turretAngle_kI.getAsDouble();
+      newConfigs.kD = turretAngle_kD.getAsDouble();
+      turret.setTurretRotationMotorGains(newConfigs);
     }
 
-    turret.setTurretRotationMotorVoltage(Volts.of(calculatedVoltage));
+    switch (RobotState.instance().getTurretMode()) {
+      case TRACKING_HUB:
+        turretAutoTracking();
+        break;
+
+      case PASSING:
+        turretAutoTracking();
+        break;
+
+      case IDLE:
+        ShooterConstants.TURRET_VOLTAGE_REQUEST.Output = 0.0;
+        turret.setTurretControlRequest(ShooterConstants.TURRET_VOLTAGE_REQUEST);
+        break;
+
+      case MANUAL:
+        double manualVolts = turretMotorVoltageSupplier.getAsDouble();
+        /*
+        TurretParameters params = turret.getTurretParameters();
+        if (params.turretRotation.gt(ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD)) {
+          manualVolts =
+              turretMotorVoltageSupplier.getAsDouble() > 0
+                  ? 0
+                  : turretMotorVoltageSupplier.getAsDouble();
+        } else if (params.turretRotation.lt(ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE)) {
+          manualVolts =
+              turretMotorVoltageSupplier.getAsDouble() < 0
+                  ? 0
+                  : turretMotorVoltageSupplier.getAsDouble();
+        }*/
+        turret.setTurretControlRequest(
+            ShooterConstants.TURRET_VOLTAGE_REQUEST.withOutput(Volts.of(manualVolts)));
+
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  // Helper methods
+  private void turretAutoTracking() {
+    TurretParameters params = turret.getTurretParameters();
+
+    turret.setTurretControlRequest(
+        ShooterConstants.TURRET_POSITION_REQUEST.withPosition(params.turretRotationTarget));
   }
 
   // Called once the command ends or is interrupted.

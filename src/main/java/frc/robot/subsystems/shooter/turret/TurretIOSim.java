@@ -32,7 +32,7 @@ public class TurretIOSim implements TurretIO {
     inputs.turretAngleSuppliedVoltage.mut_replace(Volts.of(turretRotationMotor.getInputVoltage()));
     inputs.turretAngleCurrentDraw.mut_replace(Amps.of(turretRotationMotor.getCurrentDrawAmps()));
 
-    inputs.turretMotorAngle = turretRotationMotor.getAngularPosition();
+    inputs.turretMotorAngle.mut_replace(turretRotationMotor.getAngularPosition());
   }
 
   @Override
@@ -42,18 +42,6 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public TurretParameters getTurretParameters() {
-    /*
-     * Angle error = currentTurretAngle.minus(targetTurretAngle);
-     * Angle clampedError = Degrees.of(error.in(Degrees) % 360);
-     * if (clampedError.in(Degrees) > 180) {
-     * params.turretRotationError = clampedError.minus(Degrees.of(360));
-     * } else if (clampedError.in(Degrees) < -180) {
-     * params.turretRotationError = clampedError.plus(Degrees.of(360));
-     *
-     * } else {
-     * params.turretRotationError = clampedError;
-     * }
-     */
     Angle currentTurretAngle = turretRotationMotor.getAngularPosition();
     Angle targetTurretAngle = ShotCalculator.instance().getTargetTurretAngle();
 
@@ -66,7 +54,7 @@ public class TurretIOSim implements TurretIO {
     }
 
     params.turretRotationError = turretRotationMotor.getAngularPosition().minus(targetTurretAngle);
-
+    params.turretRotationTarget = targetTurretAngle;
     params.turretRotation = turretRotationMotor.getAngularPosition();
 
     return params;

@@ -12,16 +12,12 @@ public interface ClimberIO {
 
   @AutoLog
   public static class ClimberInputs {
-    public double leftMotorCurrent = 0;
-    public double rightMotorCurrent = 0;
+    public double motorCurrent = 0;
   }
 
   public default void updateInputs(ClimberInputs inputs) {}
-  ;
 
   public default void setClimbMotorSpeed(double speed) {}
-  ;
 
   public default void setTarget(Distance target) {}
-  ;
 }

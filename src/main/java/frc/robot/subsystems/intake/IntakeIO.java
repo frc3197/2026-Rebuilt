@@ -1,20 +1,19 @@
 package frc.robot.subsystems.intake;
 
-import java.util.function.Supplier;
+import static edu.wpi.first.units.Units.Degrees;
 
-import org.littletonrobotics.junction.AutoLog;
-
-import edu.wpi.first.units.AngleUnit;
+import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
 
   @AutoLog
   public static class IntakeInputs {
     public double spinMotorSetSpeed = 0.0;
-
     public double deployMotorSuppliedCurrent = 0.0;
     public double spinMotorSuppliedCurrent = 0.0;
+    public double deployAngleDegrees = 0.0;
   }
 
   public default void updateInputs(IntakeInputs inputs) {}
@@ -29,11 +28,19 @@ public interface IntakeIO {
     return 0.0;
   }
 
-  public default Supplier<Angle> getDeployMotorAbsPos() {
-    return null;
+  public default Angle getDeployMotorAbsPos() {
+    return Degrees.of(0.0);
   }
+
+  public default void setDeployMotorRequest(ControlRequest request) {}
 
   public default void setSpinMotorSpeed(double speed) {}
 
   public default void setDeployMotorSpeed(double speed) {}
+
+  public default void setDeployTargetAngle(Angle angle) {}
+
+  public default Angle getDeployTargetAngle() {
+    return Degrees.of(0.0);
+  }
 }

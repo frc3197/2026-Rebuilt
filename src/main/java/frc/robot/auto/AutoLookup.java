@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.enums.Modes.FlywheelMode;
-import frc.robot.enums.Modes.IntakeMode;
+import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
 import frc.robot.subsystems.drive.Drive;
@@ -39,6 +39,7 @@ public class AutoLookup {
     return new SequentialCommandGroup(
         getCommonCommands(),
         setRobotPoseWithFlipping(new Pose2d(4.168, 2.398, Rotation2d.kZero)),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         new WaitCommand(0.5),
         loadPath("Start-Neutral-Shoot"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
@@ -55,7 +56,7 @@ public class AutoLookup {
     if (auto == RealAutos.Right_Bump) {
       return getRightBumpAuto();
     }
-    return Commands.print("NO/INVALID AUTO COMMAND SELECTED");
+    return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }
 
   private Command setRobotPoseWithFlipping(Pose2d pose) {
@@ -68,7 +69,7 @@ public class AutoLookup {
     return new SequentialCommandGroup(
         turret.zeroTurretPositionCommand(),
         RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
-        RobotContainer.setIntakeMode(IntakeMode.IDLE_RETRACTED),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED),
         RobotContainer.setTurretMode(TurretMode.IDLE));
   }
 

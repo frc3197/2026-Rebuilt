@@ -4,63 +4,37 @@
 
 package frc.robot.subsystems.climber;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.units.measure.Distance;
 import frc.robot.util.RealSubsystem;
 
 /** Add your docs here. */
 public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
 
-  private final TalonFX leftMotor;
-  private final TalonFX rightMotor;
-
-  private final PIDController controller = ClimberConstants.controller;
+  private final TalonFX climberMotor;
 
   private final PositionDutyCycle request = new PositionDutyCycle(0.0);
 
   public ClimberIOTalonFX() {
 
-    leftMotor = new TalonFX(ClimberConstants.leftClimberMotorID);
-    rightMotor = new TalonFX(ClimberConstants.leftClimberMotorID);
+    climberMotor = new TalonFX(ClimberConstants.climberMotor);
 
     configureHardware();
   }
 
   @Override
   protected void configureHardware() {
-
-    leftMotor.getConfigurator().apply(ClimberConstants.climberTalonConfig);
-    rightMotor.getConfigurator().apply(ClimberConstants.climberTalonConfig);
-  }
-
-  public void setLeftClimberMotorSpeed(double speed) {
-    leftMotor.set(speed);
-  }
-
-  public void setRightClimberMotorSpeed(double speed) {
-    rightMotor.set(speed);
+    climberMotor.getConfigurator().apply(ClimberConstants.climberTalonConfig);
   }
 
   @Override
   public void updateInputs(ClimberInputs inputs) {
-    inputs.leftMotorCurrent = leftMotor.getSupplyCurrent().getValueAsDouble();
-    inputs.rightMotorCurrent = rightMotor.getSupplyCurrent().getValueAsDouble();
+    inputs.motorCurrent = climberMotor.getSupplyCurrent().getValueAsDouble();
   }
 
   @Override
   public void setClimbMotorSpeed(double speed) {
-    leftMotor.setControl(new DutyCycleOut(speed));
-    rightMotor.setControl(new DutyCycleOut(speed));
-  }
-
-  @Override
-  public void setTarget(Distance height) {
-    leftMotor.setControl(request.withPosition(height.in(Meters)));
-    rightMotor.setControl(request.withPosition(height.in(Meters)));
+    System.out.println("SPEED");
+    climberMotor.set(speed);
   }
 }

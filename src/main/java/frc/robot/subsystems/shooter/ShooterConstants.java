@@ -7,7 +7,10 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,33 +22,54 @@ import frc.robot.HardwareID;
 
 public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
+  // TURRET ----------------------------------------------------------------------
   public static final double FX_TO_TURRET_RATIO = (1 * 12 * (100 / 20));
-
-  public static final PIDController FLYWHEEL_PID_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
-
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
-
-  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(6.0);
 
   // Describes the turret's bottom opening relative to robot position
   public static final Transform3d ROBOT_TO_TURRET_CENTER =
       new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);
 
   // Turret rotation PID controller
-  public static final PIDController TURRET_ANGLE_PID_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+  private static final double kSTurret = 0.05; // Add 0.05 V output to overcome static friction
+  private static final double kVTurret = 0.00;
+  private static final double kPTurret =
+      7.5; // A position error of 2.5 rotations results in 12 V output
+  private static final double kITurret = 0;
+  private static final double kDTurret = 0.0;
+  public static Slot0Configs TURRET_SLOT0_CONFIGS =
+      new Slot0Configs()
+          .withKS(kSTurret)
+          .withKV(kVTurret)
+          .withKP(kPTurret)
+          .withKI(kITurret)
+          .withKD(kDTurret);
+  public static final VoltageOut TURRET_VOLTAGE_REQUEST = new VoltageOut(0.0);
+  public static final PositionDutyCycle TURRET_POSITION_REQUEST = new PositionDutyCycle(0.0);
 
-  public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
+  public static final Angle TURRET_ROTATION_LIMIT_FORWARD = Degrees.of(180);
+  public static final Angle TURRET_ROTATION_LIMIT_REVERSE = Degrees.of(-180);
+
+  public static FeedbackConfigs TURRET_FEEDBACK_CONFIGS =
+      new FeedbackConfigs().withSensorToMechanismRatio(FX_TO_TURRET_RATIO);
+
+  public static TalonFXConfiguration TURRET_MOTOR_CONFIG =
       new TalonFXConfiguration()
+          .withMotorOutput(
+              new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))
+          .withFeedback(TURRET_FEEDBACK_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(100)
-                  .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(100.0)
-                  .withSupplyCurrentLimitEnable(true))
-          .withMotorOutput(
-              new MotorOutputConfigs()
-                  .withNeutralMode(NeutralModeValue.Brake)
-                  .withInverted(InvertedValue.CounterClockwise_Positive));
+                  .withStatorCurrentLimit(50.0)
+                  .withStatorCurrentLimitEnable(true))
+          .withSoftwareLimitSwitch(
+              new SoftwareLimitSwitchConfigs()
+                  .withForwardSoftLimitEnable(true)
+                  .withForwardSoftLimitThreshold(TURRET_ROTATION_LIMIT_FORWARD)
+                  .withReverseSoftLimitEnable(true)
+                  .withReverseSoftLimitThreshold(TURRET_ROTATION_LIMIT_REVERSE));
+
+  // FLYWHEEL --------------------------------------------------------------------
 
   private static final double kSFlywheel = 0.25; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
@@ -62,14 +86,21 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKI(kIFlywheel)
           .withKD(kDFlywheel);
 
-  public static FeedbackConfigs TURRET_FEEDBACK_CONFIGS =
-      new FeedbackConfigs().withSensorToMechanismRatio(FX_TO_TURRET_RATIO);
+  public static final PIDController FLYWHEEL_PID_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
 
-  public static TalonFXConfiguration TURRET_MOTOR_CONFIG =
+  // Manual preset flywheel speed
+  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(6.50);
+
+  public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
       new TalonFXConfiguration()
-          .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive))
-          .withFeedback(TURRET_FEEDBACK_CONFIGS);
-
-  public static final Angle TURRET_ROTATION_LIMIT_FORWARD = Degrees.of(180);
-  public static final Angle TURRET_ROTATION_LIMIT_REVERSE = Degrees.of(-180);
+          .withCurrentLimits(
+              new CurrentLimitsConfigs()
+                  .withStatorCurrentLimit(100)
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimit(100.0)
+                  .withSupplyCurrentLimitEnable(true))
+          .withMotorOutput(
+              new MotorOutputConfigs()
+                  .withNeutralMode(NeutralModeValue.Brake)
+                  .withInverted(InvertedValue.CounterClockwise_Positive));
 }

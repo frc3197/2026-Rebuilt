@@ -15,13 +15,17 @@ public class DefaultIndexCommand extends Command {
 
   private final Index index;
 
+  /**
+   * Creates a new DefaultFlywheelCommand.
+   *
+   * @param intake The intake subsystem.
+   */
   public DefaultIndexCommand(Index index) {
     this.index = index;
   }
 
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
@@ -36,6 +40,5 @@ public class DefaultIndexCommand extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 }
