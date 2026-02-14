@@ -5,16 +5,20 @@
 package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Millimeters;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.util.LinearServo;
 import frc.robot.util.RealSubsystem;
 
 /** Add your docs here. */
@@ -23,7 +27,12 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   // Motors
   private final TalonFX turretRotationMotor;
 
+  // Actuators
+  private final LinearServo leftHoodActuator = new LinearServo(0, 50, 32);
+
   private TurretParameters params = new TurretParameters();
+
+  private Distance hoodExtensionTarget = Millimeters.of(0.0);
 
   public TurretIOTalonFX() {
     // Initialize motors
@@ -35,17 +44,15 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
 
   protected void configureHardware() {
     turretRotationMotor.getConfigurator().apply(ShooterConstants.TURRET_MOTOR_CONFIG);
-    turretRotationMotor.getConfigurator().apply(ShooterConstants.TURRET_SLOT0_CONFIGS);
   }
 
   @Override
   public void updateInputs(TurretInputs inputs) {
-    inputs.turretAngleSuppliedVoltage.mut_replace(
-        turretRotationMotor.getSupplyVoltage().getValue());
-    inputs.turretAngleCurrentDraw.mut_replace(turretRotationMotor.getSupplyCurrent().getValue());
-    inputs.turretAngleSuppliedVoltage.mut_replace(
-        turretRotationMotor.getSupplyVoltage().getValue());
+
+    leftHoodActuator.updateCurPos();
+
     inputs.turretMotorAngle.mut_replace(getTurretAngularPosition());
+    inputs.hoodAngle.mut_replace(getTurretAngularPosition());
   }
 
   @Override
@@ -54,9 +61,14 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     turretRotationMotor.getConfigurator().apply(newConfig);
   }
 
+  public void setHoodActuatorMM(Distance distance) {
+    hoodExtensionTarget = distance;
+    leftHoodActuator.setPosition(distance.in(Millimeters));
+  }
+
   @Override
   public void setTurretMotorVolts(Voltage volts) {
-    turretRotationMotor.setVoltage(volts.magnitude());
+    // turretRotationMotor.setVoltage(volts.magnitude());
   }
 
   @Override
@@ -66,14 +78,13 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
 
   @Override
   public void setTurretControlRequest(ControlRequest request) {
-    turretRotationMotor.setControl(request);
+    // turretRotationMotor.setControl(request);
   }
 
   @Override
   public void setOutputTargetAngle(Angle rotations) {
-    ShooterConstants.TURRET_POSITION_REQUEST.Position = rotations.magnitude();
+    // ShooterConstants.TURRET_POSITION_REQUEST.Position = rotations.magnitude();
   }
-  ;
 
   @Override
   public TurretParameters getTurretParameters() {
@@ -88,9 +99,13 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
       targetTurretAngle = targetTurretAngle.plus(Degrees.of(360));
     }
 
-    params.turretRotationError = getTurretAngularPosition().minus(targetTurretAngle);
-    params.turretRotation = getTurretAngularPosition();
-    params.turretRotationTarget = targetTurretAngle;
+    params.turretRotationError.mut_replace(currentTurretAngle.minus(targetTurretAngle));
+    params.turretRotation.mut_replace(currentTurretAngle);
+    params.turretRotationTarget.mut_replace(targetTurretAngle);
+
+    params.hoodActuatorExtension.mut_replace(Millimeters.of(leftHoodActuator.getPosition()));
+    params.hoodActuatorExtensionTarget.mut_replace(hoodExtensionTarget);
+    params.hoodAngle.mut_replace(getTurretHoodAngleFromPosition(leftHoodActuator.getPosition()));
 
     return params;
   }
@@ -98,5 +113,13 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   // Helper functions
   private Angle getTurretAngularPosition() {
     return turretRotationMotor.getPosition().getValue();
+  }
+
+  private Angle getTurretHoodAngleFromPosition(double position) {
+    return Degrees.of(
+        MathUtil.interpolate(
+            ShooterConstants.MIN_HOOD_ANGLE.in(Degrees),
+            ShooterConstants.MAX_HOOD_ANGLE.in(Degrees),
+            position / 55));
   }
 }

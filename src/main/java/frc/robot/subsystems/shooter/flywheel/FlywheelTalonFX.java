@@ -2,11 +2,9 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.RealSubsystem;
@@ -15,9 +13,6 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
 
   private final TalonFX flywheelMotor;
   private AngularVelocity targetFlywheelAngularVelocity = RotationsPerSecond.of(0.0);
-
-  private final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
-  private final VoltageOut voltageOutRequest = new VoltageOut(0.0);
 
   private FlywheelParameters params = new FlywheelParameters();
 
@@ -34,27 +29,21 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   }
 
   @Override
-  public void setFlywheelMotorVolts(Voltage volts) {
-    flywheelMotor.setControl(voltageOutRequest.withOutput(volts));
-  }
-
-  @Override
-  public void setFlywheelTargetVelocity(AngularVelocity velocity) {
-    targetFlywheelAngularVelocity = velocity;
-    flywheelMotor.setControl(velocityVoltageRequest.withVelocity(velocity));
-  }
-
-  @Override
   public FlywheelParameters getFlywheelParameters() {
     params.rpsError = targetFlywheelAngularVelocity.minus(getFlywheelVelocity());
     return params;
   }
 
   @Override
+  public void setFlywheelOutput(ControlRequest request) {
+    flywheelMotor.setControl(request);
+  }
+
+  @Override
   public void updateInputs(FlywheelInputs inputs) {
     inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
     inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
-    inputs.flywheelVelocity = getFlywheelVelocity();
+    inputs.flywheelVelocity.mut_replace(getFlywheelVelocity());
   }
 
   // Helper functions

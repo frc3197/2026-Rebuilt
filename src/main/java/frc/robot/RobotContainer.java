@@ -66,324 +66,317 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // Subsystems
-    private final Climber climber;
-    private final Drive drive;
-    private final Flywheel flywheel;
-    private final Index index;
-    private final Intake intake;
-    private final Turret turret;
-    private final Vision vision;
+  // Subsystems
+  private final Climber climber;
+  private final Drive drive;
+  private final Flywheel flywheel;
+  private final Index index;
+  private final Intake intake;
+  private final Turret turret;
+  private final Vision vision;
 
-    // Autos
-    private final AutoLookup autoLookup;
+  // Autos
+  private final AutoLookup autoLookup;
 
-    // Controllers & mappings
-    private final CommandXboxController driveController = new CommandXboxController(0);
-    // TODO make it so both controllers arent the only ones haha :)
-    private final ControlScheme controlScheme = new ControlScheme(driveController, driveController);
+  // Controllers & mappings
+  private final CommandXboxController driveController = new CommandXboxController(0);
+  // TODO make it so both controllers arent the only ones haha :)
+  private final ControlScheme controlScheme = new ControlScheme(driveController, driveController);
 
-    // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
 
-    // Triggers
-    // -------------------------------------------------------------------------
-    // Trigger for when robot enters the alliance zone, used to automatically begin
-    // tracking hub
-    private final Trigger enteredAllianceZoneAuto = new Trigger(() -> RobotState.instance().inAllianceZone()
-            && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous()));
+  // Triggers
+  // -------------------------------------------------------------------------
+  // Trigger for when robot enters the alliance zone, used to automatically begin
+  // tracking hub
+  private final Trigger enteredAllianceZoneAuto =
+      new Trigger(
+          () ->
+              RobotState.instance().inAllianceZone()
+                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous()));
 
-    // Triggers only during autonomous period, deploys intake and begins spinning
-    // when robot enters neutral zone
-    private final Trigger enteredNeutralZoneAuto = new Trigger(
-            () -> (RobotState.instance().inNeutralZone()
-                    && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())));
+  // Triggers only during autonomous period, deploys intake and begins spinning
+  // when robot enters neutral zone
+  private final Trigger enteredNeutralZoneAuto =
+      new Trigger(
+          () ->
+              (RobotState.instance().inNeutralZone()
+                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())));
 
-    public RobotContainer() {
+  public RobotContainer() {
 
-        switch (LoggingConstants.currentMode) {
-            case REAL:
-                // Real robot, instantiate hardware IO implementations
+    switch (LoggingConstants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
 
-                climber = new Climber(new ClimberIOTalonFX());
+        climber = new Climber(new ClimberIOTalonFX());
 
-                drive = new Drive(
-                        new GyroIOPigeon2(),
-                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFX(TunerConstants.FrontRight),
-                        new ModuleIOTalonFX(TunerConstants.BackLeft),
-                        new ModuleIOTalonFX(TunerConstants.BackRight));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
 
-                flywheel = new Flywheel(new FlywheelTalonFX());
+        flywheel = new Flywheel(new FlywheelTalonFX());
 
-                index = new Index(new IndexIOTalonFX());
+        index = new Index(new IndexIOTalonFX());
 
-                intake = new Intake(new IntakeIOTalonFX());
+        intake = new Intake(new IntakeIOTalonFX());
 
-                turret = new Turret(new TurretIOTalonFX());
+        turret = new Turret(new TurretIOTalonFX());
 
-                vision = new Vision(
-                        drive::addVisionMeasurement,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
 
-                break;
+        break;
 
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
 
-                climber = new Climber(new ClimberIOSim());
+        climber = new Climber(new ClimberIOSim());
 
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(TunerConstants.FrontLeft),
-                        new ModuleIOSim(TunerConstants.FrontRight),
-                        new ModuleIOSim(TunerConstants.BackLeft),
-                        new ModuleIOSim(TunerConstants.BackRight));
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
 
-                index = new Index(new IndexIOSim());
+        index = new Index(new IndexIOSim());
 
-                intake = new Intake(new IntakeIOSim());
+        intake = new Intake(new IntakeIOSim());
 
-                flywheel = new Flywheel(new FlywheelSim());
+        flywheel = new Flywheel(new FlywheelSim());
 
-                turret = new Turret(new TurretIOSim());
-
-                /*
-                 * vision =
-                 * new Vision(
-                 * drive::addVisionMeasurement,
-                 * new VisionIOPhotonVisionSim(
-                 * VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                 * new VisionIOPhotonVisionSim(
-                 * VisionConstants.camera1Name, VisionConstants.robotToCamera1,
-                 * drive::getPose));
-                 */
-                vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {
-                });
-
-                break;
-
-            default:
-                // Replayed robot, disable IO implementations
-
-                climber = new Climber(new ClimberIO() {
-                });
-
-                drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        });
-
-                index = new Index(new IndexIO() {
-                });
-
-                intake = new Intake(new IntakeIO() {
-                });
-
-                flywheel = new Flywheel(new FlywheelIO() {
-                });
-
-                turret = new Turret(new TurretIO() {
-                });
-
-                vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
-                }, new VisionIO() {
-                });
-
-                break;
-        }
-
-        // Initialize auto lookup with appropriate subsystems
-        this.autoLookup = new AutoLookup(drive, turret);
-
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Real auto routines
-        autoChooser.addOption("Right Bump Auto", autoLookup.getAuto(RealAutos.Right_Bump));
-
-        // Set up SysId routines
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-        // Configure the button bindings
-        configureButtonBindings();
-
-        // Configure trigger callbacks
-        configureTriggerCallbacks();
-    }
-
-    private void configureButtonBindings() {
-
-        // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive,
-                        () -> -controlScheme.getDriveX(),
-                        () -> -controlScheme.getDriveY(),
-                        () -> -controlScheme.getDriveRotation()));
-
-        intake.setDefaultCommand(new DefaultIntakeCommand(intake, controlScheme.getIntakeSpinManual(),
-                controlScheme.getIntakeDeployManual()));
-
-        // Flywheel is controlled based on FlywheelMode with manual override buttons
-        flywheel.setDefaultCommand(
-                new DefaultFlywheelCommand(flywheel, controlScheme.getSpoolFlywheelManual()));
-
-        // Turret is controlled by TurretMode with manual overrides
-        if (LoggingConstants.currentMode != Mode.SIM)
-            turret.setDefaultCommand(
-                    new DefaultTurretCommand(turret, controlScheme.getTurretVoltageManual()));
-        else
-            turret.setDefaultCommand(
-                    new SimTurretCommand(turret, controlScheme.getTurretVoltageManual()));
-
-        // Switch to X pattern when X button is pressed
-        // .onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-        // Not gonna test now
-        // .onTrue(setTurretMode(TurretMode.TRACKING_HUB));
-        // .onTrue(setTurretMode(TurretMode.IDLE));
-
-        controlScheme
-                .getSpindexFeedFlywheelManual()
-                .onTrue(
-                        index
-                                .setSpindexMotorCommand(Volts.of(-2.95))
-                                .andThen(index.setFeedMotorCommand(Volts.of(10.0))))
-                .onFalse(
-                        index
-                                .setSpindexMotorCommand(Volts.of(0.0))
-                                .andThen(index.setFeedMotorCommand(Volts.of(0.0))));
-
-        controlScheme
-                .getZeroGyro()
-                .onTrue(
-                        Commands.runOnce(
-                                () -> drive.setPose(
-                                        new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                                drive)
-                                .ignoringDisable(true));
-
-        controlScheme
-                .getFeedManual()
-                .onTrue(index.setFeedMotorCommand(Volts.of(8.0)))
-                .onFalse(index.setFeedMotorCommand(Volts.of(0.0)));
-
-        controlScheme
-                .getClimberRotateCW()
-                .onTrue(climber.setClimbSpeed(0.5))
-                .onFalse(climber.setClimbSpeed(0.0));
-        controlScheme
-                .getClimberRotateCWW()
-                .onTrue(climber.setClimbSpeed(-0.5))
-                .onFalse(climber.setClimbSpeed(0.0));
+        turret = new Turret(new TurretIOSim());
 
         /*
-         * controlScheme
-         * .getIntakeExtendPreset()
-         * .onTrue(
-         * Commands.runOnce(
-         * () ->
-         * intake.setDeployControlRequest(
-         * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
-         * IntakeConstants.FULLY_EXTENDED_ANGLE)),
-         * intake));
-         * controlScheme
-         * .getIntakeRetractPreset()
-         * .onTrue(
-         * Commands.runOnce(
-         * () ->
-         * intake.setDeployControlRequest(
-         * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
-         * IntakeConstants.FULLY_RETRACTED_ANGLE)),
-         * intake));
+         * vision =
+         * new Vision(
+         * drive::addVisionMeasurement,
+         * new VisionIOPhotonVisionSim(
+         * VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+         * new VisionIOPhotonVisionSim(
+         * VisionConstants.camera1Name, VisionConstants.robotToCamera1,
+         * drive::getPose));
          */
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
+        break;
+
+      default:
+        // Replayed robot, disable IO implementations
+
+        climber = new Climber(new ClimberIO() {});
+
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+
+        index = new Index(new IndexIO() {});
+
+        intake = new Intake(new IntakeIO() {});
+
+        flywheel = new Flywheel(new FlywheelIO() {});
+
+        turret = new Turret(new TurretIO() {});
+
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
+        break;
     }
 
-    private void configureTriggerCallbacks() {
-        enteredAllianceZoneAuto
-                .onTrue(
-                        setTurretMode(
-                                RobotState.instance().getTurretMode() != TurretMode.MANUAL
-                                        ? TurretMode.TRACKING_HUB
-                                        : RobotState.instance().getTurretMode()))
-                .onFalse(
-                        setTurretMode(
-                                RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
-                                        ? TurretMode.IDLE
-                                        : RobotState.instance().getTurretMode()));
+    // Initialize auto lookup with appropriate subsystems
+    this.autoLookup = new AutoLookup(drive, turret);
 
-        enteredNeutralZoneAuto
-                .onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
-                        .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING))
-                        .andThen(setFlywheelMode(FlywheelMode.IDLE)))
-                .onFalse(
-                        setIntakeSpinMode(IntakeSpinMode.IDLE)
-                                .andThen(setFlywheelMode(FlywheelMode.PREPARE)));
-    }
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
+    // Real auto routines
+    autoChooser.addOption("Right Bump Auto", autoLookup.getAuto(RealAutos.Right_Bump));
+
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // Configure the button bindings
+    configureButtonBindings();
+
+    // Configure trigger callbacks
+    configureTriggerCallbacks();
+  }
+
+  private void configureButtonBindings() {
+
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controlScheme.getDriveX(),
+            () -> -controlScheme.getDriveY(),
+            () -> -controlScheme.getDriveRotation()));
+
+    intake.setDefaultCommand(
+        new DefaultIntakeCommand(
+            intake, controlScheme.getIntakeSpinManual(), controlScheme.getIntakeDeployManual()));
+
+    // Flywheel is controlled based on FlywheelMode with manual override buttons
+    flywheel.setDefaultCommand(
+        new DefaultFlywheelCommand(flywheel, controlScheme.getSpoolFlywheelManual()));
+
+    // Turret is controlled by TurretMode with manual overrides
+    if (LoggingConstants.currentMode != Mode.SIM)
+      turret.setDefaultCommand(
+          new DefaultTurretCommand(turret, controlScheme.getTurretVoltageManual()));
+    else
+      turret.setDefaultCommand(
+          new SimTurretCommand(turret, controlScheme.getTurretVoltageManual()));
+
+    // Switch to X pattern when X button is pressed
+    // .onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    // Not gonna test now
+    // .onTrue(setTurretMode(TurretMode.TRACKING_HUB));
+    // .onTrue(setTurretMode(TurretMode.IDLE));
+
+    controlScheme
+        .getSpindexFeedFlywheelManual()
+        .onTrue(
+            index
+                .setSpindexMotorCommand(Volts.of(-2.95))
+                .andThen(index.setFeedMotorCommand(Volts.of(10.0))))
+        .onFalse(
+            index
+                .setSpindexMotorCommand(Volts.of(0.0))
+                .andThen(index.setFeedMotorCommand(Volts.of(0.0))));
+
+    controlScheme
+        .getZeroGyro()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    drive)
+                .ignoringDisable(true));
+
+    controlScheme
+        .getFeedManual()
+        .onTrue(index.setFeedMotorCommand(Volts.of(8.0)))
+        .onFalse(index.setFeedMotorCommand(Volts.of(0.0)));
+
+    controlScheme
+        .getClimberRotateCW()
+        .onTrue(climber.setClimbSpeed(0.5))
+        .onFalse(climber.setClimbSpeed(0.0));
+    controlScheme
+        .getClimberRotateCWW()
+        .onTrue(climber.setClimbSpeed(-0.5))
+        .onFalse(climber.setClimbSpeed(0.0));
+
+    /*
+     * controlScheme
+     * .getIntakeExtendPreset()
+     * .onTrue(
+     * Commands.runOnce(
+     * () ->
+     * intake.setDeployControlRequest(
+     * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
+     * IntakeConstants.FULLY_EXTENDED_ANGLE)),
+     * intake));
+     * controlScheme
+     * .getIntakeRetractPreset()
+     * .onTrue(
+     * Commands.runOnce(
+     * () ->
+     * intake.setDeployControlRequest(
+     * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
+     * IntakeConstants.FULLY_RETRACTED_ANGLE)),
+     * intake));
      */
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
+  }
 
-    public static Command setIntakeDeployMode(IntakeDeployMode mode) {
-        return Commands.runOnce(() -> RobotState.instance().setIntakeDeployMode(mode));
-    }
+  private void configureTriggerCallbacks() {
+    enteredAllianceZoneAuto
+        .onTrue(
+            setTurretMode(
+                RobotState.instance().getTurretMode() != TurretMode.MANUAL
+                    ? TurretMode.TRACKING_HUB
+                    : RobotState.instance().getTurretMode()))
+        .onFalse(
+            setTurretMode(
+                RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
+                    ? TurretMode.IDLE
+                    : RobotState.instance().getTurretMode()));
 
-    public static Command setIntakeSpinMode(IntakeSpinMode mode) {
-        return Commands.runOnce(() -> RobotState.instance().setIntakeSpinMode(mode));
-    }
+    enteredNeutralZoneAuto
+        .onTrue(
+            setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
+                .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING))
+                .andThen(setFlywheelMode(FlywheelMode.IDLE)))
+        .onFalse(
+            setIntakeSpinMode(IntakeSpinMode.IDLE).andThen(setFlywheelMode(FlywheelMode.PREPARE)));
+  }
 
-    public static Command setFlywheelMode(FlywheelMode mode) {
-        return Commands.runOnce(() -> RobotState.instance().setFlywheelMode(mode));
-    }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
 
-    public static Command setTurretMode(TurretMode mode) {
-        return Commands.runOnce(() -> RobotState.instance().setTurretMode(mode));
-    }
+  public static Command setIntakeDeployMode(IntakeDeployMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setIntakeDeployMode(mode));
+  }
 
-    public static boolean isRed() {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-        }
-        return false;
+  public static Command setIntakeSpinMode(IntakeSpinMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setIntakeSpinMode(mode));
+  }
+
+  public static Command setFlywheelMode(FlywheelMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setFlywheelMode(mode));
+  }
+
+  public static Command setTurretMode(TurretMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setTurretMode(mode));
+  }
+
+  public static boolean isRed() {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      return alliance.get() == DriverStation.Alliance.Red;
     }
+    return false;
+  }
 }

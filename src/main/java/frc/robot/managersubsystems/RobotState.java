@@ -135,7 +135,7 @@ public class RobotState extends VirtualSubsystem {
     if (edu.wpi.first.wpilibj.RobotState.isTest()) this.intakeDeployMode = IntakeDeployMode.MANUAL;
     else this.intakeDeployMode = intakeMode;
   }
-  
+
   public IntakeSpinMode getIntakeSpinMode() {
     return intakeSpinMode;
   }

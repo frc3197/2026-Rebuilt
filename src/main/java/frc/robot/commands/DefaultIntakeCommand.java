@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,14 +13,9 @@ import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
-
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Degrees;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DefaultIntakeCommand extends Command {
   /** Creates a new DefaultIntakeCommand. */
   private final Intake intake;
@@ -34,7 +30,8 @@ public class DefaultIntakeCommand extends Command {
    * @param spinManual Determines if manual intake spin button is pressed.
    * @param deployManual Determines if manual intake deploy button is pressed.
    */
-  public DefaultIntakeCommand(Intake intake, BooleanSupplier spinManual, DoubleSupplier deployManual) {
+  public DefaultIntakeCommand(
+      Intake intake, BooleanSupplier spinManual, DoubleSupplier deployManual) {
     this.spinManual = spinManual;
     this.deployManual = deployManual;
 
@@ -44,8 +41,7 @@ public class DefaultIntakeCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -60,7 +56,6 @@ public class DefaultIntakeCommand extends Command {
 
   private void intakeSpinLogic() {
     switch (RobotState.instance().getIntakeSpinMode()) {
-
       case IDLE:
         intake.setIntakeSpinSpeed(0.0);
         break;
@@ -89,26 +84,33 @@ public class DefaultIntakeCommand extends Command {
 
     IntakeDeployMode mode = RobotState.instance().getIntakeDeployMode();
 
-    if (mode != IntakeDeployMode.MANUAL && MathUtil.isNear(IntakeConstants.FULLY_DEPLOYED_ANGLE.in(Degrees),
-        intake.getDeployAngle().in(Degrees), Degrees.of(5.0).in(Degrees))) {
+    if (mode != IntakeDeployMode.MANUAL
+        && MathUtil.isNear(
+            IntakeConstants.FULLY_DEPLOYED_ANGLE.in(Degrees),
+            intake.getDeployAngle().in(Degrees),
+            Degrees.of(5.0).in(Degrees))) {
       RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_DEPLOYED);
     }
 
-    if (mode != IntakeDeployMode.MANUAL && MathUtil.isNear(IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
-        intake.getDeployAngle().in(Degrees), Degrees.of(5.0).in(Degrees))) {
+    if (mode != IntakeDeployMode.MANUAL
+        && MathUtil.isNear(
+            IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
+            intake.getDeployAngle().in(Degrees),
+            Degrees.of(5.0).in(Degrees))) {
       RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED);
     }
 
     switch (RobotState.instance().getIntakeDeployMode()) {
-
       case DEPLOYING:
         intake.setDeployControlRequest(
-            IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(IntakeConstants.FULLY_DEPLOYED_ANGLE));
+            IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
+                IntakeConstants.FULLY_DEPLOYED_ANGLE));
         break;
 
       case RETRACTING:
         intake.setDeployControlRequest(
-            IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(IntakeConstants.FULLY_RETRACTED_ANGLE));
+            IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
+                IntakeConstants.FULLY_RETRACTED_ANGLE));
         break;
 
       case IDLE_DEPLOYED:
@@ -120,12 +122,12 @@ public class DefaultIntakeCommand extends Command {
         break;
 
       case MANUAL:
-        intake
-            .setDeployControlRequest(IntakeConstants.DEPLOY_DUTY_CYCLE_REQUEST.withOutput(deployManual.getAsDouble()));
+        intake.setDeployControlRequest(
+            IntakeConstants.DEPLOY_DUTY_CYCLE_REQUEST.withOutput(deployManual.getAsDouble()));
         break;
 
       default:
-      DriverStation.reportError(
+        DriverStation.reportError(
             "Invalid intake deploy mode: " + RobotState.instance().getIntakeDeployMode(), false);
         break;
     }
@@ -133,6 +135,5 @@ public class DefaultIntakeCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 }

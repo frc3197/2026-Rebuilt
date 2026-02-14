@@ -40,7 +40,6 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
                     .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
                     .withSensorToMechanismRatio(1.0)
                     .withRotorToSensorRatio(1)));
-    deployMotor.getConfigurator().apply(IntakeConstants.DEPLOY_MOTOR_GAINS);
 
     spinMotor.getConfigurator().apply(IntakeConstants.SPIN_MOTOR_CONFIG);
   }

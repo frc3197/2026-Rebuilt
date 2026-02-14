@@ -6,9 +6,6 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.enums.Modes.FlywheelMode;
@@ -50,31 +47,32 @@ public class DefaultFlywheelCommand extends Command {
 
         // Flywheel is idle, let it naturally spool down
       case IDLE:
-        flywheel.setFlywheelVoltage(Volts.of(0.0));
+        flywheel.setFlywheelControl(
+            ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(Volts.of(0.0)));
         break;
 
         // Flywheel is preparing to shoot (revving), so use simple bang-bang control to
         // reach target angular velocity
       case PREPARE:
-        Voltage prepareVolts =
-            getBangBangVoltage(ShotCalculator.instance().getTargetFlywheelVelocity());
-        flywheel.setFlywheelVoltage(prepareVolts);
+        flywheel.setFlywheelControl(
+            ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
+                ShotCalculator.instance().getTargetFlywheelVelocity()));
         break;
 
         // Flywheel is shooting in typical fashion with known recovery period intervals
         // TODO this is for testing right now, bang-bang should be replaced later
       case SHOOTING:
-        Voltage shootingVolts =
-            getBangBangVoltage(ShotCalculator.instance().getTargetFlywheelVelocity());
-        flywheel.setFlywheelVoltage(shootingVolts);
+        flywheel.setFlywheelControl(
+            ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
+                ShotCalculator.instance().getTargetFlywheelVelocity()));
         break;
 
         // Flywheel is frantically shooting, little to no care about recovery interval
         // TODO this is for testing right now, bang-bang should be replaced later
       case FRENZY:
-        Voltage frenzyVolts =
-            getBangBangVoltage(ShotCalculator.instance().getTargetFlywheelVelocity());
-        flywheel.setFlywheelVoltage(frenzyVolts);
+        flywheel.setFlywheelControl(
+            ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
+                ShotCalculator.instance().getTargetFlywheelVelocity()));
         break;
 
         // Flywheel is operated by secondary controller, basically a true-false boolean
@@ -83,8 +81,12 @@ public class DefaultFlywheelCommand extends Command {
         // TODO tune this
       case MANUAL:
         if (isTriggerPressed.getAsBoolean())
-          flywheel.setFlywheelVoltage(ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN);
-        else flywheel.setFlywheelVoltage(Volts.of(0.0));
+          flywheel.setFlywheelControl(
+              ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(
+                  ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN));
+        else
+          flywheel.setFlywheelControl(
+              ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(Volts.of(0.0)));
         break;
 
         // Invalid mode or unassigned behavior
@@ -92,10 +94,6 @@ public class DefaultFlywheelCommand extends Command {
         DriverStation.reportError("Invalid flywheel mode: " + currentMode, false);
         break;
     }
-  }
-
-  private Voltage getBangBangVoltage(AngularVelocity target) {
-    return Volts.of(MathUtil.clamp(target.magnitude() / 50.0, -12, 12));
   }
 
   @Override

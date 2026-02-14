@@ -1,9 +1,7 @@
 package frc.robot.subsystems.shooter.turret;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -29,9 +27,6 @@ public class TurretIOSim implements TurretIO {
         turretRotationMotor.getAngularVelocity().in(RadiansPerSecond) * (0.85));
     turretRotationMotor.update(0.02);
 
-    inputs.turretAngleSuppliedVoltage.mut_replace(Volts.of(turretRotationMotor.getInputVoltage()));
-    inputs.turretAngleCurrentDraw.mut_replace(Amps.of(turretRotationMotor.getCurrentDrawAmps()));
-
     inputs.turretMotorAngle.mut_replace(turretRotationMotor.getAngularPosition());
   }
 
@@ -53,9 +48,9 @@ public class TurretIOSim implements TurretIO {
       targetTurretAngle = targetTurretAngle.plus(Degrees.of(360));
     }
 
-    params.turretRotationError = turretRotationMotor.getAngularPosition().minus(targetTurretAngle);
-    params.turretRotationTarget = targetTurretAngle;
-    params.turretRotation = turretRotationMotor.getAngularPosition();
+    params.turretRotationError.mut_replace(currentTurretAngle.minus(targetTurretAngle));
+    params.turretRotationTarget.mut_replace(targetTurretAngle);
+    params.turretRotation.mut_replace(currentTurretAngle);
 
     return params;
   }

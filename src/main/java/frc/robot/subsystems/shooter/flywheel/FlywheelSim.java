@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class FlywheelSim implements FlywheelIO {
@@ -20,11 +19,6 @@ public class FlywheelSim implements FlywheelIO {
   private FlywheelParameters params = new FlywheelParameters();
 
   public FlywheelSim() {}
-
-  @Override
-  public void setFlywheelMotorVolts(Voltage volts) {
-    flywheelMotorSim.setInputVoltage(volts.magnitude());
-  }
 
   @Override
   public void setFlywheelTargetVelocity(AngularVelocity velocity) {}
@@ -41,7 +35,7 @@ public class FlywheelSim implements FlywheelIO {
         flywheelMotorSim.getAngularVelocity().in(RadiansPerSecond) * (.85));
     flywheelMotorSim.update(0.02);
 
-    inputs.flywheelVelocity = getFlywheelVelocity();
+    inputs.flywheelVelocity.mut_replace(getFlywheelVelocity());
     inputs.flywheelCurrentDraw.mut_replace(Amps.of(flywheelMotorSim.getCurrentDrawAmps()));
     inputs.flywheelSuppliedVoltage.mut_replace(Volts.of(flywheelMotorSim.getInputVoltage()));
   }

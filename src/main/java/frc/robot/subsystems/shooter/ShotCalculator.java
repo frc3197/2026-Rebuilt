@@ -29,7 +29,8 @@ public class ShotCalculator extends VirtualSubsystem {
 
   private MutAngle targetHoodAngle = new MutAngle(45.0, 45.0, Degrees);
   private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
-  private MutAngularVelocity targetRPM = new MutAngularVelocity(0.0, 0.0, RotationsPerSecond);
+  private MutAngularVelocity targetFlywheelVelocity =
+      new MutAngularVelocity(0.0, 0.0, RotationsPerSecond);
 
   public ShotCalculator(String key) {
     this.key = key;
@@ -125,7 +126,7 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   public AngularVelocity getTargetFlywheelVelocity() {
-    return RotationsPerSecond.of(20.0);
+    return targetFlywheelVelocity;
   }
 
   // Helper functions ------------------------------------------------------

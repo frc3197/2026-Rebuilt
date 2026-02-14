@@ -1,19 +1,25 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Angle;
@@ -44,15 +50,30 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKP(kPTurret)
           .withKI(kITurret)
           .withKD(kDTurret);
+
+  // Motion magic configs
+  private static final double max_turret_rps = DegreesPerSecond.of(45).in(RotationsPerSecond);
+  private static final double max_turret_acceleration =
+      DegreesPerSecondPerSecond.of(15).in(RotationsPerSecondPerSecond);
+  private static final MotionMagicConfigs TURRET_MM_CONFIGS =
+      new MotionMagicConfigs()
+          .withMotionMagicAcceleration(max_turret_acceleration)
+          .withMotionMagicCruiseVelocity(max_turret_rps);
+  public static final MotionMagicTorqueCurrentFOC TURRET_MOTION_MAGIC_REQUEST =
+      new MotionMagicTorqueCurrentFOC(Degrees.of(0.0));
+
   public static final VoltageOut TURRET_VOLTAGE_REQUEST = new VoltageOut(0.0);
   public static final PositionDutyCycle TURRET_POSITION_REQUEST = new PositionDutyCycle(0.0);
 
+  // Turret rotation limits
   public static final Angle TURRET_ROTATION_LIMIT_FORWARD = Degrees.of(180);
   public static final Angle TURRET_ROTATION_LIMIT_REVERSE = Degrees.of(-180);
 
+  // Set the turret ratio
   public static FeedbackConfigs TURRET_FEEDBACK_CONFIGS =
       new FeedbackConfigs().withSensorToMechanismRatio(FX_TO_TURRET_RATIO);
 
+  // Turret motor configs
   public static TalonFXConfiguration TURRET_MOTOR_CONFIG =
       new TalonFXConfiguration()
           .withMotorOutput(
@@ -67,7 +88,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
                   .withForwardSoftLimitEnable(true)
                   .withForwardSoftLimitThreshold(TURRET_ROTATION_LIMIT_FORWARD)
                   .withReverseSoftLimitEnable(true)
-                  .withReverseSoftLimitThreshold(TURRET_ROTATION_LIMIT_REVERSE));
+                  .withReverseSoftLimitThreshold(TURRET_ROTATION_LIMIT_REVERSE))
+          .withSlot0(TURRET_SLOT0_CONFIGS)
+          .withMotionMagic(TURRET_MM_CONFIGS);
 
   // FLYWHEEL --------------------------------------------------------------------
 
@@ -86,7 +109,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKI(kIFlywheel)
           .withKD(kDFlywheel);
 
-  public static final PIDController FLYWHEEL_PID_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+  public static final VelocityTorqueCurrentFOC FLYWHEEL_TORQUE_REQUEST =
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0.0));
+  public static final VoltageOut FLYWHEEL_VOLTAGE_REQUEST = new VoltageOut(Volts.of(0.0));
 
   // Manual preset flywheel speed
   public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(6.50);
@@ -103,4 +128,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
               new MotorOutputConfigs()
                   .withNeutralMode(NeutralModeValue.Brake)
                   .withInverted(InvertedValue.CounterClockwise_Positive));
+
+  // HOOD --------------
+  public static Angle MAX_HOOD_ANGLE = Degrees.of(45);
+  public static Angle MIN_HOOD_ANGLE = Degrees.of(20);
 }

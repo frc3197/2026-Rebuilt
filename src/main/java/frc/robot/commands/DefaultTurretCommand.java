@@ -16,7 +16,6 @@ import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DefaultTurretCommand extends Command {
 
   // Logged tunable gains
@@ -104,7 +103,7 @@ public class DefaultTurretCommand extends Command {
     TurretParameters params = turret.getTurretParameters();
 
     turret.setTurretControlRequest(
-        ShooterConstants.TURRET_POSITION_REQUEST.withPosition(params.turretRotationTarget));
+        ShooterConstants.TURRET_MOTION_MAGIC_REQUEST.withPosition(params.turretRotationTarget));
   }
 
   // Called once the command ends or is interrupted.

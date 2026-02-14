@@ -21,7 +21,6 @@ import org.littletonrobotics.junction.Logger;
 public class Turret extends SubsystemBase {
 
   private TurretIO turretIO;
-
   private TurretInputsAutoLogged loggedTurret = new TurretInputsAutoLogged();
 
   public Turret(TurretIO turretIO) {
