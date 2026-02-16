@@ -40,7 +40,7 @@ public class AutoLookup {
         getCommonCommands(),
         setRobotPoseWithFlipping(new Pose2d(4.168, 2.398, Rotation2d.kZero)),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(0.5),
+        new WaitCommand(2.5),
         loadPath("Start-Neutral-Shoot"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         new WaitCommand(5.0),

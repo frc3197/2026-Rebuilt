@@ -94,19 +94,21 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   // FLYWHEEL --------------------------------------------------------------------
 
-  private static final double kSFlywheel = 0.25; // Add 0.25 V output to overcome static friction
+  private static final double kSFlywheel = 12.5; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
-      0.12; // A velocity target of 1 rps results in 0.12 V output
+      0.15; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
-      4.8; // A position error of 2.5 rotations results in 12 V output
+      10.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error
-  private static final double kDFlywheel = 0.1; // A velocity error of 1 rps results in 0.1 V output
+  private static final double kDFlywheel = 0.0;
+  private static final double kAFlywheel = 1.5; // A velocity error of 1 rps results in 0.1 V output
   public static Slot0Configs FLYWHEEL_SLOT0_CONFIGS =
       new Slot0Configs()
           .withKS(kSFlywheel)
           .withKV(kVFlywheel)
           .withKP(kPFlywheel)
           .withKI(kIFlywheel)
+          .withKA(kAFlywheel)
           .withKD(kDFlywheel);
 
   public static final VelocityTorqueCurrentFOC FLYWHEEL_TORQUE_REQUEST =

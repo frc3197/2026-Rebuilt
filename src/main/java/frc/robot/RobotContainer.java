@@ -7,8 +7,11 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.AutoLookup;
 import frc.robot.commands.DefaultFlywheelCommand;
+import frc.robot.commands.DefaultIndexCommand;
 import frc.robot.commands.DefaultIntakeCommand;
 import frc.robot.commands.DefaultTurretCommand;
 import frc.robot.commands.DriveCommands;
@@ -44,6 +48,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.index.Index;
+import frc.robot.subsystems.index.IndexConstants;
 import frc.robot.subsystems.index.IndexIO;
 import frc.robot.subsystems.index.IndexIOSim;
 import frc.robot.subsystems.index.IndexIOTalonFX;
@@ -86,8 +91,10 @@ public class RobotContainer {
 
   // Controllers & mappings
   private final CommandXboxController driveController = new CommandXboxController(0);
+  private final CommandXboxController secondaryController = new CommandXboxController(1);
   // TODO make it so both controllers arent the only ones haha :)
-  private final ControlScheme controlScheme = new ControlScheme(driveController, driveController);
+  private final ControlScheme controlScheme =
+      new ControlScheme(driveController, secondaryController);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -241,9 +248,11 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controlScheme.getDriveX(),
-            () -> -controlScheme.getDriveY(),
+            () -> controlScheme.getDriveX(),
+            () -> controlScheme.getDriveY(),
             () -> -controlScheme.getDriveRotation()));
+
+    index.setDefaultCommand(new DefaultIndexCommand(index));
 
     intake.setDefaultCommand(
         new DefaultIntakeCommand(
@@ -272,12 +281,18 @@ public class RobotContainer {
         .getSpindexFeedFlywheelManual()
         .onTrue(
             index
-                .setSpindexMotorCommand(Volts.of(-2.95))
-                .andThen(index.setFeedMotorCommand(Volts.of(10.0))))
+                .setSpindexMotorCommand(Volts.of(-2.35))
+                .andThen(
+                    Commands.runOnce(
+                        () ->
+                            index.setFeedRequest(
+                                IndexConstants.FEED_TORQUE_REQUEST.withVelocity(
+                                    RotationsPerSecond.of(100))))))
         .onFalse(
             index
                 .setSpindexMotorCommand(Volts.of(0.0))
-                .andThen(index.setFeedMotorCommand(Volts.of(0.0))));
+                .andThen(
+                    Commands.runOnce(() -> index.setFeedRequest(new VoltageOut(Volts.of(0.0))))));
 
     controlScheme
         .getZeroGyro()
@@ -294,14 +309,26 @@ public class RobotContainer {
         .onTrue(index.setFeedMotorCommand(Volts.of(8.0)))
         .onFalse(index.setFeedMotorCommand(Volts.of(0.0)));
 
-    controlScheme
-        .getClimberRotateCW()
-        .onTrue(climber.setClimbSpeed(0.5))
-        .onFalse(climber.setClimbSpeed(0.0));
-    controlScheme
-        .getClimberRotateCWW()
-        .onTrue(climber.setClimbSpeed(-0.5))
-        .onFalse(climber.setClimbSpeed(0.0));
+    controlScheme.spoolFlywheel().onTrue(setFlywheelMode(FlywheelMode.SHOOTING));
+    controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
+
+    controlScheme.getHoodAngleMaximum().onTrue(turret.setActuatorPosition(Millimeters.of(40.0)));
+    controlScheme.getHoodAngleMedium().onTrue(turret.setActuatorPosition(Millimeters.of(25.0)));
+    controlScheme.getHoodAngleMinimum().onTrue(turret.setActuatorPosition(Millimeters.of(0.0)));
+
+    /*
+     * controlScheme
+     * .getClimberRotateCW()
+     * .onTrue(climber.setClimbSpeed(0.5))
+     * .onFalse(climber.setClimbSpeed(0.0));
+     * controlScheme
+     * .getClimberRotateCWW()
+     * .onTrue(climber.setClimbSpeed(-0.5))
+     * .onFalse(climber.setClimbSpeed(0.0));
+     */
+
+    controlScheme.getIntakeExtendPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING));
+    controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
 
     /*
      * controlScheme

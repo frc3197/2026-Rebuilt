@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.index;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID;
@@ -26,7 +30,9 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   protected void configureHardware() {}
 
   @Override
-  public void updateInputs(IndexInputs inputs) {}
+  public void updateInputs(IndexInputs inputs) {
+    inputs.feedRPS = feedMotor.getVelocity().getValue().in(RotationsPerSecond);
+  }
 
   @Override
   public void setFeedMotorVoltage(Voltage volts) {
@@ -36,5 +42,15 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   @Override
   public void setSpindexMotorVoltage(Voltage volts) {
     spindexMotorController.setVoltage(volts.magnitude());
+  }
+
+  @Override
+  public void setGains(Slot0Configs gains) {
+    feedMotor.getConfigurator().apply(gains);
+  }
+
+  public void setFeedMotorRequest(ControlRequest request) {
+    System.out.println("HDJA");
+    feedMotor.setControl(request);
   }
 }

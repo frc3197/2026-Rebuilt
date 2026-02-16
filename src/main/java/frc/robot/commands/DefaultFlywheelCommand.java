@@ -6,19 +6,33 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.LoggingConstants;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 
 public class DefaultFlywheelCommand extends Command {
 
   private final Flywheel flywheel;
   private final BooleanSupplier isTriggerPressed;
+
+  private LoggedTunableNumber flywheelKS =
+      new LoggedTunableNumber("FLYSHEEL KS", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kS);
+  private LoggedTunableNumber flywheelKA =
+      new LoggedTunableNumber("FLYSHEEL KA", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kA);
+  private LoggedTunableNumber flywheelKP =
+      new LoggedTunableNumber("FLYSHEEL KP", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kP);
+  private LoggedTunableNumber flywheelKV =
+      new LoggedTunableNumber("FLYSHEEL KV", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kV);
+  private LoggedTunableNumber flywheelKD =
+      new LoggedTunableNumber("FLYSHEEL KD", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kD);
 
   /**
    * Creates a new DefaultFlywheelCommand.
@@ -41,6 +55,21 @@ public class DefaultFlywheelCommand extends Command {
   // from the ShotCalculator class
   @Override
   public void execute() {
+
+    if (LoggingConstants.tuningMode
+            && (flywheelKA.hasChanged(hashCode()) || flywheelKD.hasChanged(hashCode()))
+        || flywheelKP.hasChanged(hashCode())
+        || flywheelKS.hasChanged(hashCode())
+        || flywheelKV.hasChanged(hashCode())) {
+      Slot0Configs newConfigs = new Slot0Configs();
+      newConfigs.kP = flywheelKP.getAsDouble();
+      newConfigs.kA = flywheelKA.getAsDouble();
+      newConfigs.kD = flywheelKD.getAsDouble();
+      newConfigs.kS = flywheelKS.getAsDouble();
+      newConfigs.kV = flywheelKV.getAsDouble();
+      flywheel.setGains(newConfigs);
+    }
+
     FlywheelMode currentMode = RobotState.instance().getFlywheelMode();
 
     switch (currentMode) {

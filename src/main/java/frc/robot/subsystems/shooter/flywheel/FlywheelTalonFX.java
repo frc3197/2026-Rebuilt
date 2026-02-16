@@ -2,11 +2,13 @@ package frc.robot.subsystems.shooter.flywheel;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.RealSubsystem;
 
 public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
@@ -29,12 +31,6 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   }
 
   @Override
-  public FlywheelParameters getFlywheelParameters() {
-    params.rpsError = targetFlywheelAngularVelocity.minus(getFlywheelVelocity());
-    return params;
-  }
-
-  @Override
   public void setFlywheelOutput(ControlRequest request) {
     flywheelMotor.setControl(request);
   }
@@ -43,11 +39,18 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   public void updateInputs(FlywheelInputs inputs) {
     inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
     inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
-    inputs.flywheelVelocity.mut_replace(getFlywheelVelocity());
+    inputs.flywheelVelocity = (getFlywheelVelocity().in(RotationsPerSecond));
+    inputs.flywheelTargetVelocity =
+        (ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond));
   }
 
   // Helper functions
   private AngularVelocity getFlywheelVelocity() {
     return flywheelMotor.getVelocity().getValue();
+  }
+
+  @Override
+  public void updateFlywheelSlot0Configs(Slot0Configs newConfig) {
+    flywheelMotor.getConfigurator().apply(newConfig);
   }
 }

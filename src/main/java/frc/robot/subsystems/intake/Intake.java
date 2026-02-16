@@ -6,8 +6,6 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,14 +27,6 @@ public class Intake extends SubsystemBase {
    * @param speed (DoubleSupplier) The speed to run the intaker
    * @return none There is no return
    */
-  public Command setIntakeSpinSpeedCommand(double speed) {
-    return Commands.runOnce(
-        () -> {
-          intakeIO.setSpinMotorSpeed(speed);
-        },
-        this);
-  }
-
   public void setIntakeSpinSpeed(double speed) {
     intakeIO.setSpinMotorSpeed(speed);
   }

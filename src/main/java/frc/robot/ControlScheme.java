@@ -32,6 +32,15 @@ public class ControlScheme {
     return primaryController.start();
   }
 
+  // FLywheel modes
+  public Trigger spoolFlywheel() {
+    return primaryController.a();
+  }
+
+  public Trigger idleFlywheel() {
+    return primaryController.b();
+  }
+
   // Manual fallbacks ---------------------------------------------------------
 
   // Climber
@@ -72,6 +81,18 @@ public class ControlScheme {
   // Shooter
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.b();
+  }
+
+  public Trigger getHoodAngleMaximum() {
+    return secondaryController.povUp();
+  }
+
+  public Trigger getHoodAngleMedium() {
+    return secondaryController.povRight();
+  }
+
+  public Trigger getHoodAngleMinimum() {
+    return secondaryController.povDown();
   }
 
   public DoubleSupplier getTurretVoltageManual() {

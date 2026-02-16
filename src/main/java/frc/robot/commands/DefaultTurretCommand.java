@@ -61,11 +61,11 @@ public class DefaultTurretCommand extends Command {
 
     switch (RobotState.instance().getTurretMode()) {
       case TRACKING_HUB:
-        turretAutoTracking();
+        // turretAutoTracking();
         break;
 
       case PASSING:
-        turretAutoTracking();
+        // turretAutoTracking();
         break;
 
       case IDLE:
@@ -74,7 +74,7 @@ public class DefaultTurretCommand extends Command {
         break;
 
       case MANUAL:
-        double manualVolts = turretMotorVoltageSupplier.getAsDouble();
+        double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 3;
         /*
         TurretParameters params = turret.getTurretParameters();
         if (params.turretRotation.gt(ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD)) {

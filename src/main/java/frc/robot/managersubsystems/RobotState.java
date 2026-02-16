@@ -40,7 +40,7 @@ public class RobotState extends VirtualSubsystem {
   private IntakeDeployMode intakeDeployMode = IntakeDeployMode.MANUAL;
   private IntakeSpinMode intakeSpinMode = IntakeSpinMode.MANUAL;
   private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
-  private TurretMode turretMode = TurretMode.TRACKING_HUB;
+  private TurretMode turretMode = TurretMode.MANUAL;
 
   private static RobotState instance;
 

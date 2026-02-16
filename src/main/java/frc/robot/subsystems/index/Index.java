@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.index;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,5 +42,13 @@ public class Index extends SubsystemBase {
 
   public void setSpindexMotor(Voltage volts) {
     indexIO.setSpindexMotorVoltage(volts);
+  }
+
+  public void setGains(Slot0Configs gains) {
+    indexIO.setGains(gains);
+  }
+
+  public void setFeedRequest(ControlRequest request) {
+    indexIO.setFeedMotorRequest(request);
   }
 }

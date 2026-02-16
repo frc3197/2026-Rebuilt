@@ -13,8 +13,8 @@ public class HardwareID {
   }
 
   public interface IndexHardwareID {
-    public static final int FEED_MOTOR_ID = 15;
-    public static final int SPINDEX_MOTOR_ID = 16;
+    public static final int FEED_MOTOR_ID = 10;
+    public static final int SPINDEX_MOTOR_ID = 9;
   }
 
   public interface IntakeHardwareID {
@@ -25,6 +25,6 @@ public class HardwareID {
   }
 
   public interface ClimberHardwareID {
-    public static final int climberMotor = 18;
+    public static final int climberMotor = 15;
   }
 }

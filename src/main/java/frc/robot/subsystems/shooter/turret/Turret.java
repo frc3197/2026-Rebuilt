@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -71,5 +72,9 @@ public class Turret extends SubsystemBase {
 
   public Command zeroTurretPositionCommand() {
     return Commands.runOnce(() -> turretIO.zeroTurretEncoder());
+  }
+
+  public Command setActuatorPosition(Distance position) {
+    return Commands.runOnce(() -> turretIO.setHoodActuatorMM(position));
   }
 }

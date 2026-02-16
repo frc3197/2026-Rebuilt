@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Millimeters;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
@@ -17,6 +18,7 @@ public interface TurretIO {
   public static class TurretInputs {
     public MutAngle turretMotorAngle = Degrees.of(0.0).mutableCopy();
     public MutAngle hoodAngle = Degrees.of(45.0).mutableCopy();
+    public MutDistance hoodActuatorExtension = Millimeters.of(0.0).mutableCopy();
   }
 
   public class TurretParameters {
@@ -42,6 +44,8 @@ public interface TurretIO {
   public default TurretParameters getTurretParameters() {
     return new TurretParameters();
   }
+
+  public default void setHoodActuatorMM(Distance d) {}
 
   public default void updateInputs(TurretInputs inputs) {}
 }
