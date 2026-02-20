@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,5 +45,9 @@ public class Intake extends SubsystemBase {
     intakeIO.updateInputs(loggedInputs);
 
     Logger.processInputs("Intake", loggedInputs);
+  }
+
+  public void setDeployGains(Slot0Configs gains) {
+    intakeIO.setDeployGains(gains);
   }
 }

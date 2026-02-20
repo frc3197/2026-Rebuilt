@@ -144,8 +144,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                new VisionIOLimelight(VisionConstants.LIMELIGHT_NAME, drive::getRotation));
 
         break;
 
@@ -248,8 +247,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controlScheme.getDriveX(),
-            () -> controlScheme.getDriveY(),
+            () -> -controlScheme.getDriveX(),
+            () -> -controlScheme.getDriveY(),
             () -> -controlScheme.getDriveRotation()));
 
     index.setDefaultCommand(new DefaultIndexCommand(index));
@@ -300,7 +299,9 @@ public class RobotContainer {
             Commands.runOnce(
                     () ->
                         drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                            new Pose2d(
+                                drive.getPose().getTranslation(),
+                                isRed() ? Rotation2d.k180deg : Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
 
@@ -316,19 +317,23 @@ public class RobotContainer {
     controlScheme.getHoodAngleMedium().onTrue(turret.setActuatorPosition(Millimeters.of(25.0)));
     controlScheme.getHoodAngleMinimum().onTrue(turret.setActuatorPosition(Millimeters.of(0.0)));
 
-    /*
-     * controlScheme
-     * .getClimberRotateCW()
-     * .onTrue(climber.setClimbSpeed(0.5))
-     * .onFalse(climber.setClimbSpeed(0.0));
-     * controlScheme
-     * .getClimberRotateCWW()
-     * .onTrue(climber.setClimbSpeed(-0.5))
-     * .onFalse(climber.setClimbSpeed(0.0));
-     */
+    controlScheme
+        .getClimberRotateCW()
+        .onTrue(climber.setClimbSpeed(1.0))
+        .onFalse(climber.setClimbSpeed(0.0));
+
+    controlScheme
+        .getClimberRotateCWW()
+        .onTrue(climber.setClimbSpeed(-1.0))
+        .onFalse(climber.setClimbSpeed(0.0));
 
     controlScheme.getIntakeExtendPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING));
     controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
+
+    controlScheme.getTurretTrack().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
+    controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.MANUAL));
+
+    controlScheme.zeroTurret().onTrue(turret.zeroTurretPositionCommand().ignoringDisable(true));
 
     /*
      * controlScheme

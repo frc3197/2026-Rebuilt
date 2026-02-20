@@ -17,8 +17,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import frc.robot.RobotContainer;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.LoggingConstants;
 import frc.robot.managersubsystems.RobotState;
-import frc.robot.util.FieldConstants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,6 +31,8 @@ public class ShotCalculator extends VirtualSubsystem {
 
   private MutAngle targetHoodAngle = new MutAngle(45.0, 45.0, Degrees);
   private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
+
+  private LoggedTunableNumber targetVelocityManual = new LoggedTunableNumber("FLYWHEEL VELO", 44);
   private MutAngularVelocity targetFlywheelVelocity = RotationsPerSecond.of(44.0).mutableCopy();
   private boolean readyToShoot = false;
 
@@ -106,7 +110,8 @@ public class ShotCalculator extends VirtualSubsystem {
         Radians.of(
                 Math.atan2(sinAngle.in(Radians), cosAngle.in(Radians))
                     * (robotToHub.get(1) < 0 ? -1.0 : 1.0))
-            .minus(Radians.of(robotPose.getRotation().getRadians()));
+            .minus(Radians.of(robotPose.getRotation().getRadians()))
+            .plus(Degrees.of(180));
 
     if (robotToHub.get(1) < 0) {
       potAngle = potAngle.plus(Degrees.of(360));
@@ -126,6 +131,10 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   public AngularVelocity getTargetFlywheelVelocity() {
+    if (LoggingConstants.tuningMode && targetVelocityManual.hasChanged(hashCode())) {
+      this.targetFlywheelVelocity.mut_replace(
+          RotationsPerSecond.of(targetVelocityManual.getAsDouble()));
+    }
     return targetFlywheelVelocity;
   }
 

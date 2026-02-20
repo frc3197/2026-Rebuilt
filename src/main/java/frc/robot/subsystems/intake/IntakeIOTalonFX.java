@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -17,7 +18,7 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
   private final TalonFX deployMotor;
   private final TalonFX spinMotor;
 
-  private MutAngle targetDeployAngle = Degrees.of(0.0).mutableCopy();
+  private MutAngle targetDeployAngle = IntakeConstants.FULLY_RETRACTED_ANGLE.mutableCopy();
 
   private final CANcoder deployEncoder;
 
@@ -50,6 +51,7 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
     inputs.deployMotorSuppliedCurrent = deployMotor.getSupplyCurrent().getValueAsDouble();
     inputs.spinMotorSuppliedCurrent = spinMotor.getSupplyCurrent().getValueAsDouble();
     inputs.deployAngleDegrees = deployMotor.getPosition().getValue().in(Degrees);
+    inputs.deployMotorVelocity.mut_replace(deployEncoder.getVelocity().getValue());
   }
 
   @Override
@@ -90,5 +92,10 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
   @Override
   public void setDeployMotorSpeed(double speed) {
     deployMotor.set(speed);
+  }
+
+  @Override
+  public void setDeployGains(Slot0Configs gains) {
+    deployMotor.getConfigurator().apply(gains);
   }
 }

@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Millimeters;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
@@ -38,6 +39,8 @@ public interface TurretIO {
   public default void zeroTurretEncoder() {}
 
   public default void updateTurretSlot0Configs(Slot0Configs newConfig) {}
+
+  public default void updateTurretMMConfigs(MotionMagicConfigs newConfig) {}
 
   public default void setOutputTargetAngle(Angle rotations) {}
 

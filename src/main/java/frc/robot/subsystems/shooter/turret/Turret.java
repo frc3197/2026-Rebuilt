@@ -6,6 +6,7 @@ package frc.robot.subsystems.shooter.turret;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.math.MathUtil;
@@ -62,6 +63,10 @@ public class Turret extends SubsystemBase {
     turretIO.updateTurretSlot0Configs(configs);
   }
 
+  public void setTurretRotationMotorMM(MotionMagicConfigs configs) {
+    turretIO.updateTurretMMConfigs(configs);
+  }
+
   public void setTurretControlRequest(ControlRequest request) {
     turretIO.setTurretControlRequest(request);
   }
@@ -76,5 +81,9 @@ public class Turret extends SubsystemBase {
 
   public Command setActuatorPosition(Distance position) {
     return Commands.runOnce(() -> turretIO.setHoodActuatorMM(position));
+  }
+
+  public void setActuatorPositionFunc(Distance position) {
+    turretIO.setHoodActuatorMM(position);
   }
 }

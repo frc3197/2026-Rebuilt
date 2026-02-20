@@ -71,16 +71,20 @@ public class ControlScheme {
   }
 
   public Trigger getIntakeExtendPreset() {
-    return primaryController.povDown();
+    return primaryController.povUp();
   }
 
   public Trigger getIntakeRetractPreset() {
-    return primaryController.povUp();
+    return primaryController.povDown();
   }
 
   // Shooter
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.b();
+  }
+
+  public Trigger zeroTurret() {
+    return secondaryController.start();
   }
 
   public Trigger getHoodAngleMaximum() {
@@ -98,5 +102,13 @@ public class ControlScheme {
   public DoubleSupplier getTurretVoltageManual() {
     return () ->
         secondaryController.getLeftTriggerAxis() - secondaryController.getRightTriggerAxis();
+  }
+
+  public Trigger getTurretTrack() {
+    return primaryController.leftBumper();
+  }
+
+  public Trigger getTurretIdle() {
+    return primaryController.rightBumper();
   }
 }

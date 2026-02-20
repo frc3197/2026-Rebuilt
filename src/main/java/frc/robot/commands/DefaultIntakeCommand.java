@@ -6,14 +6,16 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
+import frc.robot.constants.LoggingConstants;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -23,6 +25,15 @@ public class DefaultIntakeCommand extends Command {
 
   private final BooleanSupplier spinManual;
   private final DoubleSupplier deployManual;
+
+  private final LoggedTunableNumber deployKs =
+      new LoggedTunableNumber("Intake deploy ks", IntakeConstants.DEPLOY_MOTOR_GAINS.kS);
+  private final LoggedTunableNumber deployKp =
+      new LoggedTunableNumber("Intake deploy kp", IntakeConstants.DEPLOY_MOTOR_GAINS.kP);
+  private final LoggedTunableNumber deployKv =
+      new LoggedTunableNumber("Intake deploy kv", IntakeConstants.DEPLOY_MOTOR_GAINS.kV);
+  private final LoggedTunableNumber deployKg =
+      new LoggedTunableNumber("Intake deploy kg", IntakeConstants.DEPLOY_MOTOR_GAINS.kG);
 
   /**
    * Creates a new DefaultFlywheelCommand.
@@ -47,6 +58,19 @@ public class DefaultIntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    if (LoggingConstants.tuningMode
+        && (deployKs.hasChanged(hashCode())
+            || deployKg.hasChanged(hashCode())
+            || deployKp.hasChanged(hashCode())
+            || deployKv.hasChanged(hashCode()))) {
+      intake.setDeployGains(
+          new Slot0Configs()
+              .withKV(deployKv.get())
+              .withKG(deployKg.get())
+              .withKS(deployKs.get())
+              .withKP(deployKp.get()));
+    }
 
     // First update spinning logic
     intakeSpinLogic();
@@ -85,23 +109,25 @@ public class DefaultIntakeCommand extends Command {
 
     IntakeDeployMode mode = RobotState.instance().getIntakeDeployMode();
 
-    if (mode != IntakeDeployMode.MANUAL
+    if (mode == IntakeDeployMode.DEPLOYING
         && MathUtil.isNear(
             IntakeConstants.FULLY_DEPLOYED_ANGLE.in(Degrees),
             intake.getDeployAngle().in(Degrees),
-            Degrees.of(5.0).in(Degrees))) {
-      RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_DEPLOYED);
+            5.0)) {
+      // RobotState.instance().setIntakeDeployMode(IntakeDeployMode.IDLE_DEPLOYED);
+      // mode = IntakeDeployMode.IDLE_DEPLOYED;
     }
 
-    if (mode != IntakeDeployMode.MANUAL
+    if (mode == IntakeDeployMode.RETRACTING
         && MathUtil.isNear(
             IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
             intake.getDeployAngle().in(Degrees),
-            Degrees.of(5.0).in(Degrees))) {
-      RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED);
+            5.0)) {
+      // RobotState.instance().setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED);
+      // mode = IntakeDeployMode.IDLE_RETRACTED;
     }
 
-    switch (RobotState.instance().getIntakeDeployMode()) {
+    switch (mode) {
       case DEPLOYING:
         intake.setDeployControlRequest(
             IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(

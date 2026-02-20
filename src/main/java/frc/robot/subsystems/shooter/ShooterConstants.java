@@ -3,6 +3,9 @@ package frc.robot.subsystems.shooter;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -23,24 +26,34 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID;
 
 public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
+  // Physical
+  public static final Distance FUEL_RELEASE_HEIGHT = Inches.of(20);
+
+  private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
+  private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);
+  // Describes the turret's bottom opening relative to robot position
+  public static final Transform3d ROBOT_TO_TURRET_CENTER =
+      new Transform3d(
+          -ROBOT_TO_TURRET_Y.in(Meters),
+          -ROBOT_TO_TURRET_X.in(Meters),
+          0.5,
+          new Rotation3d(0, 0, Degrees.of(180).in(Radians)));
+
   // TURRET ----------------------------------------------------------------------
   public static final double FX_TO_TURRET_RATIO = (1 * 12 * (100 / 20));
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
-  // Describes the turret's bottom opening relative to robot position
-  public static final Transform3d ROBOT_TO_TURRET_CENTER =
-      new Transform3d(0.2, 0.2, 0.5, Rotation3d.kZero);
-
   // Turret rotation PID controller
-  private static final double kSTurret = 0.05; // Add 0.05 V output to overcome static friction
+  private static final double kSTurret = 2.05; // Add 0.05 V output to overcome static friction
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      7.5; // A position error of 2.5 rotations results in 12 V output
+      350.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
   private static final double kDTurret = 0.0;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
@@ -52,9 +65,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKD(kDTurret);
 
   // Motion magic configs
-  private static final double max_turret_rps = DegreesPerSecond.of(45).in(RotationsPerSecond);
+  private static final double max_turret_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
   private static final double max_turret_acceleration =
-      DegreesPerSecondPerSecond.of(15).in(RotationsPerSecondPerSecond);
+      DegreesPerSecondPerSecond.of(300).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs TURRET_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicAcceleration(max_turret_acceleration)
@@ -81,7 +94,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withFeedback(TURRET_FEEDBACK_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(50.0)
+                  .withStatorCurrentLimit(25.0)
                   .withStatorCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()

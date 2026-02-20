@@ -1,9 +1,14 @@
-package frc.robot.util;
+package frc.robot.constants;
+
+import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 
 public class FieldConstants {
+  public static final Distance HUB_HEIGHT = Inches.of(67);
+
   public class Blue {
     public static final Pose2d HUB_CENTER = new Pose2d(4.593, 4.026, new Rotation2d(0.0));
 

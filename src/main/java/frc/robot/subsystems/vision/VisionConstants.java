@@ -18,7 +18,7 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "camera_0";
+  public static String LIMELIGHT_NAME = "limelight";
   public static String camera1Name = "camera_1";
 
   // Robot to camera transforms

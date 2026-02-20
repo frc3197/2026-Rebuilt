@@ -7,6 +7,7 @@ package frc.robot.subsystems.shooter.turret;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Millimeters;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -81,6 +82,11 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   @Override
   public void setTurretControlRequest(ControlRequest request) {
     turretRotationMotor.setControl(request);
+  }
+
+  @Override
+  public void updateTurretMMConfigs(MotionMagicConfigs request) {
+    turretRotationMotor.getConfigurator().apply(request);
   }
 
   @Override
