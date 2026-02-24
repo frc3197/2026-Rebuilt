@@ -31,4 +31,10 @@ public class Modes {
     FRENZY,
     MANUAL
   }
+
+  public static enum ClimbCameraMode {
+    CLIMB_RED,
+    CLIMB_BLUE,
+    APRIL_TAGS
+  }
 }

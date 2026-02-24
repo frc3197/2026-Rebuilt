@@ -1,7 +1,9 @@
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -9,7 +11,9 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -18,8 +22,11 @@ public interface TurretIO {
   @AutoLog
   public static class TurretInputs {
     public MutAngle turretMotorAngle = Degrees.of(0.0).mutableCopy();
+    public MutCurrent turretMotorCurrent = Amps.of(0.0).mutableCopy();
+    public MutVoltage turretMotorVoltage = Volts.of(0.0).mutableCopy();
     public MutAngle hoodAngle = Degrees.of(45.0).mutableCopy();
     public MutDistance hoodActuatorExtension = Millimeters.of(0.0).mutableCopy();
+    public MutDistance hoodActuatorExtensionTarget = Millimeters.of(0.0).mutableCopy();
   }
 
   public class TurretParameters {

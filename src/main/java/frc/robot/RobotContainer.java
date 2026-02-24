@@ -25,18 +25,20 @@ import frc.robot.auto.AutoLookup;
 import frc.robot.commands.DefaultFlywheelCommand;
 import frc.robot.commands.DefaultIndexCommand;
 import frc.robot.commands.DefaultIntakeCommand;
-import frc.robot.commands.DefaultTurretCommand;
+import frc.robot.commands.DefaultTurretHoodCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.Sim.SimTurretCommand;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.constants.LoggingConstants.Mode;
 import frc.robot.constants.TunerConstants;
+import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
 import frc.robot.managersubsystems.RobotState;
+import frc.robot.subsystems.Align;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSim;
@@ -56,6 +58,10 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.quest.Quest;
+import frc.robot.subsystems.quest.QuestIO;
+import frc.robot.subsystems.quest.QuestIOReal;
+import frc.robot.subsystems.quest.QuestIOSim;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelSim;
@@ -78,12 +84,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
+  private final Align align;
   private final Climber climber;
   private final Drive drive;
   private final Flywheel flywheel;
   private final Index index;
   private final Intake intake;
   private final Turret turret;
+  private final Quest quest;
   private final Vision vision;
 
   // Autos
@@ -119,6 +127,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
+    this.align = new Align();
+
     switch (LoggingConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -141,9 +151,12 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOTalonFX());
 
+        quest = new Quest(new QuestIOReal());
+
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                quest::acceptVisionPose,
                 new VisionIOLimelight(VisionConstants.LIMELIGHT_NAME, drive::getRotation));
 
         break;
@@ -169,6 +182,8 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOSim());
 
+        quest = new Quest(new QuestIOSim());
+
         /*
          * vision =
          * new Vision(
@@ -179,7 +194,12 @@ public class RobotContainer {
          * VisionConstants.camera1Name, VisionConstants.robotToCamera1,
          * drive::getPose));
          */
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                quest::acceptVisionPose,
+                new VisionIO() {},
+                new VisionIO() {});
 
         break;
 
@@ -204,13 +224,20 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIO() {});
 
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        quest = new Quest(new QuestIO() {});
+
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                quest::acceptVisionPose,
+                new VisionIO() {},
+                new VisionIO() {});
 
         break;
     }
 
     // Initialize auto lookup with appropriate subsystems
-    this.autoLookup = new AutoLookup(drive, turret);
+    this.autoLookup = new AutoLookup(align, drive, turret);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -255,7 +282,10 @@ public class RobotContainer {
 
     intake.setDefaultCommand(
         new DefaultIntakeCommand(
-            intake, controlScheme.getIntakeSpinManual(), controlScheme.getIntakeDeployManual()));
+            intake,
+            controlScheme.getIntakeSpinManual(),
+            controlScheme.getIntakeDeployManual(),
+            controlScheme.getBackfeedManual()));
 
     // Flywheel is controlled based on FlywheelMode with manual override buttons
     flywheel.setDefaultCommand(
@@ -264,7 +294,7 @@ public class RobotContainer {
     // Turret is controlled by TurretMode with manual overrides
     if (LoggingConstants.currentMode != Mode.SIM)
       turret.setDefaultCommand(
-          new DefaultTurretCommand(turret, controlScheme.getTurretVoltageManual()));
+          new DefaultTurretHoodCommand(turret, controlScheme.getTurretVoltageManual()));
     else
       turret.setDefaultCommand(
           new SimTurretCommand(turret, controlScheme.getTurretVoltageManual()));
@@ -277,10 +307,15 @@ public class RobotContainer {
     // .onTrue(setTurretMode(TurretMode.IDLE));
 
     controlScheme
+        .getBackfeedIndexManual()
+        .onTrue(index.setSpindexMotorCommand(Volts.of(-5.35)))
+        .onFalse(index.setSpindexMotorCommand(Volts.of(0.0)));
+
+    controlScheme
         .getSpindexFeedFlywheelManual()
         .onTrue(
             index
-                .setSpindexMotorCommand(Volts.of(-2.35))
+                .setSpindexMotorCommand(Volts.of(2.35))
                 .andThen(
                     Commands.runOnce(
                         () ->
@@ -304,11 +339,6 @@ public class RobotContainer {
                                 isRed() ? Rotation2d.k180deg : Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
-
-    controlScheme
-        .getFeedManual()
-        .onTrue(index.setFeedMotorCommand(Volts.of(8.0)))
-        .onFalse(index.setFeedMotorCommand(Volts.of(0.0)));
 
     controlScheme.spoolFlywheel().onTrue(setFlywheelMode(FlywheelMode.SHOOTING));
     controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
@@ -360,15 +390,11 @@ public class RobotContainer {
   private void configureTriggerCallbacks() {
     enteredAllianceZoneAuto
         .onTrue(
-            setTurretMode(
-                RobotState.instance().getTurretMode() != TurretMode.MANUAL
-                    ? TurretMode.TRACKING_HUB
-                    : RobotState.instance().getTurretMode()))
+            setTurretMode(TurretMode.TRACKING_HUB)
+                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL))
         .onFalse(
-            setTurretMode(
-                RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
-                    ? TurretMode.IDLE
-                    : RobotState.instance().getTurretMode()));
+            setTurretMode(TurretMode.IDLE)
+                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL));
 
     enteredNeutralZoneAuto
         .onTrue(
@@ -402,6 +428,10 @@ public class RobotContainer {
 
   public static Command setTurretMode(TurretMode mode) {
     return Commands.runOnce(() -> RobotState.instance().setTurretMode(mode));
+  }
+
+  public static Command setClimbCameraMode(ClimbCameraMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setClimbCameraMode(mode));
   }
 
   public static boolean isRed() {

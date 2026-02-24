@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -12,12 +13,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.shooter.turret.TurretIO.TurretParameters;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
 
-public class DefaultTurretCommand extends Command {
+public class DefaultTurretHoodCommand extends Command {
 
   // Logged tunable gains
   private LoggedTunableNumber turretAngle_kP =
@@ -39,7 +41,8 @@ public class DefaultTurretCommand extends Command {
           "turretVelocity",
           ShooterConstants.TURRET_MOTOR_CONFIG.MotionMagic.MotionMagicCruiseVelocity);
 
-  private LoggedTunableNumber hoodAngle = new LoggedTunableNumber("HOOD MM", 20);
+  private LoggedTunableNumber turretFFProp =
+      new LoggedTunableNumber("Turret FF Prop", ShooterConstants.TURRET_SPRING_FF);
 
   private final Turret turret;
   private final DoubleSupplier turretMotorVoltageSupplier;
@@ -50,7 +53,7 @@ public class DefaultTurretCommand extends Command {
    * @param turret The turret subsystem.
    * @param turretMotorVoltageSupplier Supplies turret motor voltage magnitude.
    */
-  public DefaultTurretCommand(Turret turret, DoubleSupplier turretMotorVoltageSupplier) {
+  public DefaultTurretHoodCommand(Turret turret, DoubleSupplier turretMotorVoltageSupplier) {
     this.turretMotorVoltageSupplier = turretMotorVoltageSupplier;
     this.turret = turret;
     addRequirements(this.turret);
@@ -64,32 +67,11 @@ public class DefaultTurretCommand extends Command {
   public void execute() {
 
     // Check for gain updates
-    if (LoggingConstants.tuningMode
-            && (turretAcceleration.hasChanged(hashCode())
-                || turretVelocity.hasChanged(hashCode())
-                || turretAngle_kP.hasChanged(hashCode())
-                || turretAngle_kI.hasChanged(hashCode()))
-        || turretAngle_kD.hasChanged(hashCode())
-        || turretAngle_kS.hasChanged(hashCode())
-        || turretAngle_kV.hasChanged(hashCode())) {
-      Slot0Configs newConfigs = new Slot0Configs();
-      newConfigs.kP = turretAngle_kP.getAsDouble();
-      newConfigs.kI = turretAngle_kI.getAsDouble();
-      newConfigs.kD = turretAngle_kD.getAsDouble();
-      newConfigs.kV = turretAngle_kV.getAsDouble();
-      newConfigs.kS = turretAngle_kS.getAsDouble();
-
-      MotionMagicConfigs newMM =
-          new MotionMagicConfigs()
-              .withMotionMagicAcceleration(turretAcceleration.getAsDouble())
-              .withMotionMagicCruiseVelocity(turretVelocity.getAsDouble());
-
-      turret.setTurretRotationMotorGains(newConfigs);
+    if (LoggingConstants.tuningMode) {
+      checkGains();
     }
 
-    if (LoggingConstants.tuningMode && hoodAngle.hasChanged(hashCode())) {
-      // turret.setActuatorPositionFunc(Millimeters.of(hoodAngle.getAsDouble()));
-    }
+    turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
 
     switch (RobotState.instance().getTurretMode()) {
       case TRACKING_HUB:
@@ -107,22 +89,6 @@ public class DefaultTurretCommand extends Command {
 
       case MANUAL:
         double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 10;
-        /*
-         * TurretParameters params = turret.getTurretParameters();
-         * if (params.turretRotation.gt(ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD))
-         * {
-         * manualVolts =
-         * turretMotorVoltageSupplier.getAsDouble() > 0
-         * ? 0
-         * : turretMotorVoltageSupplier.getAsDouble();
-         * } else if
-         * (params.turretRotation.lt(ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE)) {
-         * manualVolts =
-         * turretMotorVoltageSupplier.getAsDouble() < 0
-         * ? 0
-         * : turretMotorVoltageSupplier.getAsDouble();
-         * }
-         */
         turret.setTurretControlRequest(
             ShooterConstants.TURRET_VOLTAGE_REQUEST.withOutput(Volts.of(manualVolts)));
 
@@ -138,12 +104,45 @@ public class DefaultTurretCommand extends Command {
     TurretParameters params = turret.getTurretParameters();
 
     turret.setTurretControlRequest(
-        ShooterConstants.TURRET_MOTION_MAGIC_REQUEST.withPosition(params.turretRotationTarget));
+        ShooterConstants.TURRET_MOTION_MAGIC_REQUEST
+            .withPosition(params.turretRotationTarget)
+            .withFeedForward(
+                ShooterConstants.TURRET_SPRING_ANGLE_ZERO
+                        .minus(RobotState.instance().getTurretRotationAngle())
+                        .in(Degrees)
+                    * (LoggingConstants.tuningMode
+                        ? turretFFProp.getAsDouble()
+                        : ShooterConstants.TURRET_SPRING_FF)));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     turret.setTurretRotationMotorVoltage(Volts.of(0.0));
+  }
+
+  private void checkGains() {
+    if (turretAcceleration.hasChanged(hashCode())
+        || turretVelocity.hasChanged(hashCode())
+        || turretAngle_kP.hasChanged(hashCode())
+        || turretAngle_kI.hasChanged(hashCode())
+        || turretAngle_kD.hasChanged(hashCode())
+        || turretAngle_kS.hasChanged(hashCode())
+        || turretAngle_kV.hasChanged(hashCode())) {
+      Slot0Configs newConfigs = new Slot0Configs();
+      newConfigs.kP = turretAngle_kP.getAsDouble();
+      newConfigs.kI = turretAngle_kI.getAsDouble();
+      newConfigs.kD = turretAngle_kD.getAsDouble();
+      newConfigs.kV = turretAngle_kV.getAsDouble();
+      newConfigs.kS = turretAngle_kS.getAsDouble();
+
+      MotionMagicConfigs newMM =
+          new MotionMagicConfigs()
+              .withMotionMagicAcceleration(turretAcceleration.getAsDouble())
+              .withMotionMagicCruiseVelocity(turretVelocity.getAsDouble());
+
+      turret.setTurretRotationMotorMM(newMM);
+      turret.setTurretRotationMotorGains(newConfigs);
+    }
   }
 }

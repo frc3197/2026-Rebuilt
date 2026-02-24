@@ -11,10 +11,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.commands.AlignCommand;
+import frc.robot.constants.FieldConstants;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.enums.RealAutos;
+import frc.robot.subsystems.Align;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.turret.Turret;
 import java.io.IOException;
@@ -27,10 +30,12 @@ import org.json.simple.parser.ParseException;
 
 public class AutoLookup {
 
+  private final Align align;
   private final Drive drive;
   private final Turret turret;
 
-  public AutoLookup(Drive drive, Turret turret) {
+  public AutoLookup(Align align, Drive drive, Turret turret) {
+    this.align = align;
     this.drive = drive;
     this.turret = turret;
   }
@@ -38,8 +43,9 @@ public class AutoLookup {
   private Command getRightBumpAuto() {
     return new SequentialCommandGroup(
         getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(4.168, 2.398, Rotation2d.kZero)),
+        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
         new WaitCommand(2.5),
         loadPath("Start-Neutral-Shoot"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
@@ -49,6 +55,12 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         new WaitCommand(5.0),
         loadPath("Shoot-Tower"),
+        new AlignCommand(
+            align,
+            drive,
+            (RobotContainer.isRed()
+                ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
+                : FieldConstants.CLIMB_ALIGN_POSE)),
         RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
   }
 
@@ -68,9 +80,9 @@ public class AutoLookup {
   private SequentialCommandGroup getCommonCommands() {
     return new SequentialCommandGroup(
         turret.zeroTurretPositionCommand(),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED),
-        RobotContainer.setTurretMode(TurretMode.IDLE));
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB));
   }
 
   private Command loadPath(String name) {

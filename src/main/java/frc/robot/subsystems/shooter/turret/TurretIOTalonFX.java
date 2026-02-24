@@ -52,9 +52,11 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     leftHoodActuator.updateCurPos();
 
     inputs.turretMotorAngle.mut_replace(getTurretAngularPosition());
+    inputs.turretMotorCurrent.mut_replace(turretRotationMotor.getSupplyCurrent().getValue());
+    inputs.turretMotorVoltage.mut_replace(turretRotationMotor.getMotorVoltage().getValue());
     inputs.hoodAngle.mut_replace(getTurretAngularPosition());
-
     inputs.hoodActuatorExtension.mut_replace(Millimeters.of(leftHoodActuator.getPosition()));
+    inputs.hoodActuatorExtensionTarget.mut_replace(hoodExtensionTarget);
   }
 
   @Override

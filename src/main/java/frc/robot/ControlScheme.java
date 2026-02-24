@@ -57,7 +57,7 @@ public class ControlScheme {
     return secondaryController.a();
   }
 
-  public Trigger getFeedManual() {
+  public Trigger getBackfeedManual() {
     return secondaryController.y();
   }
 
@@ -81,6 +81,10 @@ public class ControlScheme {
   // Shooter
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.b();
+  }
+
+  public Trigger getBackfeedIndexManual() {
+    return secondaryController.povLeft();
   }
 
   public Trigger zeroTurret() {

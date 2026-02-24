@@ -20,8 +20,7 @@ public class IndexConstants implements IndexHardwareID {
       new TalonFXSConfiguration()
           .withCommutation(
               new CommutationConfigs().withMotorArrangement(MotorArrangementValue.Minion_JST))
-          .withMotorOutput(
-              new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+          .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
   public static final VelocityDutyCycle FEED_TORQUE_REQUEST =
       new VelocityDutyCycle(RotationsPerSecond.of(0.0)).withEnableFOC(true);

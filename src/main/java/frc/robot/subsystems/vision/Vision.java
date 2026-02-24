@@ -25,13 +25,18 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
-  private final VisionConsumer consumer;
+  private final VisionConsumer driveVisionConsumer;
+  private final VisionConsumer questVisionConsumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
-    this.consumer = consumer;
+  private double lastQuestUpdateTimestamp = 0.0;
+
+  public Vision(
+      VisionConsumer driveVisionConsumer, VisionConsumer questVisionConsumer, VisionIO... io) {
+    this.driveVisionConsumer = driveVisionConsumer;
+    this.questVisionConsumer = questVisionConsumer;
     this.io = io;
 
     // Initialize inputs
@@ -94,7 +99,8 @@ public class Vision extends SubsystemBase {
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
-            observation.tagCount() == 0 // Must have at least one tag
+            observation.type() == PoseObservationType.MEGATAG_1
+                || observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())
@@ -134,10 +140,19 @@ public class Vision extends SubsystemBase {
         }
 
         // Send vision observation
-        consumer.accept(
+        driveVisionConsumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+        if (observation.averageTagDistance() >= 0.5
+            && observation.averageTagDistance() <= 2.0
+            && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1500) {
+          questVisionConsumer.accept(
+              observation.pose().toPose2d(),
+              observation.timestamp(),
+              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        }
       }
 
       // Log camera metadata

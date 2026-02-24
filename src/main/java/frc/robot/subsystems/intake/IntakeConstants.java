@@ -23,7 +23,7 @@ import frc.robot.HardwareID;
 
 public class IntakeConstants implements HardwareID.IntakeHardwareID {
 
-  public static final double INTAKE_SPIN_DUTY_CYCLE = 0.75;
+  public static final double INTAKE_SPIN_DUTY_CYCLE = 1.0;
 
   // Motion magic configs
   private static final double max_intake_rps = DegreesPerSecond.of(500).in(RotationsPerSecond);
@@ -56,8 +56,8 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new SoftwareLimitSwitchConfigs()
                   .withForwardSoftLimitEnable(true)
                   .withReverseSoftLimitEnable(true)
-                  .withForwardSoftLimitThreshold(170.0)
-                  .withReverseSoftLimitThreshold(-20.0))
+                  .withForwardSoftLimitThreshold(0.0)
+                  .withReverseSoftLimitThreshold(-120.0))
           .withMotionMagic(INTAKE_MM_CONFIGS)
           .withSlot0(DEPLOY_MOTOR_GAINS)
           .withFeedback(new FeedbackConfigs().withRotorToSensorRatio(5 * 5 * 3))
@@ -71,8 +71,8 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
                   .withStatorCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(41.0);
-  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(160);
+  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(-120);
+  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(0);
 
   public static final PositionDutyCycle DEPLOY_POSITION_REQUEST =
       new PositionDutyCycle(Degrees.of(0.0));

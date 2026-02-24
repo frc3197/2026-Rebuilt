@@ -2,10 +2,13 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -26,7 +29,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID;
 
@@ -34,6 +39,17 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   // Physical
   public static final Distance FUEL_RELEASE_HEIGHT = Inches.of(20);
+
+  // Thresholds
+  public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(2.5);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(1.25);
+
+  public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(1.0);
+  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(60);
+  public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(4.0);
+  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(3.5);
+
+  public static final double TURRET_ROTATION_COMPENSATION_CONSTANT = 0.5;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);
@@ -50,10 +66,10 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
   // Turret rotation PID controller
-  private static final double kSTurret = 2.05; // Add 0.05 V output to overcome static friction
+  private static final double kSTurret = 7; // Add 0.05 V output to overcome static friction
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      350.5; // A position error of 2.5 rotations results in 12 V output
+      150.0; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
   private static final double kDTurret = 0.0;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
@@ -65,9 +81,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKD(kDTurret);
 
   // Motion magic configs
-  private static final double max_turret_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
+  private static final double max_turret_rps = RadiansPerSecond.of(10).in(RotationsPerSecond);
   private static final double max_turret_acceleration =
-      DegreesPerSecondPerSecond.of(300).in(RotationsPerSecondPerSecond);
+      RadiansPerSecondPerSecond.of(20).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs TURRET_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicAcceleration(max_turret_acceleration)
@@ -77,6 +93,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final VoltageOut TURRET_VOLTAGE_REQUEST = new VoltageOut(0.0);
   public static final PositionDutyCycle TURRET_POSITION_REQUEST = new PositionDutyCycle(0.0);
+
+  public static final Angle TURRET_SPRING_ANGLE_ZERO = Radians.of(-0.917321);
+  public static final double TURRET_SPRING_FF = -0.05;
 
   // Turret rotation limits
   public static final Angle TURRET_ROTATION_LIMIT_FORWARD = Degrees.of(180);
@@ -109,7 +128,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   private static final double kSFlywheel = 12.5; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
-      0.15; // A velocity target of 1 rps results in 0.12 V output
+      0.4; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
       10.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error

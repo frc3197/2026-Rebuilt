@@ -1,24 +1,34 @@
 package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
 import frc.robot.RobotContainer;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.LoggingConstants;
+import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.VirtualSubsystem;
@@ -29,12 +39,19 @@ public class ShotCalculator extends VirtualSubsystem {
   private String key;
   public static ShotCalculator instance;
 
-  private MutAngle targetHoodAngle = new MutAngle(45.0, 45.0, Degrees);
+  private MutDistance targetHoodExtension = Millimeters.of(25.0).mutableCopy();
   private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
 
-  private LoggedTunableNumber targetVelocityManual = new LoggedTunableNumber("FLYWHEEL VELO", 44);
+  private LoggedTunableNumber targetVelocityManual =
+      new LoggedTunableNumber("FLYWHEEL VELO TUNING", 44);
+  private LoggedTunableNumber hoodDistanceTunable = new LoggedTunableNumber("HOOD MM TUNING", 20);
   private MutAngularVelocity targetFlywheelVelocity = RotationsPerSecond.of(44.0).mutableCopy();
-  private boolean readyToShoot = false;
+
+  private boolean flywheelReadyToShoot = false;
+  private boolean translationalReadyToShoot = false;
+  private boolean angularReadyToShoot = false;
+  private boolean turretRotationReadyToShoot = false;
+  private boolean hoodReadyToShoot = false;
 
   public ShotCalculator(String key) {
     this.key = key;
@@ -69,15 +86,38 @@ public class ShotCalculator extends VirtualSubsystem {
   private void calculateTargetParameters() {
     boolean isRed = RobotContainer.isRed();
 
+    // Robot pose
     Pose2d robotPose = RobotState.instance().getRobotPose();
+    // Vel
     ChassisSpeeds robotVelocity = RobotState.instance().getRobotVelocity();
+    // Acc
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
 
-    // Where the turret is aiming
-    Pose2d turretTargetPose =
-        isRed ? FieldConstants.Red.HUB_CENTER : FieldConstants.Blue.HUB_CENTER;
+    // 384 --92
 
-    Logger.recordOutput("Shot Calculator/Target to shoot at", turretTargetPose);
+    // Where the turret is aiming
+    Pose2d poseToAimAt = new Pose2d();
+
+    switch (RobotState.instance().getTurretMode()) {
+      case TRACKING_HUB:
+        poseToAimAt = isRed ? FieldConstants.Red.HUB_CENTER : FieldConstants.Blue.HUB_CENTER;
+        break;
+      default:
+        break;
+    }
+
+    Logger.recordOutput("Shot Calculator/Target to shoot at", poseToAimAt);
+
+    // Compensate for velocity
+    // Target field pose
+    Pose2d poseToAimAtCompensated =
+        poseToAimAt.plus(
+            new Transform2d(
+                -robotVelocity.vxMetersPerSecond / 1.15,
+                -robotVelocity.vyMetersPerSecond / 1.15,
+                Rotation2d.kZero));
+    Logger.recordOutput(
+        "Shot Calculator/VELO COMPENSATED Target to shoot at", poseToAimAtCompensated);
 
     // Where the turret is relative to blue origin
     Pose2d turretFieldLocation =
@@ -87,43 +127,145 @@ public class ShotCalculator extends VirtualSubsystem {
             .toPose2d();
 
     // Vector from blue origin to robot
-    Vector<N2> vRobot = VecBuilder.fill(turretFieldLocation.getX(), turretFieldLocation.getY());
+    Vector<N2> vTurret = VecBuilder.fill(turretFieldLocation.getX(), turretFieldLocation.getY());
 
-    // Vector from blue origin to target
-    Vector<N2> vTarget = VecBuilder.fill(turretTargetPose.getX(), turretTargetPose.getY());
-    Vector<N2> robotToHub = vTarget.minus(vRobot);
+    // Vector from blue origin to compensated target
+    Vector<N2> vTarget =
+        VecBuilder.fill(poseToAimAtCompensated.getX(), poseToAimAtCompensated.getY());
 
-    // Log the error vector
-    Logger.recordOutput(
-        "Shot Calculator/Robot to Hub", "<" + robotToHub.get(0) + ", " + robotToHub.get(1) + ">");
+    // Turret to
+    Vector<N2> turretToCompensatedTarget = vTarget.minus(vTurret);
 
     // Cosine component from dot product
-    Angle cosAngle = Radians.of(robotToHub.dot(VecBuilder.fill(1, 0)));
+    Angle cosAngle = Radians.of(turretToCompensatedTarget.dot(VecBuilder.fill(1, 0)));
 
     // Sine component from cross product
-    Vector<N3> robotToHub3d = VecBuilder.fill(robotToHub.get(0), robotToHub.get(1), 0);
+    Vector<N3> turretToTarget3d =
+        VecBuilder.fill(turretToCompensatedTarget.get(0), turretToCompensatedTarget.get(1), 0);
     Angle sinAngle =
-        Radians.of(getMagnitude3d(Vector.cross(VecBuilder.fill(1, 0, 0), robotToHub3d)));
+        Radians.of(getMagnitude3d(Vector.cross(VecBuilder.fill(1, 0, 0), turretToTarget3d)));
 
     // Final target rotation for the turret to track
     Angle potAngle =
         Radians.of(
                 Math.atan2(sinAngle.in(Radians), cosAngle.in(Radians))
-                    * (robotToHub.get(1) < 0 ? -1.0 : 1.0))
+                    * (turretToCompensatedTarget.get(1) < 0 ? -1.0 : 1.0))
             .minus(Radians.of(robotPose.getRotation().getRadians()))
             .plus(Degrees.of(180));
 
-    if (robotToHub.get(1) < 0) {
+    if (turretToCompensatedTarget.get(1) < 0) {
       potAngle = potAngle.plus(Degrees.of(360));
     }
 
-    targetTurretAngle.mut_replace(potAngle);
+    Angle compensatedAngle =
+        potAngle.minus(
+            Radians.of(
+                robotVelocity.omegaRadiansPerSecond
+                    * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT));
+
+    // This is prob the problem! compensatedAngle & targetTurretAngle
+    Logger.recordOutput("Shot Calculator/compensatedAngle", compensatedAngle.in(Degrees));
+
+    targetTurretAngle.mut_replace(compensatedAngle);
     // targetTurretAngle.mut_replace(Degrees.of(45));
+
+    double turretToCompensatedTargetMagnitude =
+        (getDistance(
+            RobotState.instance().getRobotPose3d(),
+            new Pose3d(poseToAimAtCompensated)
+                .plus(
+                    new Transform3d(
+                        0, 0, FieldConstants.HUB_HEIGHT.in(Meters), new Rotation3d()))));
+
+    Logger.recordOutput("TURRET TO TARGET DIST", turretToCompensatedTargetMagnitude);
+
+    // TODO DISABLE
+    targetHoodExtension.mut_replace(
+        getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
+    targetFlywheelVelocity.mut_replace(
+        getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
+
+    // ----------------------------------------------------------
+    // CHECK IF WE ARE READY TO SHOOT
+    // ----------------------------------------------------------
+    // Velocity and shot readiness
+    flywheelReadyToShoot =
+        MathUtil.isNear(
+            ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond),
+            RobotState.instance().getFlywheelVelocity().in(RotationsPerSecond),
+            frc.robot.managersubsystems.RobotState.instance().getFlywheelMode()
+                    == FlywheelMode.FRENZY
+                ? ShooterConstants.FRENZY_FEED_THRESHOLD.in(RotationsPerSecond)
+                : ShooterConstants.NORMAL_FEED_THRESHOLD.in(RotationsPerSecond));
+
+    translationalReadyToShoot =
+        MathUtil.isNear(
+            0.0,
+            Math.sqrt(
+                Math.pow(robotVelocity.vxMetersPerSecond, 2)
+                    + Math.pow(robotVelocity.vyMetersPerSecond, 2)),
+            ShooterConstants.TRANSLATIONAL_SPEED_THRESHOLD.in(MetersPerSecond));
+
+    angularReadyToShoot =
+        MathUtil.isNear(
+            0.0,
+            robotVelocity.omegaRadiansPerSecond,
+            ShooterConstants.ANGULAR_SPEED_THRESHOLD.in(RotationsPerSecond));
+
+    turretRotationReadyToShoot =
+        MathUtil.isNear(
+            0.0,
+            RobotState.instance().getTurretRotationAngle().minus(targetTurretAngle).in(Degrees),
+            ShooterConstants.TURRET_ANGLE_ERROR_THRESHOLD.in(Degrees));
+
+    hoodReadyToShoot =
+        MathUtil.isNear(
+            RobotState.instance().getHoodExtension().in(Millimeters),
+            targetHoodExtension.in(Millimeters),
+            ShooterConstants.HOOD_EXTENSION_THRESHOLD.in(Millimeters));
+
+    Logger.recordOutput("Shot Calculator/Shot Checks/Flywheel spooled", flywheelReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Linear velocity", translationalReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Angular velocity", angularReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Turret rotation", turretRotationReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Hood angled", hoodReadyToShoot);
+  }
+
+  private AngularVelocity getTargetVelo(double distanceInMeters) {
+    // double rps = MathUtil.clamp((3.76 * distanceInMeters) + 30.7, 5, 60);
+    double rps = MathUtil.clamp((4.76 * distanceInMeters) + 30.7, 5, 60);
+    return RotationsPerSecond.of(rps);
+  }
+
+  private Distance getTargetExtension(double distanceInMeters) {
+    // double mm = MathUtil.clamp(-31.7 + (48.3 * Math.log(distanceInMeters)), 0,
+    // 50.0);
+    double mm = (1.0 / (-0.15 * (distanceInMeters - 0.184))) + 40;
+    if (distanceInMeters <= 2) {
+      mm = 0;
+    }
+    // double mm = MathUtil.clamp(-21 + (10 * (distanceInMeters)), 0, 50.0);
+    return Millimeters.of(MathUtil.clamp(mm, 0, 50));
+  }
+
+  private AngularVelocity getTargetVeloLongHoodLow(double distanceInMeters) {
+    double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 60);
+    return RotationsPerSecond.of(rps);
+  }
+
+  private Distance getTargetExtensionLongHoodLow(double distanceInMeters) {
+    double mm = (1.9 * distanceInMeters) + 33.9;
+    return Millimeters.of(MathUtil.clamp(mm, 0, 50));
   }
 
   // Getters ---------------------------------------------------------------
-  public Angle getTargetHoodAngle() {
-    return targetHoodAngle;
+  public Distance getTargetHoodExtension() {
+
+    if (false && LoggingConstants.tuningMode && hoodDistanceTunable.hasChanged(hashCode())) {
+      this.targetHoodExtension.mut_replace(Millimeters.of(hoodDistanceTunable.getAsDouble()));
+    }
+
+    return targetHoodExtension;
   }
 
   public Angle getTargetTurretAngle() {
@@ -131,19 +273,20 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   public AngularVelocity getTargetFlywheelVelocity() {
-    if (LoggingConstants.tuningMode && targetVelocityManual.hasChanged(hashCode())) {
+
+    if (false && LoggingConstants.tuningMode && targetVelocityManual.hasChanged(hashCode())) {
       this.targetFlywheelVelocity.mut_replace(
           RotationsPerSecond.of(targetVelocityManual.getAsDouble()));
     }
+
     return targetFlywheelVelocity;
   }
 
   public boolean getReadyToFeed() {
-    return readyToShoot;
-  }
-
-  public void setReadyToFeed(boolean value) {
-    readyToShoot = value;
+    return flywheelReadyToShoot
+        && translationalReadyToShoot
+        && angularReadyToShoot
+        && turretRotationReadyToShoot;
   }
 
   // Helper functions ------------------------------------------------------
@@ -154,5 +297,12 @@ public class ShotCalculator extends VirtualSubsystem {
   private double getMagnitude3d(Vector<N3> vector) {
     return Math.sqrt(
         Math.pow(vector.get(0), 2.0) + Math.pow(vector.get(1), 2.0) + Math.pow(vector.get(2), 2.0));
+  }
+
+  private double getDistance(Pose3d p1, Pose3d p2) {
+    return Math.sqrt(
+        Math.pow(p1.getX() - p2.getX(), 2)
+            + Math.pow(p1.getY() - p2.getY(), 2)
+            + Math.pow(p1.getZ() - p2.getZ(), 2));
   }
 }

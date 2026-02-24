@@ -24,6 +24,7 @@ public class DefaultIntakeCommand extends Command {
   private final Intake intake;
 
   private final BooleanSupplier spinManual;
+  private final BooleanSupplier backfeedManual;
   private final DoubleSupplier deployManual;
 
   private final LoggedTunableNumber deployKs =
@@ -43,9 +44,13 @@ public class DefaultIntakeCommand extends Command {
    * @param deployManual Determines if manual intake deploy button is pressed.
    */
   public DefaultIntakeCommand(
-      Intake intake, BooleanSupplier spinManual, DoubleSupplier deployManual) {
+      Intake intake,
+      BooleanSupplier spinManual,
+      DoubleSupplier deployManual,
+      BooleanSupplier backfeedManual) {
     this.spinManual = spinManual;
     this.deployManual = deployManual;
+    this.backfeedManual = backfeedManual;
 
     this.intake = intake;
     addRequirements(intake);
@@ -90,12 +95,18 @@ public class DefaultIntakeCommand extends Command {
         break;
 
       case OUTTAKING:
-        intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        intake.setIntakeSpinSpeed(-IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
         break;
 
       case MANUAL:
-        intake.setIntakeSpinSpeed(
-            spinManual.getAsBoolean() ? IntakeConstants.INTAKE_SPIN_DUTY_CYCLE : 0.0);
+        if (spinManual.getAsBoolean()) {
+
+          intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        } else if (backfeedManual.getAsBoolean()) {
+          intake.setIntakeSpinSpeed(-IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        } else {
+          intake.setIntakeSpinSpeed(0.0);
+        }
         break;
 
       default:

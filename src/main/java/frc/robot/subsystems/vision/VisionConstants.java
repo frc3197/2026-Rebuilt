@@ -49,4 +49,8 @@ public class VisionConstants {
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available, use gyro instead
+
+  public static final int CLIMBER_APRIL_TAG_PIPELINE = 0;
+  public static final int CLIMBER_BLUE_ALIGN_PIPELINE = 2;
+  public static final int CLIMBER_RED_ALIGN_PIPELINE = 1;
 }

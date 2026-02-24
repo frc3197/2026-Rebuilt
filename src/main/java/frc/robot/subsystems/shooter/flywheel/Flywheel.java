@@ -4,12 +4,10 @@
 
 package frc.robot.subsystems.shooter.flywheel;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import org.littletonrobotics.junction.Logger;
 
@@ -32,12 +30,8 @@ public class Flywheel extends SubsystemBase {
 
     Logger.processInputs("Shooter/Flywheel", loggedInputs);
 
-    ShotCalculator.instance()
-        .setReadyToFeed(
-            MathUtil.isNear(
-                ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond),
-                loggedInputs.flywheelTargetVelocity,
-                20));
+    RobotState.instance()
+        .setFlywheelVelocity(ShotCalculator.instance().getTargetFlywheelVelocity());
   }
 
   public void setGains(Slot0Configs gains) {
