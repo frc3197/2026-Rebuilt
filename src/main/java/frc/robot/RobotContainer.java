@@ -328,6 +328,7 @@ public class RobotContainer {
                 .andThen(
                     Commands.runOnce(() -> index.setFeedRequest(new VoltageOut(Volts.of(0.0))))));
 
+    // Zeroes the robot
     controlScheme
         .getZeroGyro()
         .onTrue(
@@ -340,12 +341,29 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    // Driver controller bindings to spool flywheel
     controlScheme.spoolFlywheel().onTrue(setFlywheelMode(FlywheelMode.SHOOTING));
     controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
 
-    controlScheme.getHoodAngleMaximum().onTrue(turret.setActuatorPosition(Millimeters.of(40.0)));
-    controlScheme.getHoodAngleMedium().onTrue(turret.setActuatorPosition(Millimeters.of(25.0)));
-    controlScheme.getHoodAngleMinimum().onTrue(turret.setActuatorPosition(Millimeters.of(0.0)));
+    // Manual hood, for now only when in calibration mode
+    controlScheme
+        .getHoodAngleMaximum()
+        .onTrue(
+            turret
+                .setActuatorPosition(Millimeters.of(40.0))
+                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+    controlScheme
+        .getHoodAngleMedium()
+        .onTrue(
+            turret
+                .setActuatorPosition(Millimeters.of(25.0))
+                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+    controlScheme
+        .getHoodAngleMinimum()
+        .onTrue(
+            turret
+                .setActuatorPosition(Millimeters.of(0.0))
+                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
 
     controlScheme
         .getClimberRotateCW()
@@ -364,27 +382,6 @@ public class RobotContainer {
     controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.MANUAL));
 
     controlScheme.zeroTurret().onTrue(turret.zeroTurretPositionCommand().ignoringDisable(true));
-
-    /*
-     * controlScheme
-     * .getIntakeExtendPreset()
-     * .onTrue(
-     * Commands.runOnce(
-     * () ->
-     * intake.setDeployControlRequest(
-     * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
-     * IntakeConstants.FULLY_EXTENDED_ANGLE)),
-     * intake));
-     * controlScheme
-     * .getIntakeRetractPreset()
-     * .onTrue(
-     * Commands.runOnce(
-     * () ->
-     * intake.setDeployControlRequest(
-     * IntakeConstants.DEPLOY_POSITION_REQUEST.withPosition(
-     * IntakeConstants.FULLY_RETRACTED_ANGLE)),
-     * intake));
-     */
   }
 
   private void configureTriggerCallbacks() {

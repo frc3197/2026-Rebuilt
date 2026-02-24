@@ -37,7 +37,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShotCalculator extends VirtualSubsystem {
 
   private String key;
-  public static ShotCalculator instance;
+  private static ShotCalculator instance;
 
   private MutDistance targetHoodExtension = Millimeters.of(25.0).mutableCopy();
   private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
@@ -46,6 +46,8 @@ public class ShotCalculator extends VirtualSubsystem {
       new LoggedTunableNumber("FLYWHEEL VELO TUNING", 44);
   private LoggedTunableNumber hoodDistanceTunable = new LoggedTunableNumber("HOOD MM TUNING", 20);
   private MutAngularVelocity targetFlywheelVelocity = RotationsPerSecond.of(44.0).mutableCopy();
+
+  private Pose2d poseToAimAt = new Pose2d();
 
   private boolean flywheelReadyToShoot = false;
   private boolean translationalReadyToShoot = false;
@@ -81,6 +83,13 @@ public class ShotCalculator extends VirtualSubsystem {
                         0, 0, 0, new Rotation3d(0, 0, targetTurretAngle.in(Radians))))));
 
     Logger.recordOutput("Shot Calculator/Robot to hub angle", targetTurretAngle);
+    Logger.recordOutput("Shot Calculator/Target to shoot at", poseToAimAt);
+
+    Logger.recordOutput("Shot Calculator/Shot Checks/Flywheel spooled", flywheelReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Linear velocity", translationalReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Angular velocity", angularReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Turret rotation", turretRotationReadyToShoot);
+    Logger.recordOutput("Shot Calculator/Shot Checks/Hood angled", hoodReadyToShoot);
   }
 
   private void calculateTargetParameters() {
@@ -92,12 +101,16 @@ public class ShotCalculator extends VirtualSubsystem {
     ChassisSpeeds robotVelocity = RobotState.instance().getRobotVelocity();
     // Acc
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
+    // Where the turret is relative to blue origin
+    Pose2d turretFieldLocation =
+        RobotState.instance()
+            .getRobotPose3d()
+            .plus(ShooterConstants.ROBOT_TO_TURRET_CENTER)
+            .toPose2d();
 
     // 384 --92
 
-    // Where the turret is aiming
-    Pose2d poseToAimAt = new Pose2d();
-
+    // Where the turret is aiming as pose
     switch (RobotState.instance().getTurretMode()) {
       case TRACKING_HUB:
         poseToAimAt = isRed ? FieldConstants.Red.HUB_CENTER : FieldConstants.Blue.HUB_CENTER;
@@ -106,10 +119,9 @@ public class ShotCalculator extends VirtualSubsystem {
         break;
     }
 
-    Logger.recordOutput("Shot Calculator/Target to shoot at", poseToAimAt);
-
     // Compensate for velocity
     // Target field pose
+    // TODO it is a work in progress
     Pose2d poseToAimAtCompensated =
         poseToAimAt.plus(
             new Transform2d(
@@ -119,33 +131,36 @@ public class ShotCalculator extends VirtualSubsystem {
     Logger.recordOutput(
         "Shot Calculator/VELO COMPENSATED Target to shoot at", poseToAimAtCompensated);
 
-    // Where the turret is relative to blue origin
-    Pose2d turretFieldLocation =
-        RobotState.instance()
-            .getRobotPose3d()
-            .plus(ShooterConstants.ROBOT_TO_TURRET_CENTER)
-            .toPose2d();
-
     // Vector from blue origin to robot
     Vector<N2> vTurret = VecBuilder.fill(turretFieldLocation.getX(), turretFieldLocation.getY());
-
     // Vector from blue origin to compensated target
     Vector<N2> vTarget =
         VecBuilder.fill(poseToAimAtCompensated.getX(), poseToAimAtCompensated.getY());
-
     // Turret to
     Vector<N2> turretToCompensatedTarget = vTarget.minus(vTurret);
-
     // Cosine component from dot product
-    Angle cosAngle = Radians.of(turretToCompensatedTarget.dot(VecBuilder.fill(1, 0)));
-
-    // Sine component from cross product
+    Angle cosAngle =
+        Radians.of(
+            turretToCompensatedTarget.dot(
+                VecBuilder.fill(
+                    -Math.sin(robotPose.getRotation().getRadians()),
+                    Math.cos(robotPose.getRotation().getRadians()))));
+    // Vector for the cross product, represents the error vector from the robot
     Vector<N3> turretToTarget3d =
         VecBuilder.fill(turretToCompensatedTarget.get(0), turretToCompensatedTarget.get(1), 0);
+    // Sine component from cross product, i crossed with the error vector from robot
+    // to target
     Angle sinAngle =
-        Radians.of(getMagnitude3d(Vector.cross(VecBuilder.fill(1, 0, 0), turretToTarget3d)));
+        Radians.of(
+            getMagnitude3d(
+                Vector.cross(
+                    VecBuilder.fill(
+                        -Math.sin(robotPose.getRotation().getRadians()),
+                        Math.cos(robotPose.getRotation().getRadians()),
+                        0),
+                    turretToTarget3d)));
 
-    // Final target rotation for the turret to track
+    // Final field-relative rotation for the turret to track
     Angle potAngle =
         Radians.of(
                 Math.atan2(sinAngle.in(Radians), cosAngle.in(Radians))
@@ -153,15 +168,24 @@ public class ShotCalculator extends VirtualSubsystem {
             .minus(Radians.of(robotPose.getRotation().getRadians()))
             .plus(Degrees.of(180));
 
-    if (turretToCompensatedTarget.get(1) < 0) {
-      potAngle = potAngle.plus(Degrees.of(360));
-    }
+    /*
+     * if (turretToCompensatedTarget.get(1) < 0) {
+     * potAngle = potAngle.plus(Degrees.of(360));
+     * }
+     */
 
+    // Now, compensate for angular velocity by adding a linear constant proportional
+    // to rotation speed
     Angle compensatedAngle =
         potAngle.minus(
             Radians.of(
                 robotVelocity.omegaRadiansPerSecond
-                    * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT));
+                    * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT
+                    * 0.0));
+
+    // Now we have a target to rotate to on the field. Yet, there is one issue: the
+    // turret will wither under or over rotate if the error vector is not parallel
+    // to i.
 
     // This is prob the problem! compensatedAngle & targetTurretAngle
     Logger.recordOutput("Shot Calculator/compensatedAngle", compensatedAngle.in(Degrees));
@@ -177,13 +201,13 @@ public class ShotCalculator extends VirtualSubsystem {
                     new Transform3d(
                         0, 0, FieldConstants.HUB_HEIGHT.in(Meters), new Rotation3d()))));
 
-    Logger.recordOutput("TURRET TO TARGET DIST", turretToCompensatedTargetMagnitude);
-
-    // TODO DISABLE
-    targetHoodExtension.mut_replace(
-        getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
-    targetFlywheelVelocity.mut_replace(
-        getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
+    // If we are not calibrating, calculate the target spool & hood angle
+    if (!LoggingConstants.shooterCalibrationMode) {
+      targetHoodExtension.mut_replace(
+          getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
+      targetFlywheelVelocity.mut_replace(
+          getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
+    }
 
     // ----------------------------------------------------------
     // CHECK IF WE ARE READY TO SHOOT
@@ -223,12 +247,6 @@ public class ShotCalculator extends VirtualSubsystem {
             RobotState.instance().getHoodExtension().in(Millimeters),
             targetHoodExtension.in(Millimeters),
             ShooterConstants.HOOD_EXTENSION_THRESHOLD.in(Millimeters));
-
-    Logger.recordOutput("Shot Calculator/Shot Checks/Flywheel spooled", flywheelReadyToShoot);
-    Logger.recordOutput("Shot Calculator/Shot Checks/Linear velocity", translationalReadyToShoot);
-    Logger.recordOutput("Shot Calculator/Shot Checks/Angular velocity", angularReadyToShoot);
-    Logger.recordOutput("Shot Calculator/Shot Checks/Turret rotation", turretRotationReadyToShoot);
-    Logger.recordOutput("Shot Calculator/Shot Checks/Hood angled", hoodReadyToShoot);
   }
 
   private AngularVelocity getTargetVelo(double distanceInMeters) {
@@ -258,10 +276,22 @@ public class ShotCalculator extends VirtualSubsystem {
     return Millimeters.of(MathUtil.clamp(mm, 0, 50));
   }
 
-  // Getters ---------------------------------------------------------------
+  // ------------------------------------------------------------------------------
+  // Getters
+  // ------------------------------------------------------------------------------
+  public AngularVelocity getTargetFlywheelVelocity() {
+
+    if (LoggingConstants.shooterCalibrationMode && targetVelocityManual.hasChanged(hashCode())) {
+      this.targetFlywheelVelocity.mut_replace(
+          RotationsPerSecond.of(targetVelocityManual.getAsDouble()));
+    }
+
+    return targetFlywheelVelocity;
+  }
+
   public Distance getTargetHoodExtension() {
 
-    if (false && LoggingConstants.tuningMode && hoodDistanceTunable.hasChanged(hashCode())) {
+    if (LoggingConstants.shooterCalibrationMode && hoodDistanceTunable.hasChanged(hashCode())) {
       this.targetHoodExtension.mut_replace(Millimeters.of(hoodDistanceTunable.getAsDouble()));
     }
 
@@ -272,16 +302,7 @@ public class ShotCalculator extends VirtualSubsystem {
     return targetTurretAngle;
   }
 
-  public AngularVelocity getTargetFlywheelVelocity() {
-
-    if (false && LoggingConstants.tuningMode && targetVelocityManual.hasChanged(hashCode())) {
-      this.targetFlywheelVelocity.mut_replace(
-          RotationsPerSecond.of(targetVelocityManual.getAsDouble()));
-    }
-
-    return targetFlywheelVelocity;
-  }
-
+  // TODO not all values are used here for sake of testing
   public boolean getReadyToFeed() {
     return flywheelReadyToShoot
         && translationalReadyToShoot
@@ -289,7 +310,9 @@ public class ShotCalculator extends VirtualSubsystem {
         && turretRotationReadyToShoot;
   }
 
-  // Helper functions ------------------------------------------------------
+  // ------------------------------------------------------------------------------
+  // Helper functions
+  // ------------------------------------------------------------------------------
   private double getMagnitude2d(Vector<N2> vector) {
     return Math.sqrt(Math.pow(vector.get(0), 2.0) + Math.pow(vector.get(1), 2.0));
   }

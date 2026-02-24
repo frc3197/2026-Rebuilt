@@ -41,6 +41,7 @@ public class DefaultTurretHoodCommand extends Command {
           "turretVelocity",
           ShooterConstants.TURRET_MOTOR_CONFIG.MotionMagic.MotionMagicCruiseVelocity);
 
+  // Arbitrary feed-forward to fight spring tension
   private LoggedTunableNumber turretFFProp =
       new LoggedTunableNumber("Turret FF Prop", ShooterConstants.TURRET_SPRING_FF);
 
@@ -51,7 +52,8 @@ public class DefaultTurretHoodCommand extends Command {
    * Creates a new DefaultFlywheelCommand.
    *
    * @param turret The turret subsystem.
-   * @param turretMotorVoltageSupplier Supplies turret motor voltage magnitude.
+   * @param turretMotorVoltageSupplier Supplies turret motor voltage magnitude, -1 to 1, maps to
+   *     -10v to 10v.
    */
   public DefaultTurretHoodCommand(Turret turret, DoubleSupplier turretMotorVoltageSupplier) {
     this.turretMotorVoltageSupplier = turretMotorVoltageSupplier;
@@ -68,12 +70,17 @@ public class DefaultTurretHoodCommand extends Command {
 
     // Check for gain updates
     if (LoggingConstants.tuningMode) {
-      checkGains();
+      checkRotationGains();
     }
 
-    turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
+    // If the robot is not in shot calibration mode, then set the actuator to its
+    // target extension
+    if (!LoggingConstants.shooterCalibrationMode)
+      turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
 
+    // Update turret state
     switch (RobotState.instance().getTurretMode()) {
+        // TODO these need to be updated, currently they lead to same function
       case TRACKING_HUB:
         turretAutoTracking();
         break;
@@ -82,11 +89,13 @@ public class DefaultTurretHoodCommand extends Command {
         turretAutoTracking();
         break;
 
+        // Stop turret rotation
       case IDLE:
         ShooterConstants.TURRET_VOLTAGE_REQUEST.Output = 0.0;
         turret.setTurretControlRequest(ShooterConstants.TURRET_VOLTAGE_REQUEST);
         break;
 
+        // Rotate turret based on supplier, -10 to 10 volts
       case MANUAL:
         double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 10;
         turret.setTurretControlRequest(
@@ -121,7 +130,7 @@ public class DefaultTurretHoodCommand extends Command {
     turret.setTurretRotationMotorVoltage(Volts.of(0.0));
   }
 
-  private void checkGains() {
+  private void checkRotationGains() {
     if (turretAcceleration.hasChanged(hashCode())
         || turretVelocity.hasChanged(hashCode())
         || turretAngle_kP.hasChanged(hashCode())
