@@ -7,10 +7,14 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.measure.Distance;
 
 public class VisionConstants {
   // AprilTag layout
@@ -53,4 +57,7 @@ public class VisionConstants {
   public static final int CLIMBER_APRIL_TAG_PIPELINE = 0;
   public static final int CLIMBER_BLUE_ALIGN_PIPELINE = 2;
   public static final int CLIMBER_RED_ALIGN_PIPELINE = 1;
+
+  public static final PIDController CLIMB_ALIGN_PID_CONTROLLER = new PIDController(0.2, 0, 0);
+  public static final Distance CLIMB_ALIGNED_THRESHOLD = Inches.of(1.0);
 }

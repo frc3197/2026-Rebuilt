@@ -82,7 +82,7 @@ public class ShotCalculator extends VirtualSubsystem {
                     new Transform3d(
                         0, 0, 0, new Rotation3d(0, 0, targetTurretAngle.in(Radians))))));
 
-    Logger.recordOutput("Shot Calculator/Robot to hub angle", targetTurretAngle);
+    Logger.recordOutput("Shot Calculator/Target Turret Angle", targetTurretAngle.in(Degrees));
     Logger.recordOutput("Shot Calculator/Target to shoot at", poseToAimAt);
 
     Logger.recordOutput("Shot Calculator/Shot Checks/Flywheel spooled", flywheelReadyToShoot);
@@ -139,26 +139,14 @@ public class ShotCalculator extends VirtualSubsystem {
     // Turret to
     Vector<N2> turretToCompensatedTarget = vTarget.minus(vTurret);
     // Cosine component from dot product
-    Angle cosAngle =
-        Radians.of(
-            turretToCompensatedTarget.dot(
-                VecBuilder.fill(
-                    -Math.sin(robotPose.getRotation().getRadians()),
-                    Math.cos(robotPose.getRotation().getRadians()))));
+    Angle cosAngle = Radians.of(turretToCompensatedTarget.dot(VecBuilder.fill(1, 0)));
     // Vector for the cross product, represents the error vector from the robot
     Vector<N3> turretToTarget3d =
         VecBuilder.fill(turretToCompensatedTarget.get(0), turretToCompensatedTarget.get(1), 0);
     // Sine component from cross product, i crossed with the error vector from robot
     // to target
     Angle sinAngle =
-        Radians.of(
-            getMagnitude3d(
-                Vector.cross(
-                    VecBuilder.fill(
-                        -Math.sin(robotPose.getRotation().getRadians()),
-                        Math.cos(robotPose.getRotation().getRadians()),
-                        0),
-                    turretToTarget3d)));
+        Radians.of(getMagnitude3d(Vector.cross(VecBuilder.fill(1, 0, 0), turretToTarget3d)));
 
     // Final field-relative rotation for the turret to track
     Angle potAngle =
@@ -166,13 +154,11 @@ public class ShotCalculator extends VirtualSubsystem {
                 Math.atan2(sinAngle.in(Radians), cosAngle.in(Radians))
                     * (turretToCompensatedTarget.get(1) < 0 ? -1.0 : 1.0))
             .minus(Radians.of(robotPose.getRotation().getRadians()))
-            .plus(Degrees.of(180));
+            .minus(Degrees.of(180));
 
-    /*
-     * if (turretToCompensatedTarget.get(1) < 0) {
-     * potAngle = potAngle.plus(Degrees.of(360));
-     * }
-     */
+    if (turretToCompensatedTarget.get(1) < 0) {
+      potAngle = potAngle.plus(Degrees.of(360));
+    }
 
     // Now, compensate for angular velocity by adding a linear constant proportional
     // to rotation speed
@@ -182,6 +168,19 @@ public class ShotCalculator extends VirtualSubsystem {
                 robotVelocity.omegaRadiansPerSecond
                     * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT
                     * 0.0));
+
+    if (compensatedAngle.in(Degrees) < -180) {
+      compensatedAngle = compensatedAngle.plus(Degrees.of(360));
+    }
+    if (compensatedAngle.in(Degrees) > 180) {
+      compensatedAngle = compensatedAngle.minus(Degrees.of(360));
+    }
+    compensatedAngle =
+        Degrees.of(
+            MathUtil.clamp(
+                compensatedAngle.in(Degrees),
+                ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE.in(Degrees),
+                ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD.in(Degrees)));
 
     // Now we have a target to rotate to on the field. Yet, there is one issue: the
     // turret will wither under or over rotate if the error vector is not parallel

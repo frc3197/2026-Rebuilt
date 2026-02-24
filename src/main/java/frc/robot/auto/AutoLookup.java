@@ -11,11 +11,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.commands.AlignClimb;
 import frc.robot.commands.AlignCommand;
 import frc.robot.constants.FieldConstants;
+import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.TurretMode;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.enums.RealAutos;
 import frc.robot.subsystems.Align;
 import frc.robot.subsystems.drive.Drive;
@@ -54,6 +57,7 @@ public class AutoLookup {
         loadPath("Neutral-Shoot-2"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         new WaitCommand(5.0),
+        Commands.runOnce(() -> RobotState.instance().setClimbCameraMode(RobotContainer.isRed() ? ClimbCameraMode.CLIMB_RED : ClimbCameraMode.CLIMB_BLUE)),
         loadPath("Shoot-Tower"),
         new AlignCommand(
             align,
@@ -61,7 +65,9 @@ public class AutoLookup {
             (RobotContainer.isRed()
                 ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
                 : FieldConstants.CLIMB_ALIGN_POSE)),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        new AlignClimb(null, drive)
+        );
   }
 
   public Command getAuto(RealAutos auto) {
@@ -80,6 +86,7 @@ public class AutoLookup {
   private SequentialCommandGroup getCommonCommands() {
     return new SequentialCommandGroup(
         turret.zeroTurretPositionCommand(),
+        RobotContainer.setClimbCameraMode(ClimbCameraMode.APRIL_TAGS),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setTurretMode(TurretMode.TRACKING_HUB));
