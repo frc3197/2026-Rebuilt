@@ -15,16 +15,17 @@ public class QuestIOReal implements QuestIO {
 
   QuestNav questNav = new QuestNav();
 
-  Pose3d questPose = new Pose3d();
+  private Pose3d questPose = new Pose3d();
+  private Pose3d robotPose = new Pose3d();
+  private double timestamp = 0.0;
 
   public QuestIOReal() {}
-
-  protected void configureHardware() {}
 
   @Override
   public void updateInputs(QuestInputs inputs) {
     inputs.isConnected = questNav.isConnected();
     inputs.questPose = questPose;
+    inputs.robotPose = robotPose;
   }
 
   @Override
@@ -33,12 +34,17 @@ public class QuestIOReal implements QuestIO {
 
     PoseFrame[] poseFrames = questNav.getAllUnreadPoseFrames();
 
-    if (poseFrames.length > 0) {
-      Pose3d questPose = poseFrames[poseFrames.length - 1].questPose3d();
-      this.questPose = questPose;
+    for (PoseFrame questFrame : poseFrames) {
+      // Make sure the Quest was tracking the pose for this frame
+      if (questFrame.isTracking()) {
+        // Get the pose of the Quest
+        questPose = questFrame.questPose3d();
+        // Get timestamp for when the data was sent
+        timestamp = questFrame.dataTimestamp();
 
-      // Transform by the mount pose to get your robot pose
-      Pose3d robotPose = questPose.transformBy(QuestConstants.ROBOT_TO_QUEST.inverse());
+        // Transform by the mount pose to get your robot pose
+        robotPose = questPose.transformBy(QuestConstants.ROBOT_TO_QUEST.inverse());
+      }
     }
   }
 
@@ -50,5 +56,20 @@ public class QuestIOReal implements QuestIO {
                 QuestConstants.ROBOT_TO_QUEST.getY(),
                 QuestConstants.ROBOT_TO_QUEST.getRotation().toRotation2d()));
     questNav.setPose(new Pose3d(newQuestPose));
+  }
+
+  @Override
+  public boolean isConnected() {
+    return questNav.isConnected();
+  }
+
+  @Override
+  public Pose2d getRobotPosition() {
+    return robotPose.toPose2d();
+  }
+
+  @Override
+  public double getTimestamp() {
+    return timestamp;
   }
 }

@@ -151,7 +151,7 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOTalonFX());
 
-        quest = new Quest(new QuestIOReal());
+        quest = new Quest(new QuestIOReal(), drive::addVisionMeasurement);
 
         vision =
             new Vision(
@@ -182,7 +182,7 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIOSim());
 
-        quest = new Quest(new QuestIOSim());
+        quest = new Quest(new QuestIOSim(), drive::addVisionMeasurement);
 
         /*
          * vision =
@@ -224,7 +224,7 @@ public class RobotContainer {
 
         turret = new Turret(new TurretIO() {});
 
-        quest = new Quest(new QuestIO() {});
+        quest = new Quest(new QuestIO() {}, drive::addVisionMeasurement);
 
         vision =
             new Vision(
@@ -315,7 +315,7 @@ public class RobotContainer {
         .getSpindexFeedFlywheelManual()
         .onTrue(
             index
-                .setSpindexMotorCommand(Volts.of(2.35))
+                .setSpindexMotorCommand(Volts.of(3.5))
                 .andThen(
                     Commands.runOnce(
                         () ->

@@ -68,7 +68,7 @@ public class DefaultIndexCommand extends Command {
         break;
       case FRENZY:
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(Volts.of(2.95));
+          index.setSpindexMotor(Volts.of(3.5));
           index.setFeedMotor(Volts.of(10.0));
         } else {
           index.setFeedMotor(Volts.of(0.0));

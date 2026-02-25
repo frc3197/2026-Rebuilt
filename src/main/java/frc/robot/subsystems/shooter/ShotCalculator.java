@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
@@ -95,10 +96,19 @@ public class ShotCalculator extends VirtualSubsystem {
   private void calculateTargetParameters() {
     boolean isRed = RobotContainer.isRed();
 
-    // Robot pose
-    Pose2d robotPose = RobotState.instance().getRobotPose();
     // Vel
     ChassisSpeeds robotVelocity = RobotState.instance().getRobotVelocity();
+    // Robot pose
+    Pose2d robotPose =
+        RobotState.instance()
+            .getRobotPose()
+            .plus(
+                new Transform2d(
+                    Translation2d.kZero,
+                    new Rotation2d(
+                        Radians.of(
+                            robotVelocity.omegaRadiansPerSecond
+                                * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT))));
     // Acc
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
     // Where the turret is relative to blue origin
@@ -162,23 +172,17 @@ public class ShotCalculator extends VirtualSubsystem {
 
     // Now, compensate for angular velocity by adding a linear constant proportional
     // to rotation speed
-    Angle compensatedAngle =
-        potAngle.minus(
-            Radians.of(
-                robotVelocity.omegaRadiansPerSecond
-                    * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT
-                    * 0.0));
 
-    if (compensatedAngle.in(Degrees) < -180) {
-      compensatedAngle = compensatedAngle.plus(Degrees.of(360));
+    if (potAngle.in(Degrees) < -180) {
+      potAngle = potAngle.plus(Degrees.of(360));
     }
-    if (compensatedAngle.in(Degrees) > 180) {
-      compensatedAngle = compensatedAngle.minus(Degrees.of(360));
+    if (potAngle.in(Degrees) > 180) {
+      potAngle = potAngle.minus(Degrees.of(360));
     }
-    compensatedAngle =
+    potAngle =
         Degrees.of(
             MathUtil.clamp(
-                compensatedAngle.in(Degrees),
+                potAngle.in(Degrees),
                 ShooterConstants.TURRET_ROTATION_LIMIT_REVERSE.in(Degrees),
                 ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD.in(Degrees)));
 
@@ -187,9 +191,9 @@ public class ShotCalculator extends VirtualSubsystem {
     // to i.
 
     // This is prob the problem! compensatedAngle & targetTurretAngle
-    Logger.recordOutput("Shot Calculator/compensatedAngle", compensatedAngle.in(Degrees));
+    Logger.recordOutput("Shot Calculator/compensatedAngle", potAngle.in(Degrees));
 
-    targetTurretAngle.mut_replace(compensatedAngle);
+    targetTurretAngle.mut_replace(potAngle);
     // targetTurretAngle.mut_replace(Degrees.of(45));
 
     double turretToCompensatedTargetMagnitude =

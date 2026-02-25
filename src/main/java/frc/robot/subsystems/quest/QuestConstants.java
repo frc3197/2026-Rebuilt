@@ -11,16 +11,16 @@ import edu.wpi.first.units.measure.Distance;
 
 public class QuestConstants {
 
-  private static final Distance QUEST_TO_TURRET_X = Inches.of(9.0);
-  private static final Distance QUEST_TO_TURRET_Y = Inches.of(8);
-  private static final Distance QUEST_TO_TURRET_Z = Inches.of(12);
+  private static final Distance ROBOT_TO_QUEST_X = Inches.of(-11.75);
+  private static final Distance ROBOT_TO_QUEST_Y = Inches.of(-11.75);
+  private static final Distance ROBOT_TO_QUEST_Z = Inches.of(12);
   private static final Rotation3d ROBOT_TO_QUEST_ROTATION =
-      new Rotation3d(0, 0, Degrees.of(45).in(Radians));
+      new Rotation3d(0, 0, Degrees.of(-45 + 180).in(Radians));
 
   public static final Transform3d ROBOT_TO_QUEST =
       new Transform3d(
-          QUEST_TO_TURRET_Y.in(Meters),
-          -QUEST_TO_TURRET_X.in(Meters),
-          QUEST_TO_TURRET_Z.in(Meters),
+          ROBOT_TO_QUEST_Y.in(Meters),
+          -ROBOT_TO_QUEST_X.in(Meters),
+          ROBOT_TO_QUEST_Z.in(Meters),
           ROBOT_TO_QUEST_ROTATION);
 }

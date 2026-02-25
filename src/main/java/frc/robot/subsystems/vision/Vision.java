@@ -127,7 +127,7 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+            Math.pow(observation.averageTagDistance(), 2.0) * 10 / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (observation.type() == PoseObservationType.MEGATAG_2) {
@@ -145,9 +145,16 @@ public class Vision extends SubsystemBase {
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
 
+        Logger.recordOutput(
+            "UPDATING META POSE",
+            observation.averageTagDistance() >= 0.5
+                && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5);
+
         if (observation.averageTagDistance() >= 0.5
-            && observation.averageTagDistance() <= 2.0
-            && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1500) {
+            && observation.averageTagDistance() <= 2.5
+            && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5) {
+          lastQuestUpdateTimestamp = observation.timestamp();
+          System.out.println("YEAH");
           questVisionConsumer.accept(
               observation.pose().toPose2d(),
               observation.timestamp(),
