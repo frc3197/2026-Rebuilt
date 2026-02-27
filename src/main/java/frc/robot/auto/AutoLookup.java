@@ -49,14 +49,14 @@ public class AutoLookup {
         setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        new WaitCommand(2.5),
+        new WaitCommand(2.0),
         loadPath("Start-Neutral-Shoot"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(5.0),
+        new WaitCommand(3.75),
         RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
         loadPath("Neutral-Shoot-2"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(5.0),
+        new WaitCommand(3.75),
         Commands.runOnce(
             () ->
                 RobotState.instance()
@@ -73,6 +73,40 @@ public class AutoLookup {
                 : FieldConstants.CLIMB_ALIGN_POSE)),
         RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
         new AlignClimb(null, drive));
+  }
+
+  private Command getRightBumpCLIMBAuto() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        new WaitCommand(2.0),
+        loadPath("Start-Neutral-Shoot"),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        new WaitCommand(3.75),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        loadPath("Neutral-Shoot-2"),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        new WaitCommand(3.75),
+        Commands.runOnce(
+            () ->
+                RobotState.instance()
+                    .setClimbCameraMode(
+                        RobotContainer.isRed()
+                            ? ClimbCameraMode.CLIMB_RED
+                            : ClimbCameraMode.CLIMB_BLUE)),
+        loadPath("Shoot-Tower"),
+        new AlignCommand(
+                align,
+                drive,
+                (RobotContainer.isRed()
+                    ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
+                    : FieldConstants.CLIMB_ALIGN_POSE))
+            .withTimeout(1.5),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE)
+        // new AlignClimb(null, drive)).withTimeout(1.0);
+        );
   }
 
   public Command getAuto(RealAutos auto) {

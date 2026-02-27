@@ -11,8 +11,10 @@ import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,12 +24,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.AutoLookup;
+import frc.robot.commands.AlignClimb;
+import frc.robot.commands.AlignCommand;
 import frc.robot.commands.DefaultFlywheelCommand;
 import frc.robot.commands.DefaultIndexCommand;
 import frc.robot.commands.DefaultIntakeCommand;
 import frc.robot.commands.DefaultTurretHoodCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.Sim.SimTurretCommand;
+import frc.robot.commands.ZeroTurret;
+import frc.robot.constants.FieldConstants;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.constants.LoggingConstants.Mode;
 import frc.robot.constants.TunerConstants;
@@ -40,6 +46,7 @@ import frc.robot.enums.RealAutos;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.Align;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSim;
 import frc.robot.subsystems.climber.ClimberIOTalonFX;
@@ -73,6 +80,7 @@ import frc.robot.subsystems.shooter.turret.TurretIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOClimberLimelight;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -157,7 +165,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 quest::acceptVisionPose,
-                new VisionIOLimelight(VisionConstants.LIMELIGHT_NAME, drive::getRotation));
+                new VisionIOLimelight(VisionConstants.LIMELIGHT_NAME, drive::getRotation),
+                new VisionIOClimberLimelight(
+                    VisionConstants.CLIMBER_LIMELIGHT_NAME, drive::getRotation));
 
         break;
 
@@ -308,8 +318,14 @@ public class RobotContainer {
 
     controlScheme
         .getBackfeedIndexManual()
-        .onTrue(index.setSpindexMotorCommand(Volts.of(-5.35)))
-        .onFalse(index.setSpindexMotorCommand(Volts.of(0.0)));
+        .onTrue(
+            index
+                .setSpindexMotorCommand(Volts.of(-5.35))
+                .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING)))
+        .onFalse(
+            index
+                .setSpindexMotorCommand(Volts.of(0.0))
+                .andThen(setIntakeSpinMode(IntakeSpinMode.MANUAL)));
 
     controlScheme
         .getSpindexFeedFlywheelManual()
@@ -346,24 +362,62 @@ public class RobotContainer {
     controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
 
     // Manual hood, for now only when in calibration mode
+     /* controlScheme
+     .getHoodAngleMaximum()
+     .onTrue(
+     turret
+     .setActuatorPosition(Millimeters.of(40.0))
+     .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+     controlScheme
+     .getHoodAngleMedium()
+     .onTrue(
+     turret
+     .setActuatorPosition(Millimeters.of(25.0))
+     .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+     controlScheme
+     .getHoodAngleMinimum()
+     .onTrue(
+     turret
+     .setActuatorPosition(Millimeters.of(0.0))
+     .onlyIf(() -> LoggingConstants.shooterCalibrationMode)); */
+
     controlScheme
         .getHoodAngleMaximum()
         .onTrue(
-            turret
-                .setActuatorPosition(Millimeters.of(40.0))
-                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+            Commands.runOnce(
+                () ->
+                    climber.setClimberControlType(
+                        new PositionDutyCycle(ClimberConstants.climberUpAngle)),
+                climber));
     controlScheme
         .getHoodAngleMedium()
         .onTrue(
-            turret
-                .setActuatorPosition(Millimeters.of(25.0))
-                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+            Commands.runOnce(
+                () ->
+                    climber.setClimberControlType(
+                        new PositionDutyCycle(ClimberConstants.climberClimbAngle)),
+                climber));
     controlScheme
         .getHoodAngleMinimum()
         .onTrue(
-            turret
-                .setActuatorPosition(Millimeters.of(0.0))
-                .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+            Commands.runOnce(
+                () ->
+                    climber.setClimberControlType(
+                        new PositionDutyCycle(ClimberConstants.climberStowAngle)),
+                climber));
+
+    controlScheme
+        .getAlignClimb()
+        .whileTrue(
+            new AlignCommand(
+                    align,
+                    drive,
+                    (RobotContainer.isRed()
+                        ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
+                        : FieldConstants.CLIMB_ALIGN_POSE))
+                .withTimeout(2.0)
+                .andThen(new AlignClimb(() -> vision.getTargetX(1).getDegrees(), drive))
+                .withTimeout(1.0));
 
     controlScheme
         .getClimberRotateCW()
@@ -379,9 +433,10 @@ public class RobotContainer {
     controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
 
     controlScheme.getTurretTrack().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
-    controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.MANUAL));
+    controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.IDLE));
 
     controlScheme.zeroTurret().onTrue(turret.zeroTurretPositionCommand().ignoringDisable(true));
+    controlScheme.autoZeroTurret().whileTrue(new ZeroTurret(turret));
   }
 
   private void configureTriggerCallbacks() {

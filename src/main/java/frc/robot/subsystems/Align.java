@@ -29,9 +29,9 @@ import org.littletonrobotics.junction.Logger;
 public class Align extends SubsystemBase {
 
   // Controllers for each axis
-  private PIDController dController = new PIDController(0.25, 0, 0);
-  private PIDController lController = new PIDController(0.5, 0, 0);
-  private PIDController thetaController = new PIDController(1.0, 0, 0);
+  private PIDController dController = new PIDController(4.0, 0, 0);
+  private PIDController lController = new PIDController(4.0, 0, 0);
+  private PIDController thetaController = new PIDController(0.045, 0, 0);
 
   // Min & max speeds
   private final double maxDepthSpeed = 4.5;
@@ -40,9 +40,9 @@ public class Align extends SubsystemBase {
 
   // Tunable proportional gains
   private LoggedTunableNumber dKp =
-      new LoggedTunableNumber("Align/Depth controller proportional", 0.75);
+      new LoggedTunableNumber("Align/Depth controller proportional", dController.getP());
   private LoggedTunableNumber lKp =
-      new LoggedTunableNumber("Align/Lateral controller proportional", 0.75);
+      new LoggedTunableNumber("Align/Lateral controller proportional", lController.getP());
 
   public Align() {
     dController.setP(dKp.getAsDouble());
@@ -118,7 +118,8 @@ public class Align extends SubsystemBase {
     // Log rotation speed while aligning
     Logger.recordOutput("Align/Align rotation speed", rotSpeed.in(DegreesPerSecond));
 
-    // Return field centric chassis speeds from d & l vectors, angle of target, and rotation speed
+    // Return field centric chassis speeds from d & l vectors, angle of target, and
+    // rotation speed
     return getFieldCentricSpeeds(
         VecBuilder.fill(targetAlignedOffsets.get(0, 0), 0),
         VecBuilder.fill(0, targetAlignedOffsets.get(1, 0)),
@@ -139,6 +140,8 @@ public class Align extends SubsystemBase {
     Matrix<N2, N1> combinedVector = dVector.plus(lVector);
 
     return new ChassisSpeeds(
-        combinedVector.get(0, 0), combinedVector.get(1, 0), rotSpeed.in(DegreesPerSecond));
+        MathUtil.applyDeadband(combinedVector.get(0, 0), 0.05),
+        MathUtil.applyDeadband(combinedVector.get(1, 0), 0.05),
+        MathUtil.applyDeadband(rotSpeed.in(DegreesPerSecond), 0.05));
   }
 }

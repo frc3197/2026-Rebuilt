@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -43,7 +42,7 @@ public class DefaultTurretHoodCommand extends Command {
 
   // Arbitrary feed-forward to fight spring tension
   private LoggedTunableNumber turretFFProp =
-      new LoggedTunableNumber("Turret FF Prop", ShooterConstants.TURRET_SPRING_FF);
+      new LoggedTunableNumber("Turret CURRENT TORQUE", ShooterConstants.TURRET_SPRING_FF);
 
   private final Turret turret;
   private final DoubleSupplier turretMotorVoltageSupplier;
@@ -83,6 +82,9 @@ public class DefaultTurretHoodCommand extends Command {
         // TODO these need to be updated, currently they lead to same function
       case TRACKING_HUB:
         turretAutoTracking();
+        // turret.setTurretControlRequest(new VelocityDutyCycle(0.2));
+        // turret.setTurretControlRequest(new
+        // TorqueCurrentFOC(Amps.of(turretFFProp.get())));
         break;
 
       case PASSING:
@@ -93,6 +95,12 @@ public class DefaultTurretHoodCommand extends Command {
       case IDLE:
         ShooterConstants.TURRET_VOLTAGE_REQUEST.Output = 0.0;
         turret.setTurretControlRequest(ShooterConstants.TURRET_VOLTAGE_REQUEST);
+
+        /*
+         * turret.setTurretControlRequest(
+         * ShooterConstants.TURRET_MOTION_MAGIC_REQUEST.withPosition(
+         * ShooterConstants.TURRET_SPRING_ANGLE_ZERO));
+         */
         break;
 
         // Rotate turret based on supplier, -10 to 10 volts
@@ -115,13 +123,7 @@ public class DefaultTurretHoodCommand extends Command {
     turret.setTurretControlRequest(
         ShooterConstants.TURRET_MOTION_MAGIC_REQUEST
             .withPosition(params.turretRotationTarget)
-            .withFeedForward(
-                ShooterConstants.TURRET_SPRING_ANGLE_ZERO
-                        .minus(RobotState.instance().getTurretRotationAngle())
-                        .in(Degrees)
-                    * (LoggingConstants.tuningMode
-                        ? turretFFProp.getAsDouble()
-                        : ShooterConstants.TURRET_SPRING_FF)));
+            .withFeedForward(turret.getTurretFFAmps()));
   }
 
   // Called once the command ends or is interrupted.

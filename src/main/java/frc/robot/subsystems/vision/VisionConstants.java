@@ -23,7 +23,7 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String LIMELIGHT_NAME = "limelight";
-  public static String camera1Name = "camera_1";
+  public static String CLIMBER_LIMELIGHT_NAME = "limelight-climb";
 
   // Robot to camera transforms
   // (ONLY FOR PHOTONVISION)

@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems.shooter.turret;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,5 +88,24 @@ public class Turret extends SubsystemBase {
 
   public void setActuatorPositionFunc(Distance position) {
     turretIO.setHoodActuatorMM(position);
+  }
+
+  public Current getTurretFFAmps() {
+    if (turretIO
+        .getTurretParameters()
+        .turretRotation
+        .gt(ShooterConstants.TURRET_SPRING_ANGLE_ZERO)) {
+      double rot = turretIO.getTurretParameters().turretRotation.in(Radians);
+      double value = 9.21 + (4.17 * rot) - (2.66 * Math.pow(rot, 2));
+      return Amps.of(MathUtil.clamp(value, 0, 11.0));
+    } else {
+      double rot = turretIO.getTurretParameters().turretRotation.in(Radians);
+      double value = 50.3 + (61.9 * rot) + (14.5 * Math.pow(rot, 2));
+      return Amps.of(MathUtil.clamp(value, -15.5, 0));
+    }
+  }
+
+  public boolean limitActivated() {
+    return turretIO.limitActivated();
   }
 }

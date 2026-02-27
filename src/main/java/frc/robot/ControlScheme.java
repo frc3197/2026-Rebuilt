@@ -16,6 +16,10 @@ public class ControlScheme {
 
   // Drive button mappings
 
+  public Trigger getAlignClimb() {
+    return primaryController.y();
+  }
+
   public double getDriveX() {
     return primaryController.getLeftY();
   }
@@ -81,6 +85,10 @@ public class ControlScheme {
   // Shooter
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.b();
+  }
+
+  public Trigger autoZeroTurret() {
+    return secondaryController.back();
   }
 
   public Trigger getBackfeedIndexManual() {

@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.HardwareID;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -30,6 +31,8 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
 
   // Actuators
   private final LinearServo leftHoodActuator = new LinearServo(0, 50, 32);
+
+  private DigitalInput turretZeroLimit = new DigitalInput(ShooterConstants.TURRET_ZERO_LIMIT);
 
   private TurretParameters params = new TurretParameters();
 
@@ -57,6 +60,7 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     inputs.hoodAngle.mut_replace(getTurretAngularPosition());
     inputs.hoodActuatorExtension.mut_replace(Millimeters.of(leftHoodActuator.getPosition()));
     inputs.hoodActuatorExtensionTarget.mut_replace(hoodExtensionTarget);
+    inputs.limitSwitchActivated = limitActivated();
   }
 
   @Override
@@ -118,6 +122,11 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
     params.hoodAngle.mut_replace(getTurretHoodAngleFromPosition(leftHoodActuator.getPosition()));
 
     return params;
+  }
+
+  @Override
+  public boolean limitActivated() {
+    return !turretZeroLimit.get();
   }
 
   // Helper functions

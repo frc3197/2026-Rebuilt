@@ -33,7 +33,9 @@ public class Quest extends SubsystemBase {
     Logger.processInputs("Quest", inputs);
 
     driveVisionConsumer.accept(
-        questIO.getRobotPosition(), questIO.getTimestamp(), VecBuilder.fill(0.0, 0.0, 0.0));
+        questIO.getRobotPosition(),
+        questIO.getTimestamp(),
+        VecBuilder.fill(0.0, 0.0, Double.POSITIVE_INFINITY));
   }
 
   public void acceptVisionPose(

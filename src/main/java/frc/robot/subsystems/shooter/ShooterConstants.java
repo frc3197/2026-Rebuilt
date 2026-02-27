@@ -66,12 +66,12 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
   // Turret rotation PID controller
-  private static final double kSTurret = 7; // Add 0.05 V output to overcome static friction
+  private static final double kSTurret = 0.0253;
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      150.0; // A position error of 2.5 rotations results in 12 V output
+      2000; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
-  private static final double kDTurret = 0.0;
+  private static final double kDTurret = 100;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
       new Slot0Configs()
           .withKS(kSTurret)
@@ -105,6 +105,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static FeedbackConfigs TURRET_FEEDBACK_CONFIGS =
       new FeedbackConfigs().withSensorToMechanismRatio(FX_TO_TURRET_RATIO);
 
+  public static final int TURRET_ZERO_LIMIT = 0;
+
   // Turret motor configs
   public static TalonFXConfiguration TURRET_MOTOR_CONFIG =
       new TalonFXConfiguration()
@@ -128,7 +130,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   private static final double kSFlywheel = 12.5; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
-      0.4; // A velocity target of 1 rps results in 0.12 V output
+      0.35; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
       10.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error

@@ -27,6 +27,7 @@ public interface TurretIO {
     public MutAngle hoodAngle = Degrees.of(45.0).mutableCopy();
     public MutDistance hoodActuatorExtension = Millimeters.of(0.0).mutableCopy();
     public MutDistance hoodActuatorExtensionTarget = Millimeters.of(0.0).mutableCopy();
+    public boolean limitSwitchActivated = false;
   }
 
   public class TurretParameters {
@@ -58,4 +59,8 @@ public interface TurretIO {
   public default void setHoodActuatorMM(Distance d) {}
 
   public default void updateInputs(TurretInputs inputs) {}
+
+  public default boolean limitActivated() {
+    return true;
+  }
 }

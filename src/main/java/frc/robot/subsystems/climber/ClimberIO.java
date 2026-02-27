@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.climber;
 
+import com.ctre.phoenix6.controls.ControlRequest;
 import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -13,6 +14,7 @@ public interface ClimberIO {
   @AutoLog
   public static class ClimberInputs {
     public double motorCurrent = 0;
+    public double climberAngleDegrees = 0.0;
   }
 
   public default void updateInputs(ClimberInputs inputs) {}
@@ -20,4 +22,8 @@ public interface ClimberIO {
   public default void setClimbMotorSpeed(double speed) {}
 
   public default void setTarget(Distance target) {}
+
+  public default void zeroClimber() {}
+
+  public default void setClimberControl(ControlRequest request) {}
 }

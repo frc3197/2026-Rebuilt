@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems.climber;
 
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.util.RealSubsystem;
 
@@ -13,10 +15,7 @@ public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
 
   private final TalonFX climberMotor;
 
-  private final PositionDutyCycle request = new PositionDutyCycle(0.0);
-
   public ClimberIOTalonFX() {
-
     climberMotor = new TalonFX(ClimberConstants.climberMotor);
 
     configureHardware();
@@ -30,11 +29,21 @@ public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
   @Override
   public void updateInputs(ClimberInputs inputs) {
     inputs.motorCurrent = climberMotor.getSupplyCurrent().getValueAsDouble();
+    inputs.climberAngleDegrees = climberMotor.getPosition().getValue().in(Degrees);
   }
 
   @Override
   public void setClimbMotorSpeed(double speed) {
-    System.out.println("SPEED");
     climberMotor.set(speed);
+  }
+
+  @Override
+  public void setClimberControl(ControlRequest request) {
+    climberMotor.setControl(request);
+  }
+
+  @Override
+  public void zeroClimber() {
+    climberMotor.setPosition(0.0);
   }
 }
