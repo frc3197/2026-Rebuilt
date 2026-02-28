@@ -15,7 +15,7 @@ public interface FlywheelIO {
 
   @AutoLog
   public static class FlywheelInputs {
-    public double flywheelVelocity = 0.0;
+    public double flywheelTargetVelocityRPS = 0.0;
     public double flywheelTargetVelocity = 0.0;
     public MutVoltage flywheelSuppliedVoltage = new MutVoltage(0.0, 0.0, Volts);
     public MutCurrent flywheelCurrentDraw = new MutCurrent(0.0, 0.0, Amps);

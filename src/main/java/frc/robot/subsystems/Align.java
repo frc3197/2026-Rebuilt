@@ -29,13 +29,13 @@ import org.littletonrobotics.junction.Logger;
 public class Align extends SubsystemBase {
 
   // Controllers for each axis
-  private PIDController dController = new PIDController(4.0, 0, 0);
-  private PIDController lController = new PIDController(4.0, 0, 0);
+  private PIDController dController = new PIDController(3.0, 0, 0);
+  private PIDController lController = new PIDController(3.0, 0, 0);
   private PIDController thetaController = new PIDController(0.045, 0, 0);
 
   // Min & max speeds
-  private final double maxDepthSpeed = 4.5;
-  private final double maxLateralSpeed = 4.5;
+  private final double maxDepthSpeed = 2.5;
+  private final double maxLateralSpeed = 2.5;
   private final double maxRotSpeed = 1.5;
 
   // Tunable proportional gains

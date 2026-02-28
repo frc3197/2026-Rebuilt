@@ -66,7 +66,20 @@ public class DefaultIndexCommand extends Command {
         index.setFeedMotor(Volts.of(0.0));
         index.setSpindexMotor(Volts.of(0.0));
         break;
+      case PREPARE:
+        index.setFeedMotor(Volts.of(0.0));
+        index.setSpindexMotor(Volts.of(0.0));
+        break;
       case FRENZY:
+        if (ShotCalculator.instance().getReadyToFeed()) {
+          index.setSpindexMotor(Volts.of(3.5));
+          index.setFeedMotor(Volts.of(10.0));
+        } else {
+          index.setFeedMotor(Volts.of(0.0));
+          index.setSpindexMotor(Volts.of(0.0));
+        }
+        break;
+      case SHOOTING:
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setSpindexMotor(Volts.of(3.5));
           index.setFeedMotor(Volts.of(10.0));

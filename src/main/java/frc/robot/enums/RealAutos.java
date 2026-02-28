@@ -1,5 +1,6 @@
 package frc.robot.enums;
 
 public enum RealAutos {
-  Right_Bump
+  Right_Bump_Twice,
+  Right_Bump_Climb
 }

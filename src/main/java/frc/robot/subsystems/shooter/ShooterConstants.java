@@ -26,8 +26,11 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -49,10 +52,13 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(4.0);
   public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(3.5);
 
-  public static final double TURRET_ROTATION_COMPENSATION_CONSTANT = 0.25;
+  public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.25;
+  public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.0;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);
+  public static Vector<N3> ROBOT_TO_TURRET_VECTOR =
+      VecBuilder.fill(-ROBOT_TO_TURRET_Y.in(Meters), -ROBOT_TO_TURRET_X.in(Meters), 0);
   // Describes the turret's bottom opening relative to robot position
   public static final Transform3d ROBOT_TO_TURRET_CENTER =
       new Transform3d(
@@ -115,7 +121,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withFeedback(TURRET_FEEDBACK_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(25.0)
+                  .withStatorCurrentLimit(50.0)
                   .withStatorCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()
@@ -156,14 +162,15 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(100)
+                  .withStatorCurrentLimit(120)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(100.0)
+                  .withSupplyCurrentLimit(120.0)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
                   .withNeutralMode(NeutralModeValue.Brake)
-                  .withInverted(InvertedValue.CounterClockwise_Positive));
+                  .withInverted(InvertedValue.CounterClockwise_Positive))
+          .withSlot0(FLYWHEEL_SLOT0_CONFIGS);
 
   // HOOD --------------
   public static Angle MAX_HOOD_ANGLE = Degrees.of(45);

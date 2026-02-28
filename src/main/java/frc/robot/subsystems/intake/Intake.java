@@ -4,10 +4,14 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -45,6 +49,13 @@ public class Intake extends SubsystemBase {
     intakeIO.updateInputs(loggedInputs);
 
     Logger.processInputs("Intake", loggedInputs);
+
+    RobotState.instance()
+        .setIntakeFullyRetracted(
+            MathUtil.isNear(
+                loggedInputs.deployAngleDegrees,
+                IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
+                IntakeConstants.INTAKE_RETRACTED_THRESHOLD.in(Degrees)));
   }
 
   public void setDeployGains(Slot0Configs gains) {

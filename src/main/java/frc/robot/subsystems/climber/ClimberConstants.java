@@ -24,7 +24,7 @@ public class ClimberConstants implements HardwareID.ClimberHardwareID {
 
   public static final TalonFXConfiguration climberTalonConfig =
       new TalonFXConfiguration()
-          .withSlot0(new Slot0Configs().withKP(12.0))
+          .withSlot0(new Slot0Configs().withKP(20.0))
           .withCurrentLimits(
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(160)

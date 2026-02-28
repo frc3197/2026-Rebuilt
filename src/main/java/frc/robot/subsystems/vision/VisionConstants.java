@@ -23,7 +23,7 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String LIMELIGHT_NAME = "limelight";
-  public static String CLIMBER_LIMELIGHT_NAME = "limelight-climb";
+  public static String CLIMBER_LIMELIGHT_NAME = "limelight-climber";
 
   // Robot to camera transforms
   // (ONLY FOR PHOTONVISION)
@@ -58,6 +58,6 @@ public class VisionConstants {
   public static final int CLIMBER_BLUE_ALIGN_PIPELINE = 2;
   public static final int CLIMBER_RED_ALIGN_PIPELINE = 1;
 
-  public static final PIDController CLIMB_ALIGN_PID_CONTROLLER = new PIDController(0.2, 0, 0);
-  public static final Distance CLIMB_ALIGNED_THRESHOLD = Inches.of(1.0);
+  public static final PIDController CLIMB_ALIGN_PID_CONTROLLER = new PIDController(0.021, 0, 0);
+  public static final Distance CLIMB_ALIGNED_THRESHOLD = Inches.of(0.035);
 }

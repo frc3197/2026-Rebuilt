@@ -7,6 +7,7 @@ package frc.robot.subsystems.quest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import frc.robot.managersubsystems.RobotState;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
 
@@ -49,8 +50,10 @@ public class QuestIOReal implements QuestIO {
   }
 
   public void acceptVisionPose(Pose2d pose) {
+    Pose2d poseWithGyro =
+        new Pose2d(pose.getX(), pose.getY(), RobotState.instance().getRobotPose().getRotation());
     Pose2d newQuestPose =
-        pose.transformBy(
+        poseWithGyro.transformBy(
             new Transform2d(
                 QuestConstants.ROBOT_TO_QUEST.getX(),
                 QuestConstants.ROBOT_TO_QUEST.getY(),

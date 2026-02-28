@@ -26,6 +26,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.LoggingConstants;
@@ -108,7 +109,7 @@ public class ShotCalculator extends VirtualSubsystem {
                     new Rotation2d(
                         Radians.of(
                             robotVelocity.omegaRadiansPerSecond
-                                * ShooterConstants.TURRET_ROTATION_COMPENSATION_CONSTANT))));
+                                * ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT))));
     // Acc
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
     // Where the turret is relative to blue origin
@@ -138,6 +139,34 @@ public class ShotCalculator extends VirtualSubsystem {
                 -robotVelocity.vxMetersPerSecond / 1.15,
                 -robotVelocity.vyMetersPerSecond / 1.15,
                 Rotation2d.kZero));
+
+    // Now the location is compensated for robot velocity. Not good enough! Needs
+    // angular rotation
+    // factored in as well
+    Vector<N3> omegaVector = VecBuilder.fill(0, 0, robotVelocity.omegaRadiansPerSecond);
+    Pose3d robotToTurretWithAngle =
+        new Pose3d(
+            ShooterConstants.ROBOT_TO_TURRET_CENTER.getTranslation(),
+            ShooterConstants.ROBOT_TO_TURRET_CENTER.getRotation());
+    robotToTurretWithAngle =
+        robotToTurretWithAngle.rotateBy(RobotState.instance().getRobotPose3d().getRotation());
+
+    Vector<N3> robotToTurretVector =
+        VecBuilder.fill(
+            robotToTurretWithAngle.getX(),
+            robotToTurretWithAngle.getY(),
+            robotToTurretWithAngle.getZ());
+    SmartDashboard.putString(
+        "ROBOT TO TURRET WITH ROT COMP",
+        "" + robotToTurretVector.get(0) + ", " + robotToTurretVector.get(1));
+    Vector<N3> turretVelocityVector = Vector.cross(omegaVector, robotToTurretVector);
+    turretVelocityVector =
+        turretVelocityVector.times(ShooterConstants.TURRET_OMEGA_COMPENSATION_CONSTANT);
+    poseToAimAtCompensated =
+        poseToAimAtCompensated.plus(
+            new Transform2d(
+                -turretVelocityVector.get(0), -turretVelocityVector.get(1), new Rotation2d()));
+
     Logger.recordOutput(
         "Shot Calculator/VELO COMPENSATED Target to shoot at", poseToAimAtCompensated);
 
@@ -148,6 +177,7 @@ public class ShotCalculator extends VirtualSubsystem {
         VecBuilder.fill(poseToAimAtCompensated.getX(), poseToAimAtCompensated.getY());
     // Turret to
     Vector<N2> turretToCompensatedTarget = vTarget.minus(vTurret);
+
     // Cosine component from dot product
     Angle cosAngle = Radians.of(turretToCompensatedTarget.dot(VecBuilder.fill(1, 0)));
     // Vector for the cross product, represents the error vector from the robot
@@ -220,8 +250,7 @@ public class ShotCalculator extends VirtualSubsystem {
         MathUtil.isNear(
             ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond),
             RobotState.instance().getFlywheelVelocity().in(RotationsPerSecond),
-            frc.robot.managersubsystems.RobotState.instance().getFlywheelMode()
-                    == FlywheelMode.FRENZY
+            RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
                 ? ShooterConstants.FRENZY_FEED_THRESHOLD.in(RotationsPerSecond)
                 : ShooterConstants.NORMAL_FEED_THRESHOLD.in(RotationsPerSecond));
 

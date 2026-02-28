@@ -44,4 +44,8 @@ public class Quest extends SubsystemBase {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     questIO.acceptVisionPose(visionRobotPoseMeters);
   }
+
+  public boolean isQuestConnected() {
+    return inputs.isConnected;
+  }
 }

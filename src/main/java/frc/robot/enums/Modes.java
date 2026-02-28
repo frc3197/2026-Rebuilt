@@ -14,6 +14,7 @@ public class Modes {
     DEPLOYING,
     IDLE_RETRACTED,
     IDLE_DEPLOYED,
+    FLOPPING,
     MANUAL
   }
 

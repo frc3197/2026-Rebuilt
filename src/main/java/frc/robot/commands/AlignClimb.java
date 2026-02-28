@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Millimeters;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -20,7 +21,7 @@ public class AlignClimb extends Command {
 
   private final Drive drive;
 
-  private final double maxSpeed = 0.5;
+  private final double maxSpeed = 0.35;
 
   public AlignClimb(DoubleSupplier horizontalOffsetSupplier, Drive drive) {
     this.horizontalOffsetSupplier = horizontalOffsetSupplier;
@@ -34,14 +35,17 @@ public class AlignClimb extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    SmartDashboard.putNumber("CLIMB ALIGN OFFSET", horizontalOffsetSupplier.getAsDouble());
     drive.runVelocity(
         new ChassisSpeeds(
-            0.0,
             MathUtil.clamp(
-                VisionConstants.CLIMB_ALIGN_PID_CONTROLLER.calculate(
-                    horizontalOffsetSupplier.getAsDouble()),
+                MathUtil.applyDeadband(
+                    -VisionConstants.CLIMB_ALIGN_PID_CONTROLLER.calculate(
+                        horizontalOffsetSupplier.getAsDouble()),
+                    0.02),
                 -maxSpeed,
                 maxSpeed),
+            0.0,
             0.0));
   }
 

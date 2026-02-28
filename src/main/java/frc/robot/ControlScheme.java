@@ -16,7 +16,7 @@ public class ControlScheme {
 
   // Drive button mappings
 
-  public Trigger getAlignClimb() {
+  public Trigger getAlignClimb1() {
     return primaryController.y();
   }
 
@@ -36,9 +36,13 @@ public class ControlScheme {
     return primaryController.start();
   }
 
-  // FLywheel modes
-  public Trigger spoolFlywheel() {
+  // Flywheel modes
+  public Trigger prepareFlywheel() {
     return primaryController.a();
+  }
+
+  public Trigger shootingFlywheel() {
+    return primaryController.rightTrigger();
   }
 
   public Trigger idleFlywheel() {
@@ -62,10 +66,18 @@ public class ControlScheme {
   }
 
   public Trigger getBackfeedManual() {
-    return secondaryController.y();
+    return secondaryController.y().or(primaryController.leftStick());
   }
 
   // Intake
+  public Trigger getIntakeSpin() {
+    return primaryController.rightStick();
+  }
+
+  public Trigger getIntakeSpinStop() {
+    return primaryController.leftStick();
+  }
+
   public Trigger getIntakeSpinManual() {
     return secondaryController.x();
   }
@@ -80,6 +92,14 @@ public class ControlScheme {
 
   public Trigger getIntakeRetractPreset() {
     return primaryController.povDown();
+  }
+
+  public Trigger intakeDeployAndSpin() {
+    return primaryController.leftTrigger();
+  }
+
+  public Trigger startFloppping() {
+    return secondaryController.rightStick();
   }
 
   // Shooter

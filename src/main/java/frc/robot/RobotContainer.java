@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -17,9 +16,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -163,6 +164,7 @@ public class RobotContainer {
 
         vision =
             new Vision(
+                quest::isQuestConnected,
                 drive::addVisionMeasurement,
                 quest::acceptVisionPose,
                 new VisionIOLimelight(VisionConstants.LIMELIGHT_NAME, drive::getRotation),
@@ -206,6 +208,7 @@ public class RobotContainer {
          */
         vision =
             new Vision(
+                quest::isQuestConnected,
                 drive::addVisionMeasurement,
                 quest::acceptVisionPose,
                 new VisionIO() {},
@@ -238,6 +241,7 @@ public class RobotContainer {
 
         vision =
             new Vision(
+                quest::isQuestConnected,
                 drive::addVisionMeasurement,
                 quest::acceptVisionPose,
                 new VisionIO() {},
@@ -247,13 +251,14 @@ public class RobotContainer {
     }
 
     // Initialize auto lookup with appropriate subsystems
-    this.autoLookup = new AutoLookup(align, drive, turret);
+    this.autoLookup = new AutoLookup(align, climber, drive, turret, vision);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Real auto routines
-    autoChooser.addOption("Right Bump Auto", autoLookup.getAuto(RealAutos.Right_Bump));
+    autoChooser.addOption("Right Bump Twice Auto", autoLookup.getAuto(RealAutos.Right_Bump_Twice));
+    autoChooser.addOption("Right Bump Climb Auto", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -321,7 +326,7 @@ public class RobotContainer {
         .onTrue(
             index
                 .setSpindexMotorCommand(Volts.of(-5.35))
-                .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING)))
+                .andThen(setIntakeSpinMode(IntakeSpinMode.OUTTAKING)))
         .onFalse(
             index
                 .setSpindexMotorCommand(Volts.of(0.0))
@@ -344,6 +349,8 @@ public class RobotContainer {
                 .andThen(
                     Commands.runOnce(() -> index.setFeedRequest(new VoltageOut(Volts.of(0.0))))));
 
+    controlScheme.startFloppping().onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING));
+
     // Zeroes the robot
     controlScheme
         .getZeroGyro()
@@ -358,28 +365,59 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Driver controller bindings to spool flywheel
-    controlScheme.spoolFlywheel().onTrue(setFlywheelMode(FlywheelMode.SHOOTING));
+    controlScheme.prepareFlywheel().onTrue(setFlywheelMode(FlywheelMode.PREPARE));
     controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
+    controlScheme
+        .shootingFlywheel()
+        .whileTrue(
+            setFlywheelMode(FlywheelMode.SHOOTING)
+                .andThen(
+                    Commands.run(
+                        () -> {
+                          if (RobotState.instance().getIntakeSpinMode() == IntakeSpinMode.IDLE) {
+                            setIntakeDeployMode(IntakeDeployMode.FLOPPING);
+                          }
+                        })))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING) {
+                    RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
+                  }
+                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
+                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
+                  }
+                }));
+
+    controlScheme
+        .intakeDeployAndSpin()
+        .onTrue(
+            setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
+                .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING)));
+    controlScheme.getIntakeSpin().onTrue(setIntakeSpinMode(IntakeSpinMode.INTAKING));
+    controlScheme.getIntakeSpinStop().onTrue(setIntakeSpinMode(IntakeSpinMode.IDLE));
 
     // Manual hood, for now only when in calibration mode
-     /* controlScheme
-     .getHoodAngleMaximum()
-     .onTrue(
-     turret
-     .setActuatorPosition(Millimeters.of(40.0))
-     .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
-     controlScheme
-     .getHoodAngleMedium()
-     .onTrue(
-     turret
-     .setActuatorPosition(Millimeters.of(25.0))
-     .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
-     controlScheme
-     .getHoodAngleMinimum()
-     .onTrue(
-     turret
-     .setActuatorPosition(Millimeters.of(0.0))
-     .onlyIf(() -> LoggingConstants.shooterCalibrationMode)); */
+    /*
+     * controlScheme
+     * .getHoodAngleMaximum()
+     * .onTrue(
+     * turret
+     * .setActuatorPosition(Millimeters.of(40.0))
+     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+     * controlScheme
+     * .getHoodAngleMedium()
+     * .onTrue(
+     * turret
+     * .setActuatorPosition(Millimeters.of(25.0))
+     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+     * controlScheme
+     * .getHoodAngleMinimum()
+     * .onTrue(
+     * turret
+     * .setActuatorPosition(Millimeters.of(0.0))
+     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
+     */
 
     controlScheme
         .getHoodAngleMaximum()
@@ -407,17 +445,33 @@ public class RobotContainer {
                 climber));
 
     controlScheme
-        .getAlignClimb()
+        .getAlignClimb1()
         .whileTrue(
-            new AlignCommand(
-                    align,
-                    drive,
-                    (RobotContainer.isRed()
-                        ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
-                        : FieldConstants.CLIMB_ALIGN_POSE))
-                .withTimeout(2.0)
-                .andThen(new AlignClimb(() -> vision.getTargetX(1).getDegrees(), drive))
-                .withTimeout(1.0));
+            new SequentialCommandGroup(
+                    setClimbCameraMode(
+                        isRed() ? ClimbCameraMode.CLIMB_RED : ClimbCameraMode.CLIMB_BLUE),
+                    Commands.runOnce(
+                        () ->
+                            climber.setClimberControlType(
+                                new PositionDutyCycle(ClimberConstants.climberUpAngle)),
+                        climber),
+                    new AlignCommand(
+                            align,
+                            drive,
+                            (RobotContainer.isRed()
+                                ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
+                                : FieldConstants.CLIMB_ALIGN_POSE))
+                        .withTimeout(2.0),
+                    new AlignClimb(() -> vision.getTargetX(1).getDegrees(), drive).withTimeout(1.0),
+                    Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0.4, 0)), drive)
+                        .withTimeout(1.5),
+                    Commands.runOnce(
+                        () ->
+                            climber.setClimberControlType(
+                                new PositionDutyCycle(ClimberConstants.climberClimbAngle)),
+                        climber),
+                    setClimbCameraMode(ClimbCameraMode.APRIL_TAGS))
+                .onlyIf(RobotState.instance().getIntakeFullyRetractedSupplier()));
 
     controlScheme
         .getClimberRotateCW()

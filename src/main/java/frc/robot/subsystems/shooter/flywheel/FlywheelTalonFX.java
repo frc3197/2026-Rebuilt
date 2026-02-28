@@ -27,7 +27,6 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   @Override
   protected void configureHardware() {
     flywheelMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_TALON_FX_CONFIG);
-    flywheelMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_SLOT0_CONFIGS);
   }
 
   @Override
@@ -39,7 +38,7 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   public void updateInputs(FlywheelInputs inputs) {
     inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
     inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
-    inputs.flywheelVelocity = (getFlywheelVelocity().in(RotationsPerSecond));
+    inputs.flywheelTargetVelocityRPS = (getFlywheelVelocity().in(RotationsPerSecond));
     inputs.flywheelTargetVelocity =
         (ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond));
   }

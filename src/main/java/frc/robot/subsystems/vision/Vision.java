@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -33,8 +34,14 @@ public class Vision extends SubsystemBase {
 
   private double lastQuestUpdateTimestamp = 0.0;
 
+  private BooleanSupplier isQuestConnected;
+
   public Vision(
-      VisionConsumer driveVisionConsumer, VisionConsumer questVisionConsumer, VisionIO... io) {
+      BooleanSupplier isQuestConnected,
+      VisionConsumer driveVisionConsumer,
+      VisionConsumer questVisionConsumer,
+      VisionIO... io) {
+    this.isQuestConnected = isQuestConnected;
     this.driveVisionConsumer = driveVisionConsumer;
     this.questVisionConsumer = questVisionConsumer;
     this.io = io;
@@ -140,17 +147,20 @@ public class Vision extends SubsystemBase {
         }
 
         // Send vision observation
-        driveVisionConsumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        if (!isQuestConnected.getAsBoolean()) {
+          driveVisionConsumer.accept(
+              observation.pose().toPose2d(),
+              observation.timestamp(),
+              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        }
 
         Logger.recordOutput(
             "UPDATING META POSE",
             observation.averageTagDistance() >= 0.5
                 && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5);
 
-        if (observation.averageTagDistance() >= 0.5
+        if (isQuestConnected.getAsBoolean()
+            && observation.averageTagDistance() >= 0.5
             && observation.averageTagDistance() <= 2.5
             && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5) {
           lastQuestUpdateTimestamp = observation.timestamp();

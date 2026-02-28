@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -19,16 +20,21 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.HardwareID;
 
 public class IntakeConstants implements HardwareID.IntakeHardwareID {
 
   public static final double INTAKE_SPIN_DUTY_CYCLE = 1.0;
 
+  public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(2.5);
+  public static final Angle FLOP_ANGLE = Degrees.of(-65);
+  public static final Time FLOP_PERIOD = Seconds.of(3.0);
+
   // Motion magic configs
-  private static final double max_intake_rps = DegreesPerSecond.of(500).in(RotationsPerSecond);
+  private static final double max_intake_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
   private static final double max_intake_acceleration =
-      DegreesPerSecondPerSecond.of(500).in(RotationsPerSecondPerSecond);
+      DegreesPerSecondPerSecond.of(200).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs INTAKE_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicCruiseVelocity(max_intake_rps)
@@ -36,7 +42,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final MotionMagicTorqueCurrentFOC INTAKE_MOTION_MAGIC_REQUEST =
       new MotionMagicTorqueCurrentFOC(Degrees.of(0.0));
 
-  private static final double kP_DEPLOY = 75;
+  private static final double kP_DEPLOY = 250;
   private static final double kG_DEPLOY = 2;
   public static final Slot0Configs DEPLOY_MOTOR_GAINS =
       new Slot0Configs()
@@ -71,7 +77,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
                   .withStatorCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(-120);
+  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(-95);
   public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(0);
 
   public static final PositionDutyCycle DEPLOY_POSITION_REQUEST =

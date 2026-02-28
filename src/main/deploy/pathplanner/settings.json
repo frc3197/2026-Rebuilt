@@ -3,7 +3,8 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Right Bump"
+    "Right Bump Climb",
+    "Right Bump Twice"
   ],
   "autoFolders": [],
   "defaultMaxVel": 2.0,

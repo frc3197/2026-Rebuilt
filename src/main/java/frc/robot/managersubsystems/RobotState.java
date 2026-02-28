@@ -30,6 +30,7 @@ import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.VirtualSubsystem;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
@@ -37,18 +38,17 @@ public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
   private IntakeDeployMode intakeDeployMode = IntakeDeployMode.IDLE_RETRACTED;
-  private IntakeSpinMode intakeSpinMode = IntakeSpinMode.MANUAL;
+  private IntakeSpinMode intakeSpinMode = IntakeSpinMode.IDLE;
   private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
   private TurretMode turretMode = TurretMode.MANUAL;
-  private ClimbCameraMode climbCameraMode = ClimbCameraMode.APRIL_TAGS;
+  private ClimbCameraMode climbCameraMode = ClimbCameraMode.CLIMB_RED;
 
   private static RobotState instance;
 
   private final String key;
 
   // Intake
-  private boolean intakeFullyReatracted = false;
-  private boolean intakeFullyExtended = false;
+  private boolean intakeFullyRetracted = false;
 
   // Shooter
   private MutAngle turretRotationAngle = Degrees.of(0.0).mutableCopy();
@@ -214,6 +214,8 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);
     Logger.recordOutput("RobotState/Drivetrain/Robot Acceleration", robotAcceleration);
 
+    Logger.recordOutput("RobotState/Intake fully retracted", intakeFullyRetracted);
+
     turretFieldPosition =
         RobotState.instance()
             .getRobotPose3d()
@@ -248,6 +250,14 @@ public class RobotState extends VirtualSubsystem {
 
   public Pose3d getTurretFieldPosition() {
     return turretFieldPosition;
+  }
+
+  public void setIntakeFullyRetracted(boolean val) {
+    intakeFullyRetracted = val;
+  }
+
+  public BooleanSupplier getIntakeFullyRetractedSupplier() {
+    return () -> intakeFullyRetracted;
   }
 
   // Mechanism offsets, TODO can be moved to their respective constants files

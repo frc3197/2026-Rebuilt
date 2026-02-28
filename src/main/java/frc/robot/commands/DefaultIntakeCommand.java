@@ -5,12 +5,15 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.LoggingConstants;
+import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.intake.Intake;
@@ -26,6 +29,8 @@ public class DefaultIntakeCommand extends Command {
   private final BooleanSupplier spinManual;
   private final BooleanSupplier backfeedManual;
   private final DoubleSupplier deployManual;
+
+  private Timer flopTImer = new Timer();
 
   private final LoggedTunableNumber deployKs =
       new LoggedTunableNumber("Intake deploy ks", IntakeConstants.DEPLOY_MOTOR_GAINS.kS);
@@ -53,6 +58,8 @@ public class DefaultIntakeCommand extends Command {
     this.backfeedManual = backfeedManual;
 
     this.intake = intake;
+
+    flopTImer.start();
     addRequirements(intake);
   }
 
@@ -87,7 +94,12 @@ public class DefaultIntakeCommand extends Command {
   private void intakeSpinLogic() {
     switch (RobotState.instance().getIntakeSpinMode()) {
       case IDLE:
-        intake.setIntakeSpinSpeed(0.0);
+        if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+            || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY) {
+          intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        } else {
+          intake.setIntakeSpinSpeed(0.0);
+        }
         break;
 
       case INTAKING:
@@ -149,6 +161,19 @@ public class DefaultIntakeCommand extends Command {
         intake.setDeployControlRequest(
             IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
                 IntakeConstants.FULLY_RETRACTED_ANGLE));
+        break;
+
+      case FLOPPING:
+        if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds))) {
+          flopTImer.reset();
+        } else if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds) / 2.0)) {
+          intake.setDeployControlRequest(
+              IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
+                  IntakeConstants.FULLY_DEPLOYED_ANGLE));
+        } else {
+          intake.setDeployControlRequest(
+              IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(IntakeConstants.FLOP_ANGLE));
+        }
         break;
 
       case IDLE_DEPLOYED:
