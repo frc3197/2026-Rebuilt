@@ -16,8 +16,8 @@ public class ControlScheme {
 
   // Drive button mappings
 
-  public Trigger getAlignClimb1() {
-    return primaryController.y();
+  public Trigger getAlignClimb() {
+    return primaryController.y().and(() -> false);
   }
 
   public double getDriveX() {
@@ -37,15 +37,15 @@ public class ControlScheme {
   }
 
   // Flywheel modes
-  public Trigger prepareFlywheel() {
+  public Trigger getPrepareFlywheel() {
     return primaryController.a();
   }
 
-  public Trigger shootingFlywheel() {
+  public Trigger getShootingFlywheel() {
     return primaryController.rightTrigger();
   }
 
-  public Trigger idleFlywheel() {
+  public Trigger getIdleFlywheel() {
     return primaryController.b();
   }
 
@@ -53,11 +53,11 @@ public class ControlScheme {
 
   // Climber
   public Trigger getClimberRotateCW() {
-    return secondaryController.leftBumper();
+    return secondaryController.b();
   }
 
   public Trigger getClimberRotateCWW() {
-    return secondaryController.rightBumper();
+    return secondaryController.x();
   }
 
   // Index
@@ -66,7 +66,7 @@ public class ControlScheme {
   }
 
   public Trigger getBackfeedManual() {
-    return secondaryController.y().or(primaryController.leftStick());
+    return primaryController.back();
   }
 
   // Intake
@@ -79,7 +79,7 @@ public class ControlScheme {
   }
 
   public Trigger getIntakeSpinManual() {
-    return secondaryController.x();
+    return new Trigger(() -> false);
   }
 
   public DoubleSupplier getIntakeDeployManual() {
@@ -103,31 +103,28 @@ public class ControlScheme {
   }
 
   // Shooter
+
   public Trigger getSpoolFlywheelManual() {
-    return secondaryController.b();
+    return new Trigger(() -> false);
   }
 
   public Trigger autoZeroTurret() {
     return secondaryController.back();
   }
 
-  public Trigger getBackfeedIndexManual() {
-    return secondaryController.povLeft();
-  }
-
   public Trigger zeroTurret() {
     return secondaryController.start();
   }
 
-  public Trigger getHoodAngleMaximum() {
+  public Trigger getClimberUp() {
     return secondaryController.povUp();
   }
 
-  public Trigger getHoodAngleMedium() {
+  public Trigger getClimberPull() {
     return secondaryController.povRight();
   }
 
-  public Trigger getHoodAngleMinimum() {
+  public Trigger getClimberStow() {
     return secondaryController.povDown();
   }
 
@@ -137,10 +134,10 @@ public class ControlScheme {
   }
 
   public Trigger getTurretTrack() {
-    return primaryController.leftBumper();
+    return secondaryController.leftBumper();
   }
 
   public Trigger getTurretIdle() {
-    return primaryController.rightBumper();
+    return secondaryController.rightBumper();
   }
 }

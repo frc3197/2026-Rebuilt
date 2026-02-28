@@ -57,6 +57,18 @@ public class ShotCalculator extends VirtualSubsystem {
   private boolean turretRotationReadyToShoot = false;
   private boolean hoodReadyToShoot = false;
 
+  private LoggedTunableNumber omegaConstantTuning =
+      new LoggedTunableNumber(
+          "TURRET_OMEGA_COMPENSATION_CONSTANT",
+          ShooterConstants.TURRET_OMEGA_COMPENSATION_CONSTANT);
+  private LoggedTunableNumber velocityConstantTuning =
+      new LoggedTunableNumber(
+          "VELOCITY_COMPENSATION_CONSTANT", ShooterConstants.VELOCITY_COMPENSATION_CONSTANT);
+  private LoggedTunableNumber rotationLookaheadConstantTuning =
+      new LoggedTunableNumber(
+          "TURRET_ROTATION_LOOKAHEAD_CONSTANT",
+          ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT);
+
   public ShotCalculator(String key) {
     this.key = key;
   }
@@ -109,7 +121,9 @@ public class ShotCalculator extends VirtualSubsystem {
                     new Rotation2d(
                         Radians.of(
                             robotVelocity.omegaRadiansPerSecond
-                                * ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT))));
+                                * (LoggingConstants.tuningMode
+                                    ? rotationLookaheadConstantTuning.getAsDouble()
+                                    : ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT)))));
     // Acc
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
     // Where the turret is relative to blue origin
@@ -136,8 +150,14 @@ public class ShotCalculator extends VirtualSubsystem {
     Pose2d poseToAimAtCompensated =
         poseToAimAt.plus(
             new Transform2d(
-                -robotVelocity.vxMetersPerSecond / 1.15,
-                -robotVelocity.vyMetersPerSecond / 1.15,
+                -robotVelocity.vxMetersPerSecond
+                    * (LoggingConstants.tuningMode
+                        ? velocityConstantTuning.getAsDouble()
+                        : ShooterConstants.VELOCITY_COMPENSATION_CONSTANT),
+                -robotVelocity.vyMetersPerSecond
+                    * (LoggingConstants.tuningMode
+                        ? velocityConstantTuning.getAsDouble()
+                        : ShooterConstants.VELOCITY_COMPENSATION_CONSTANT),
                 Rotation2d.kZero));
 
     // Now the location is compensated for robot velocity. Not good enough! Needs
@@ -161,7 +181,10 @@ public class ShotCalculator extends VirtualSubsystem {
         "" + robotToTurretVector.get(0) + ", " + robotToTurretVector.get(1));
     Vector<N3> turretVelocityVector = Vector.cross(omegaVector, robotToTurretVector);
     turretVelocityVector =
-        turretVelocityVector.times(ShooterConstants.TURRET_OMEGA_COMPENSATION_CONSTANT);
+        turretVelocityVector.times(
+            LoggingConstants.tuningMode
+                ? omegaConstantTuning.getAsDouble()
+                : ShooterConstants.TURRET_OMEGA_COMPENSATION_CONSTANT);
     poseToAimAtCompensated =
         poseToAimAtCompensated.plus(
             new Transform2d(
@@ -337,9 +360,8 @@ public class ShotCalculator extends VirtualSubsystem {
   // TODO not all values are used here for sake of testing
   public boolean getReadyToFeed() {
     return flywheelReadyToShoot
-        && translationalReadyToShoot
-        && angularReadyToShoot
-        && turretRotationReadyToShoot;
+        && (RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
+            || (translationalReadyToShoot && angularReadyToShoot && turretRotationReadyToShoot));
   }
 
   // ------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -20,6 +21,7 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.robot.HardwareID;
 
@@ -28,8 +30,10 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final double INTAKE_SPIN_DUTY_CYCLE = 1.0;
 
   public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(2.5);
-  public static final Angle FLOP_ANGLE = Degrees.of(-65);
+  // public static final Angle FLOP_ANGLE = Degrees.of(-65);
+  public static final Angle FLOP_ANGLE = Degrees.of(-95);
   public static final Time FLOP_PERIOD = Seconds.of(3.0);
+  public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(0.5);
 
   // Motion magic configs
   private static final double max_intake_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
@@ -73,7 +77,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(90.0)
+                  .withStatorCurrentLimit(80.0)
                   .withStatorCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 

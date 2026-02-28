@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -63,6 +64,7 @@ import frc.robot.subsystems.index.IndexIO;
 import frc.robot.subsystems.index.IndexIOSim;
 import frc.robot.subsystems.index.IndexIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
@@ -133,6 +135,14 @@ public class RobotContainer {
           () ->
               (RobotState.instance().inNeutralZone()
                   && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())));
+
+  private final Trigger startFlopping =
+      new Trigger(
+          () ->
+              RobotState.instance().getRobotSpeedMPS()
+                      < IntakeConstants.MAX_FLOP_VELOCITY.in(MetersPerSecond)
+                  && (RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
+                      || RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING));
 
   public RobotContainer() {
 
@@ -322,7 +332,7 @@ public class RobotContainer {
     // .onTrue(setTurretMode(TurretMode.IDLE));
 
     controlScheme
-        .getBackfeedIndexManual()
+        .getBackfeedManual()
         .onTrue(
             index
                 .setSpindexMotorCommand(Volts.of(-5.35))
@@ -330,7 +340,7 @@ public class RobotContainer {
         .onFalse(
             index
                 .setSpindexMotorCommand(Volts.of(0.0))
-                .andThen(setIntakeSpinMode(IntakeSpinMode.MANUAL)));
+                .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
 
     controlScheme
         .getSpindexFeedFlywheelManual()
@@ -365,23 +375,24 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Driver controller bindings to spool flywheel
-    controlScheme.prepareFlywheel().onTrue(setFlywheelMode(FlywheelMode.PREPARE));
-    controlScheme.idleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
+    controlScheme.getPrepareFlywheel().onTrue(setFlywheelMode(FlywheelMode.PREPARE));
+    controlScheme.getIdleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
     controlScheme
-        .shootingFlywheel()
+        .getShootingFlywheel()
         .whileTrue(
-            setFlywheelMode(FlywheelMode.SHOOTING)
+            setFlywheelMode(FlywheelMode.FRENZY)
                 .andThen(
-                    Commands.run(
+                    Commands.runOnce(
                         () -> {
-                          if (RobotState.instance().getIntakeSpinMode() == IntakeSpinMode.IDLE) {
-                            setIntakeDeployMode(IntakeDeployMode.FLOPPING);
+                          if (RobotState.instance().getTurretMode() == TurretMode.IDLE) {
+                            RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
                           }
                         })))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING) {
+                  if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+                      || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY) {
                     RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
                   }
                   if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
@@ -394,33 +405,15 @@ public class RobotContainer {
         .onTrue(
             setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
                 .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING)));
+
     controlScheme.getIntakeSpin().onTrue(setIntakeSpinMode(IntakeSpinMode.INTAKING));
     controlScheme.getIntakeSpinStop().onTrue(setIntakeSpinMode(IntakeSpinMode.IDLE));
 
-    // Manual hood, for now only when in calibration mode
-    /*
-     * controlScheme
-     * .getHoodAngleMaximum()
-     * .onTrue(
-     * turret
-     * .setActuatorPosition(Millimeters.of(40.0))
-     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
-     * controlScheme
-     * .getHoodAngleMedium()
-     * .onTrue(
-     * turret
-     * .setActuatorPosition(Millimeters.of(25.0))
-     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
-     * controlScheme
-     * .getHoodAngleMinimum()
-     * .onTrue(
-     * turret
-     * .setActuatorPosition(Millimeters.of(0.0))
-     * .onlyIf(() -> LoggingConstants.shooterCalibrationMode));
-     */
-
+    // ------------------------------------------------------------------------
+    // CLIMBER CONTROLS
+    // -----------------------------------------------------------------------
     controlScheme
-        .getHoodAngleMaximum()
+        .getClimberUp()
         .onTrue(
             Commands.runOnce(
                 () ->
@@ -428,7 +421,7 @@ public class RobotContainer {
                         new PositionDutyCycle(ClimberConstants.climberUpAngle)),
                 climber));
     controlScheme
-        .getHoodAngleMedium()
+        .getClimberPull()
         .onTrue(
             Commands.runOnce(
                 () ->
@@ -436,16 +429,15 @@ public class RobotContainer {
                         new PositionDutyCycle(ClimberConstants.climberClimbAngle)),
                 climber));
     controlScheme
-        .getHoodAngleMinimum()
+        .getClimberStow()
         .onTrue(
             Commands.runOnce(
                 () ->
                     climber.setClimberControlType(
                         new PositionDutyCycle(ClimberConstants.climberStowAngle)),
                 climber));
-
     controlScheme
-        .getAlignClimb1()
+        .getAlignClimb()
         .whileTrue(
             new SequentialCommandGroup(
                     setClimbCameraMode(
@@ -486,9 +478,12 @@ public class RobotContainer {
     controlScheme.getIntakeExtendPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING));
     controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
 
+    // ------------------------------------------------------------------------
+    // TURRET ROTATION CONTROLS
+    // -----------------------------------------------------------------------
+
     controlScheme.getTurretTrack().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
     controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.IDLE));
-
     controlScheme.zeroTurret().onTrue(turret.zeroTurretPositionCommand().ignoringDisable(true));
     controlScheme.autoZeroTurret().whileTrue(new ZeroTurret(turret));
   }
@@ -509,6 +504,16 @@ public class RobotContainer {
                 .andThen(setFlywheelMode(FlywheelMode.IDLE)))
         .onFalse(
             setIntakeSpinMode(IntakeSpinMode.IDLE).andThen(setFlywheelMode(FlywheelMode.PREPARE)));
+
+    startFlopping
+        .onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
+                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
+                  }
+                }));
   }
 
   /**

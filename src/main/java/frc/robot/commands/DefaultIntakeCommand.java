@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.math.MathUtil;
@@ -164,16 +163,20 @@ public class DefaultIntakeCommand extends Command {
         break;
 
       case FLOPPING:
-        if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds))) {
-          flopTImer.reset();
-        } else if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds) / 2.0)) {
-          intake.setDeployControlRequest(
-              IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
-                  IntakeConstants.FULLY_DEPLOYED_ANGLE));
-        } else {
-          intake.setDeployControlRequest(
-              IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(IntakeConstants.FLOP_ANGLE));
-        }
+        /*
+         * if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds))) {
+         * flopTImer.reset();
+         * } else if (flopTImer.hasElapsed(IntakeConstants.FLOP_PERIOD.in(Seconds) /
+         * 2.0)) {
+         * intake.setDeployControlRequest(
+         * IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(
+         * IntakeConstants.FULLY_DEPLOYED_ANGLE));
+         * } else {
+         * intake.setDeployControlRequest(
+         * IntakeConstants.INTAKE_MOTION_MAGIC_REQUEST.withPosition(IntakeConstants.
+         * FLOP_ANGLE));
+         * }
+         */
         break;
 
       case IDLE_DEPLOYED:

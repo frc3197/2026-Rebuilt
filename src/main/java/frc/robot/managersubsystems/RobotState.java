@@ -40,7 +40,7 @@ public class RobotState extends VirtualSubsystem {
   private IntakeDeployMode intakeDeployMode = IntakeDeployMode.IDLE_RETRACTED;
   private IntakeSpinMode intakeSpinMode = IntakeSpinMode.IDLE;
   private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
-  private TurretMode turretMode = TurretMode.MANUAL;
+  private TurretMode turretMode = TurretMode.IDLE;
   private ClimbCameraMode climbCameraMode = ClimbCameraMode.CLIMB_RED;
 
   private static RobotState instance;
@@ -91,6 +91,12 @@ public class RobotState extends VirtualSubsystem {
 
   public ChassisSpeeds getRobotVelocity() {
     return robotVelocity;
+  }
+
+  public double getRobotSpeedMPS() {
+    return Math.sqrt(
+        Math.pow(robotVelocity.vxMetersPerSecond, 2)
+            + Math.pow(robotVelocity.vyMetersPerSecond, 2));
   }
 
   public void setRobotVelocity(ChassisSpeeds speeds) {
