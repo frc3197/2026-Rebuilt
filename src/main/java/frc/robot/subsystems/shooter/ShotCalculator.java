@@ -147,9 +147,8 @@ public class ShotCalculator extends VirtualSubsystem {
     // Compensate for velocity
     // Target field pose
     // TODO it is a work in progress
-    Pose2d poseToAimAtCompensated =
-        poseToAimAt.plus(
-            new Transform2d(
+    Pose2d velocityPose =
+        new Pose2d(
                 -robotVelocity.vxMetersPerSecond
                     * (LoggingConstants.tuningMode
                         ? velocityConstantTuning.getAsDouble()
@@ -158,7 +157,12 @@ public class ShotCalculator extends VirtualSubsystem {
                     * (LoggingConstants.tuningMode
                         ? velocityConstantTuning.getAsDouble()
                         : ShooterConstants.VELOCITY_COMPENSATION_CONSTANT),
-                Rotation2d.kZero));
+                Rotation2d.kZero)
+            .rotateBy(RobotState.instance().getRobotPose().getRotation());
+
+    Pose2d poseToAimAtCompensated =
+        poseToAimAt.plus(
+            new Transform2d(velocityPose.getX(), velocityPose.getY(), velocityPose.getRotation()));
 
     // Now the location is compensated for robot velocity. Not good enough! Needs
     // angular rotation
@@ -322,7 +326,7 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   private AngularVelocity getTargetVeloLongHoodLow(double distanceInMeters) {
-    double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 60);
+    double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
     return RotationsPerSecond.of(rps);
   }
 

@@ -53,8 +53,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(7.0);
 
   public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.15;
-  public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.5;
-  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.75;
+  public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.7;
+  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.0;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);

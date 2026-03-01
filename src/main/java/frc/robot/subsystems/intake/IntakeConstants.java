@@ -31,7 +31,10 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
 
   public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(2.5);
   // public static final Angle FLOP_ANGLE = Degrees.of(-65);
-  public static final Angle FLOP_ANGLE = Degrees.of(-95);
+  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(0);
+  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(94);
+  public static final Angle FLOP_ANGLE = Degrees.of(60);
+
   public static final Time FLOP_PERIOD = Seconds.of(3.0);
   public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(0.5);
 
@@ -66,7 +69,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new SoftwareLimitSwitchConfigs()
                   .withForwardSoftLimitEnable(true)
                   .withReverseSoftLimitEnable(true)
-                  .withForwardSoftLimitThreshold(0.0)
+                  .withForwardSoftLimitThreshold(100.0)
                   .withReverseSoftLimitThreshold(-120.0))
           .withMotionMagic(INTAKE_MM_CONFIGS)
           .withSlot0(DEPLOY_MOTOR_GAINS)
@@ -77,12 +80,9 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(80.0)
+                  .withStatorCurrentLimit(135.0)
                   .withStatorCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-
-  public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(-95);
-  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(0);
 
   public static final PositionDutyCycle DEPLOY_POSITION_REQUEST =
       new PositionDutyCycle(Degrees.of(0.0));

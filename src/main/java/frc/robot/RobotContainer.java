@@ -85,6 +85,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOClimberLimelight;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.MatchTimeUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -126,7 +127,8 @@ public class RobotContainer {
       new Trigger(
           () ->
               RobotState.instance().inAllianceZone()
-                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous()));
+                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())
+                  && !DriverStation.isTest());
 
   // Triggers only during autonomous period, deploys intake and begins spinning
   // when robot enters neutral zone
@@ -134,8 +136,30 @@ public class RobotContainer {
       new Trigger(
           () ->
               (RobotState.instance().inNeutralZone()
-                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())));
+                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())
+                  && !DriverStation.isTest()));
 
+  // Triggers during the tele period, will turn off auto tracking and spooling
+  // conditionally, only fires when the robot is real
+  private final Trigger enteredNeurtalZoneTele =
+      new Trigger(
+          () ->
+              (RobotState.instance().inNeutralZone()
+                  && (LoggingConstants.currentMode == Mode.REAL && !DriverStation.isAutonomous())
+                  && !DriverStation.isTest()));
+
+  private final Trigger enteredAllianceZoneTele =
+      new Trigger(
+          () ->
+              (RobotState.instance().inNeutralZone()
+                  && (LoggingConstants.currentMode == Mode.REAL && !DriverStation.isAutonomous())
+                  && !DriverStation.isTest()));
+
+  private final Trigger aboutToBeActive =
+      new Trigger(MatchTimeUtil.instance().aboutToBecomeActiveSupplier());
+
+  // Start flopping the intake when the shooter is spooling and the robot is below
+  // a certain speed
   private final Trigger startFlopping =
       new Trigger(
           () ->
@@ -286,6 +310,9 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    // Get the default commands bound
+    configureDefaultCommands();
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -293,8 +320,7 @@ public class RobotContainer {
     configureTriggerCallbacks();
   }
 
-  private void configureButtonBindings() {
-
+  private void configureDefaultCommands() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -323,13 +349,12 @@ public class RobotContainer {
     else
       turret.setDefaultCommand(
           new SimTurretCommand(turret, controlScheme.getTurretVoltageManual()));
+  }
+
+  private void configureButtonBindings() {
 
     // Switch to X pattern when X button is pressed
     // .onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // Not gonna test now
-    // .onTrue(setTurretMode(TurretMode.TRACKING_HUB));
-    // .onTrue(setTurretMode(TurretMode.IDLE));
 
     controlScheme
         .getBackfeedManual()
@@ -379,7 +404,7 @@ public class RobotContainer {
     controlScheme.getIdleFlywheel().onTrue(setFlywheelMode(FlywheelMode.IDLE));
     controlScheme
         .getShootingFlywheel()
-        .whileTrue(
+        .onTrue(
             setFlywheelMode(FlywheelMode.FRENZY)
                 .andThen(
                     Commands.runOnce(
@@ -504,6 +529,30 @@ public class RobotContainer {
                 .andThen(setFlywheelMode(FlywheelMode.IDLE)))
         .onFalse(
             setIntakeSpinMode(IntakeSpinMode.IDLE).andThen(setFlywheelMode(FlywheelMode.PREPARE)));
+
+    enteredNeurtalZoneTele.onTrue(
+        Commands.runOnce(
+            () -> {
+              if (RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB) {
+                RobotState.instance().setTurretMode(TurretMode.IDLE);
+              }
+            }));
+
+    enteredAllianceZoneTele.onTrue(
+        Commands.runOnce(
+            () -> {
+              if (RobotState.instance().getTurretMode() == TurretMode.IDLE) {
+                RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
+              }
+            }));
+
+    aboutToBeActive.onTrue(
+        Commands.runOnce(
+            () -> {
+              if (RobotState.instance().getFlywheelMode() == FlywheelMode.IDLE) {
+                RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
+              }
+            }));
 
     startFlopping
         .onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING))

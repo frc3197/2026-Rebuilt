@@ -66,7 +66,7 @@ public class ControlScheme {
   }
 
   public Trigger getBackfeedManual() {
-    return primaryController.back();
+    return primaryController.back().or(secondaryController.y());
   }
 
   // Intake

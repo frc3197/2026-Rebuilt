@@ -13,6 +13,7 @@ import frc.robot.constants.BuildConstants;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.util.MatchTimeUtil;
 import frc.robot.util.VirtualSubsystem;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -73,6 +74,7 @@ public class Robot extends LoggedRobot {
 
     ShotCalculator.instance();
     RobotState.instance();
+    MatchTimeUtil.instance();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.

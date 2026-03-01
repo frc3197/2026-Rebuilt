@@ -6,5 +6,12 @@ package frc.robot.enums;
 
 /** Add your docs here. */
 public enum MatchPeriod {
-    
+  DISABLED,
+  AUTO,
+  TRANSITION,
+  ACTIVE,
+  INACTIVE,
+  ABOUT_TO_BE_ACTIVE,
+  ABOUT_TO_BE_INACTIVE,
+  ENDGAME
 }

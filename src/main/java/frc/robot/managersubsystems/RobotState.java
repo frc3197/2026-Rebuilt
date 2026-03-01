@@ -206,6 +206,14 @@ public class RobotState extends VirtualSubsystem {
     visualize();
     Logger.recordOutput("IN NEUTRAL ZONE", inNeutralZone());
     Logger.recordOutput("IN ALLIANCE ZONE", inAllianceZone());
+
+    // If the robot is in test mode, everything needs to be manual!
+    if (DriverStation.isTest()) {
+      setTurretMode(TurretMode.MANUAL);
+      setFlywheelMode(FlywheelMode.MANUAL);
+      setIntakeDeployMode(IntakeDeployMode.MANUAL);
+      setIntakeSpinMode(IntakeSpinMode.MANUAL);
+    }
   }
 
   // Visualize the robot state, log modes, etc
