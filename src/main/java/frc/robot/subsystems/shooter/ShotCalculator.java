@@ -200,7 +200,13 @@ public class ShotCalculator extends VirtualSubsystem {
 
     Pose2d poseToAimAtCompensated =
         poseToAimAt.plus(
-            new Transform2d(velocityPose.getX(), velocityPose.getY(), velocityPose.getRotation()));
+            RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB
+                ? new Transform2d(
+                    velocityPose.getX(), velocityPose.getY(), velocityPose.getRotation())
+                : new Transform2d(
+                    -velocityPose.getX(),
+                    -velocityPose.getY(),
+                    velocityPose.getRotation().times(-1)));
 
     // Now the location is compensated for robot velocity. Not good enough! Needs
     // angular rotation
@@ -352,7 +358,7 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   private AngularVelocity getTargetVeloPassing(double distanceInMeters) {
-    double rps = MathUtil.clamp(((3.05 * distanceInMeters) + 25), 15, 50);
+    double rps = MathUtil.clamp(((5.0 * distanceInMeters) + 15), 15, 50);
     return RotationsPerSecond.of(rps);
   }
 

@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 2.4087874465049923,
-        "y": 3.2522111269614835
+        "x": 2.5769900142653355,
+        "y": 2.398259629101284
       },
       "prevControl": {
-        "x": 2.4087874465049923,
-        "y": 2.643543818995175
+        "x": 3.042781740370899,
+        "y": 2.3853209700427964
       },
       "nextControl": null,
       "isLocked": false,
@@ -146,7 +146,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Right Bump Climb",
+  "folder": "Right Bump Double Swipe",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

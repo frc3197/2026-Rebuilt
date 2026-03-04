@@ -167,7 +167,8 @@ public class RobotContainer {
   private final Trigger startFlopping =
       new Trigger(
           () ->
-              RobotState.instance().getRobotSpeedMPS()
+              !DriverStation.isAutonomous()
+                  && RobotState.instance().getRobotSpeedMPS()
                       < IntakeConstants.MAX_FLOP_VELOCITY.in(MetersPerSecond)
                   && (RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
                       || RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING));
@@ -296,7 +297,8 @@ public class RobotContainer {
 
     // Real auto routines
     autoChooser.addOption("Left Depot CLIMB", autoLookup.getAuto(RealAutos.Left_Depot_Climb));
-    autoChooser.addOption("Right Bump Twice", autoLookup.getAuto(RealAutos.Right_Bump_Twice));
+    autoChooser.addOption(
+        "Right Bump Twice", autoLookup.getAuto(RealAutos.Right_Bump_Double_Swipe));
     autoChooser.addOption("Right Bump Outpost", autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
     autoChooser.addOption("Right Bump CLIMB", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
 
@@ -590,12 +592,16 @@ public class RobotContainer {
             }));
 
     startFlopping
-        .onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING))
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (DriverStation.isTeleop())
+                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
+                }))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING
-                      && !DriverStation.isAutonomous()) {
+                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
                     RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
                   }
                 }));

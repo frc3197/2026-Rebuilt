@@ -12,8 +12,8 @@ public class FieldConstants {
   public static final Pose2d CLIMB_ALIGN_POSE_LEFT = new Pose2d(1.9, 4.145, Rotation2d.kCCW_90deg);
   public static final Pose2d CLIMB_ALIGN_POSE_RIGHT = new Pose2d(1.9, 3.297, Rotation2d.kCCW_90deg);
 
-  public static final Pose2d PASSING_UPPER = new Pose2d(2.163, 5.620, Rotation2d.kZero);
-  public static final Pose2d PASSING_LOWER = new Pose2d(2.163, 1.221, Rotation2d.kZero);
+  public static final Pose2d PASSING_UPPER = new Pose2d(2.163, 4.820, Rotation2d.kZero);
+  public static final Pose2d PASSING_LOWER = new Pose2d(2.163, 1.821, Rotation2d.kZero);
 
   public class Blue {
     public static final Pose2d HUB_CENTER = new Pose2d(4.593, 4.026, new Rotation2d(0.0));

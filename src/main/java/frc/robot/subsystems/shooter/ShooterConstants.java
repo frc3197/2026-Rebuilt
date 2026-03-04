@@ -57,7 +57,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.14;
   public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.7;
-  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.23;
+  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.24;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);

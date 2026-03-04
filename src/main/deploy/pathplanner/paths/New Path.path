@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 0.9039999999999999,
-        "y": 1.221
+        "y": 1.2210000000000003
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Right Bump Twice",
+  "folder": "Right Bump Double Swipe",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

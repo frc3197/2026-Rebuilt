@@ -75,20 +75,23 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY));
   }
 
-  private Command getRightBumpAuto() {
+  private Command getRightBumpDoubleSwipeAuto() {
     return new SequentialCommandGroup(
         getCommonCommands(),
         setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
         new WaitCommand(2.0),
-        loadPath("Start-Neutral-Shoot"),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        loadPath("Start-Neutral-Right-Double"),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         new WaitCommand(3.75),
         RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
         loadPath("Neutral-Shoot-2"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(3.75));
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY));
   }
 
   private Command getRightBumpCLIMBAuto() {
@@ -130,8 +133,8 @@ public class AutoLookup {
   }
 
   public Command getAuto(RealAutos auto) {
-    if (auto == RealAutos.Right_Bump_Twice) {
-      return getRightBumpAuto();
+    if (auto == RealAutos.Right_Bump_Double_Swipe) {
+      return getRightBumpDoubleSwipeAuto();
     }
     if (auto == RealAutos.Right_Bump_Climb) {
       return getRightBumpCLIMBAuto();
