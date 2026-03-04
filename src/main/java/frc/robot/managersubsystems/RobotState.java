@@ -47,6 +47,9 @@ public class RobotState extends VirtualSubsystem {
 
   private final String key;
 
+  // Climber
+  private MutAngle climberAngle = Degrees.of(0.0).mutableCopy();
+
   // Intake
   private boolean intakeFullyRetracted = false;
 
@@ -161,6 +164,14 @@ public class RobotState extends VirtualSubsystem {
   // Subsystems are below
   // Climber getters & setters ------------------------------------------------
 
+  public Angle getClimberAngle() {
+    return this.climberAngle;
+  }
+
+  public void setClimberAngle(Angle angle) {
+    climberAngle.mut_replace(angle);
+  }
+
   // Turret getters & setters --------------------------------------------------
   public Angle getTurretRotationAngle() {
     return turretRotationAngle;
@@ -223,6 +234,7 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/Modes/Intake Deploy Mode", intakeDeployMode);
     Logger.recordOutput("RobotState/Modes/Intake Spin Mode", intakeSpinMode);
     Logger.recordOutput("RobotState/Modes/Turret Mode", turretMode);
+    Logger.recordOutput("RobotState/Modes/Climber Cam Mode", climbCameraMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);

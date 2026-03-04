@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.controls.ControlRequest;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -26,4 +29,8 @@ public interface ClimberIO {
   public default void zeroClimber() {}
 
   public default void setClimberControl(ControlRequest request) {}
+
+  public default Angle getClimberAngle() {
+    return Degrees.of(0.0);
+  }
 }

@@ -20,6 +20,7 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
@@ -33,7 +34,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   // public static final Angle FLOP_ANGLE = Degrees.of(-65);
   public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(0);
   public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(94);
-  public static final Angle FLOP_ANGLE = Degrees.of(60);
+  public static final Angle FLOP_ANGLE = Degrees.of(94);
 
   public static final Time FLOP_PERIOD = Seconds.of(3.0);
   public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(0.5);
@@ -41,7 +42,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   // Motion magic configs
   private static final double max_intake_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
   private static final double max_intake_acceleration =
-      DegreesPerSecondPerSecond.of(200).in(RotationsPerSecondPerSecond);
+      DegreesPerSecondPerSecond.of(300).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs INTAKE_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicCruiseVelocity(max_intake_rps)
@@ -49,7 +50,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final MotionMagicTorqueCurrentFOC INTAKE_MOTION_MAGIC_REQUEST =
       new MotionMagicTorqueCurrentFOC(Degrees.of(0.0));
 
-  private static final double kP_DEPLOY = 250;
+  private static final double kP_DEPLOY = 350;
   private static final double kG_DEPLOY = 2;
   public static final Slot0Configs DEPLOY_MOTOR_GAINS =
       new Slot0Configs()
@@ -61,9 +62,9 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(40)
+                  .withStatorCurrentLimit(45)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(40)
+                  .withSupplyCurrentLimit(45)
                   .withSupplyCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()
@@ -74,14 +75,19 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
           .withMotionMagic(INTAKE_MM_CONFIGS)
           .withSlot0(DEPLOY_MOTOR_GAINS)
           .withFeedback(new FeedbackConfigs().withRotorToSensorRatio(5 * 5 * 3))
-          .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+          .withMotorOutput(
+              new MotorOutputConfigs()
+                  .withInverted(InvertedValue.Clockwise_Positive)
+                  .withNeutralMode(NeutralModeValue.Brake));
 
   public static final TalonFXConfiguration SPIN_MOTOR_CONFIG =
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(135.0)
-                  .withStatorCurrentLimitEnable(true))
+                  .withStatorCurrentLimit(135)
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimit(135)
+                  .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
   public static final PositionDutyCycle DEPLOY_POSITION_REQUEST =

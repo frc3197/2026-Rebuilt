@@ -4,11 +4,15 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.LoggingConstants;
+import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.index.Index;
 import frc.robot.subsystems.index.IndexConstants;
@@ -19,6 +23,7 @@ import frc.robot.util.LoggedTunableNumber;
 public class DefaultIndexCommand extends Command {
 
   private final Index index;
+  private final Timer autoBackfeedTimer = new Timer();
 
   private LoggedTunableNumber feedKS =
       new LoggedTunableNumber("FEED KS", IndexConstants.Feed_SLOT0_CONFIGS.kS);
@@ -39,6 +44,7 @@ public class DefaultIndexCommand extends Command {
   public DefaultIndexCommand(Index index) {
     this.index = index;
     addRequirements(index);
+    autoBackfeedTimer.start();
   }
 
   @Override
@@ -61,6 +67,11 @@ public class DefaultIndexCommand extends Command {
       index.setGains(newConfigs);
     }
 
+    if (RobotState.instance().getIntakeSpinMode() == IntakeSpinMode.OUTTAKING) {
+      index.setFeedMotor(Volts.of(DriverStation.isAutonomous() ? 4 : -4));
+      index.setSpindexMotor(Volts.of(DriverStation.isAutonomous() ? 5.35 : -5.35));
+    }
+
     switch (RobotState.instance().getFlywheelMode()) {
       case IDLE:
         index.setFeedMotor(Volts.of(0.0));
@@ -72,8 +83,13 @@ public class DefaultIndexCommand extends Command {
         break;
       case FRENZY:
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(Volts.of(3.5));
-          index.setFeedMotor(Volts.of(10.0));
+          index.setFeedRequest(
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
+          if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.3)) {
+            index.setSpindexMotor(Volts.of(-3.5));
+          } else {
+            index.setSpindexMotor(Volts.of(3.5));
+          }
         } else {
           index.setFeedMotor(Volts.of(0.0));
           index.setSpindexMotor(Volts.of(0.0));
@@ -82,7 +98,9 @@ public class DefaultIndexCommand extends Command {
       case SHOOTING:
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setSpindexMotor(Volts.of(3.5));
-          index.setFeedMotor(Volts.of(10.0));
+          // index.setFeedMotor(Volts.of(10.0));
+          index.setFeedRequest(
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
         } else {
           index.setFeedMotor(Volts.of(0.0));
           index.setSpindexMotor(Volts.of(0.0));

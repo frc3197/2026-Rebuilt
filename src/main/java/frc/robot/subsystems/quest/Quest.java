@@ -45,6 +45,10 @@ public class Quest extends SubsystemBase {
     questIO.acceptVisionPose(visionRobotPoseMeters);
   }
 
+  public void setRobotPose(Pose2d pose) {
+    questIO.setRobotPosition(pose);
+  }
+
   public boolean isQuestConnected() {
     return inputs.isConnected;
   }

@@ -5,9 +5,11 @@
 package frc.robot.subsystems.climber;
 
 import com.ctre.phoenix6.controls.ControlRequest;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
@@ -25,6 +27,8 @@ public class Climber extends SubsystemBase {
     climberIO.updateInputs(loggedClimber);
 
     Logger.processInputs("Climber", loggedClimber);
+
+    RobotState.instance().setClimberAngle(getClimberAngle());
   }
 
   public Command setClimbSpeed(double speed) {
@@ -45,5 +49,9 @@ public class Climber extends SubsystemBase {
 
   public void setClimberControlType(ControlRequest request) {
     climberIO.setClimberControl(request);
+  }
+
+  public Angle getClimberAngle() {
+    return climberIO.getClimberAngle();
   }
 }

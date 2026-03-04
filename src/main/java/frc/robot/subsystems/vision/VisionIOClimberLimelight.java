@@ -52,7 +52,7 @@ public class VisionIOClimberLimelight implements VisionIO {
     megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
-    pipelineSetter = NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline");
+    pipelineSetter = NetworkTableInstance.getDefault().getTable(name).getEntry("pipeline");
   }
 
   @Override

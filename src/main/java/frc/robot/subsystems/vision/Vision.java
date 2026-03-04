@@ -19,6 +19,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,6 +83,14 @@ public class Vision extends SubsystemBase {
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+
+    if (RobotState.instance().getRobotVelocity().omegaRadiansPerSecond > 2.25
+        || Math.sqrt(
+                Math.pow(RobotState.instance().getRobotVelocity().vxMetersPerSecond, 2)
+                    + Math.pow(RobotState.instance().getRobotVelocity().vxMetersPerSecond, 2))
+            > 2.0) {
+      return;
+    }
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -161,7 +170,7 @@ public class Vision extends SubsystemBase {
 
         if (isQuestConnected.getAsBoolean()
             && observation.averageTagDistance() >= 0.5
-            && observation.averageTagDistance() <= 2.5
+            && observation.averageTagDistance() <= 5.0
             && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5) {
           lastQuestUpdateTimestamp = observation.timestamp();
           System.out.println("YEAH");

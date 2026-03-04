@@ -8,6 +8,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,7 +25,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -32,7 +38,7 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.05;
-  private static final double ANGLE_KP = 5.0;
+  private static final double ANGLE_KP = 2.0;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
@@ -77,12 +83,34 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
+          Vector<N2> robotVelocities =
+              VecBuilder.fill(
+                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec());
+          if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+              && Math.sqrt(
+                      Math.pow(robotVelocities.get(0), 2) + Math.pow(robotVelocities.get(1), 2))
+                  > ShooterConstants.MAX_SPEED_WHILE_SHOOTING_MPS) {
+            double speed =
+                Math.sqrt(
+                    Math.pow(robotVelocities.get(0), 2) + Math.pow(robotVelocities.get(1), 2));
+            robotVelocities =
+                robotVelocities.div(speed / ShooterConstants.MAX_SPEED_WHILE_SHOOTING_MPS);
+          }
+
+          double rotSpeed = omega * drive.getMaxAngularSpeedRadPerSec();
+
+          if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING) {
+            rotSpeed =
+                MathUtil.clamp(
+                    rotSpeed,
+                    -ShooterConstants.MAX_OMEGA_WHILE_SHOOTING_RADPS,
+                    ShooterConstants.MAX_OMEGA_WHILE_SHOOTING_RADPS);
+          }
+
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+              new ChassisSpeeds(robotVelocities.get(0), robotVelocities.get(1), rotSpeed);
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

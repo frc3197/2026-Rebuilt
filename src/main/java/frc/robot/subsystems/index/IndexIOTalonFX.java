@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID;
@@ -41,7 +42,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
 
   @Override
   public void setSpindexMotorVoltage(Voltage volts) {
-    spindexMotorController.setVoltage(volts.magnitude());
+    spindexMotorController.setControl(new VoltageOut(volts));
   }
 
   @Override

@@ -3,7 +3,9 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
+    "Left Depot Climb",
     "Right Bump Climb",
+    "Right Bump Outpost",
     "Right Bump Twice"
   ],
   "autoFolders": [],

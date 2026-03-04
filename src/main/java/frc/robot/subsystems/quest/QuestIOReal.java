@@ -50,6 +50,7 @@ public class QuestIOReal implements QuestIO {
   }
 
   public void acceptVisionPose(Pose2d pose) {
+    System.out.println("Accepting quest pose: " + pose.getX() + ", " + pose.getY());
     Pose2d poseWithGyro =
         new Pose2d(pose.getX(), pose.getY(), RobotState.instance().getRobotPose().getRotation());
     Pose2d newQuestPose =
@@ -74,5 +75,16 @@ public class QuestIOReal implements QuestIO {
   @Override
   public double getTimestamp() {
     return timestamp;
+  }
+
+  @Override
+  public void setRobotPosition(Pose2d pose) {
+    Pose2d newQuestPose =
+        pose.transformBy(
+            new Transform2d(
+                QuestConstants.ROBOT_TO_QUEST.getX(),
+                QuestConstants.ROBOT_TO_QUEST.getY(),
+                QuestConstants.ROBOT_TO_QUEST.getRotation().toRotation2d()));
+    questNav.setPose(new Pose3d(newQuestPose));
   }
 }

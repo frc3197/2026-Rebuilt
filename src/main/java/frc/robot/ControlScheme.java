@@ -17,7 +17,11 @@ public class ControlScheme {
   // Drive button mappings
 
   public Trigger getAlignClimb() {
-    return primaryController.y().and(() -> false);
+    return primaryController.y().and(() -> true);
+  }
+
+  public Trigger getSnap45() {
+    return primaryController.leftStick();
   }
 
   public double getDriveX() {
@@ -71,11 +75,11 @@ public class ControlScheme {
 
   // Intake
   public Trigger getIntakeSpin() {
-    return primaryController.rightStick();
+    return secondaryController.leftStick();
   }
 
   public Trigger getIntakeSpinStop() {
-    return primaryController.leftStick();
+    return primaryController.rightStick();
   }
 
   public Trigger getIntakeSpinManual() {

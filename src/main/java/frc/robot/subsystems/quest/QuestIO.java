@@ -33,5 +33,7 @@ public interface QuestIO {
     return 0.0;
   }
 
+  public default void setRobotPosition(Pose2d pose) {}
+
   public default void acceptVisionPose(Pose2d pose) {}
 }

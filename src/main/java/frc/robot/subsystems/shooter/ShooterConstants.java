@@ -43,18 +43,21 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   // Physical
   public static final Distance FUEL_RELEASE_HEIGHT = Inches.of(20);
 
+  public static final double MAX_SPEED_WHILE_SHOOTING_MPS = 1.0;
+  public static final double MAX_OMEGA_WHILE_SHOOTING_RADPS = 2.0;
+
   // Thresholds
-  public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(8.0);
-  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(3.5);
+  public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
 
-  public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(1.25);
-  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(60);
+  public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
+  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(180);
   public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(10.0);
-  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(7.0);
+  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(8.0);
 
-  public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.15;
+  public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.14;
   public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.7;
-  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.0;
+  public static final double VELOCITY_COMPENSATION_CONSTANT = 1.23;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);

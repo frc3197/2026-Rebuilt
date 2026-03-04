@@ -18,13 +18,14 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.NetworkButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.AutoLookup;
 import frc.robot.commands.AlignClimb;
 import frc.robot.commands.AlignCommand;
@@ -119,6 +120,9 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private final NetworkButton seedRightAutoRed =
+      new NetworkButton(NetworkTableInstance.getDefault(), "SmartDashboard", "Seed right red");
+
   // Triggers
   // -------------------------------------------------------------------------
   // Trigger for when robot enters the alliance zone, used to automatically begin
@@ -151,7 +155,7 @@ public class RobotContainer {
   private final Trigger enteredAllianceZoneTele =
       new Trigger(
           () ->
-              (RobotState.instance().inNeutralZone()
+              (RobotState.instance().inAllianceZone()
                   && (LoggingConstants.currentMode == Mode.REAL && !DriverStation.isAutonomous())
                   && !DriverStation.isTest()));
 
@@ -285,30 +289,41 @@ public class RobotContainer {
     }
 
     // Initialize auto lookup with appropriate subsystems
-    this.autoLookup = new AutoLookup(align, climber, drive, turret, vision);
+    this.autoLookup = new AutoLookup(align, climber, drive, turret, quest, vision);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Real auto routines
-    autoChooser.addOption("Right Bump Twice Auto", autoLookup.getAuto(RealAutos.Right_Bump_Twice));
-    autoChooser.addOption("Right Bump Climb Auto", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
+    autoChooser.addOption("Left Depot CLIMB", autoLookup.getAuto(RealAutos.Left_Depot_Climb));
+    autoChooser.addOption("Right Bump Twice", autoLookup.getAuto(RealAutos.Right_Bump_Twice));
+    autoChooser.addOption("Right Bump Outpost", autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
+    autoChooser.addOption("Right Bump CLIMB", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
+
+    seedRightAutoRed.onTrue(
+        autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));
 
     // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    /*
+     * autoChooser.addOption(
+     * "Drive Wheel Radius Characterization",
+     * DriveCommands.wheelRadiusCharacterization(drive));
+     * autoChooser.addOption(
+     * "Drive Simple FF Characterization",
+     * DriveCommands.feedforwardCharacterization(drive));
+     * autoChooser.addOption(
+     * "Drive SysId (Quasistatic Forward)",
+     * drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+     * autoChooser.addOption(
+     * "Drive SysId (Quasistatic Reverse)",
+     * drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+     * autoChooser.addOption(
+     * "Drive SysId (Dynamic Forward)",
+     * drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+     * autoChooser.addOption(
+     * "Drive SysId (Dynamic Reverse)",
+     * drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+     */
 
     // Get the default commands bound
     configureDefaultCommands();
@@ -358,14 +373,22 @@ public class RobotContainer {
 
     controlScheme
         .getBackfeedManual()
-        .onTrue(
-            index
-                .setSpindexMotorCommand(Volts.of(-5.35))
-                .andThen(setIntakeSpinMode(IntakeSpinMode.OUTTAKING)))
+        .onTrue(setIntakeSpinMode(IntakeSpinMode.OUTTAKING))
         .onFalse(
             index
                 .setSpindexMotorCommand(Volts.of(0.0))
                 .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
+
+    controlScheme
+        .getSnap45()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -controlScheme.getDriveX(),
+                () -> -controlScheme.getDriveY(),
+                () -> {
+                  return Rotation2d.fromDegrees(RobotContainer.isRed() ? (45 + 180) : 45);
+                }));
 
     controlScheme
         .getSpindexFeedFlywheelManual()
@@ -405,12 +428,16 @@ public class RobotContainer {
     controlScheme
         .getShootingFlywheel()
         .onTrue(
-            setFlywheelMode(FlywheelMode.FRENZY)
+            setFlywheelMode(FlywheelMode.SHOOTING)
                 .andThen(
                     Commands.runOnce(
                         () -> {
                           if (RobotState.instance().getTurretMode() == TurretMode.IDLE) {
-                            RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
+                            RobotState.instance()
+                                .setTurretMode(
+                                    RobotState.instance().inNeutralZone()
+                                        ? TurretMode.PASSING
+                                        : TurretMode.TRACKING_HUB);
                           }
                         })))
         .onFalse(
@@ -475,9 +502,11 @@ public class RobotContainer {
                     new AlignCommand(
                             align,
                             drive,
-                            (RobotContainer.isRed()
-                                ? FlippingUtil.flipFieldPose(FieldConstants.CLIMB_ALIGN_POSE)
-                                : FieldConstants.CLIMB_ALIGN_POSE))
+                            () ->
+                                (RobotContainer.isRed()
+                                    ? FlippingUtil.flipFieldPose(
+                                        FieldConstants.CLIMB_ALIGN_POSE_RIGHT)
+                                    : FieldConstants.CLIMB_ALIGN_POSE_RIGHT))
                         .withTimeout(2.0),
                     new AlignClimb(() -> vision.getTargetX(1).getDegrees(), drive).withTimeout(1.0),
                     Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0.4, 0)), drive)
@@ -516,8 +545,10 @@ public class RobotContainer {
   private void configureTriggerCallbacks() {
     enteredAllianceZoneAuto
         .onTrue(
+            // RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
+            // .andThen(
             setTurretMode(TurretMode.TRACKING_HUB)
-                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL))
+                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL)) // )
         .onFalse(
             setTurretMode(TurretMode.IDLE)
                 .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL));
@@ -528,7 +559,8 @@ public class RobotContainer {
                 .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING))
                 .andThen(setFlywheelMode(FlywheelMode.IDLE)))
         .onFalse(
-            setIntakeSpinMode(IntakeSpinMode.IDLE).andThen(setFlywheelMode(FlywheelMode.PREPARE)));
+            setIntakeSpinMode(IntakeSpinMode.INTAKING)
+                .andThen(setFlywheelMode(FlywheelMode.PREPARE)));
 
     enteredNeurtalZoneTele.onTrue(
         Commands.runOnce(
@@ -542,6 +574,9 @@ public class RobotContainer {
         Commands.runOnce(
             () -> {
               if (RobotState.instance().getTurretMode() == TurretMode.IDLE) {
+                RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
+              }
+              if (RobotState.instance().getTurretMode() == TurretMode.PASSING) {
                 RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
               }
             }));
@@ -559,7 +594,8 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
+                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING
+                      && !DriverStation.isAutonomous()) {
                     RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
                   }
                 }));

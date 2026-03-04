@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.util.RealSubsystem;
 
 /** Add your docs here. */
@@ -45,5 +46,10 @@ public class ClimberIOTalonFX extends RealSubsystem implements ClimberIO {
   @Override
   public void zeroClimber() {
     climberMotor.setPosition(0.0);
+  }
+
+  @Override
+  public Angle getClimberAngle() {
+    return climberMotor.getPosition().getValue();
   }
 }

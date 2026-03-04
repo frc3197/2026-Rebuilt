@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Align;
 import frc.robot.subsystems.drive.Drive;
+import java.util.function.Supplier;
 
 // Align command that drives robot to the target pose
 public class AlignCommand extends Command {
@@ -18,9 +19,11 @@ public class AlignCommand extends Command {
   private final Drive drive;
 
   // Target to drive to
-  private final Pose2d targetPose;
+  private final Supplier<Pose2d> targetPose;
 
-  public AlignCommand(Align align, Drive drive, Pose2d targetPose) {
+  private ChassisSpeeds speed = new ChassisSpeeds();
+
+  public AlignCommand(Align align, Drive drive, Supplier<Pose2d> targetPose) {
 
     this.align = align;
     this.drive = drive;
@@ -31,8 +34,15 @@ public class AlignCommand extends Command {
 
   @Override
   public void execute() {
-    drive.runVelocity(
+    speed =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            align.alignWithTarget(targetPose, drive.getPose()), drive.getRotation()));
+            align.alignWithTarget(targetPose.get(), drive.getPose()), drive.getRotation());
+    drive.runVelocity(speed);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond) < 0.1
+        && Math.abs(speed.omegaRadiansPerSecond) < 0.1;
   }
 }
