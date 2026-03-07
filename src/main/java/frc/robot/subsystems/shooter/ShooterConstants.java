@@ -53,7 +53,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
   public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(180);
   public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(10.0);
-  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(8.0);
+  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(14.0);
 
   public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.14;
   public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.7;
@@ -166,9 +166,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(120)
+                  .withStatorCurrentLimit(100.0)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(120.0)
+                  .withSupplyCurrentLimit(80.0)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()

@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
+import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.IntakeSpinMode;
+import frc.robot.managersubsystems.LightManager;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.MatchTimeUtil;
@@ -76,6 +79,7 @@ public class Robot extends LoggedRobot {
     ShotCalculator.instance();
     RobotState.instance();
     MatchTimeUtil.instance();
+    LightManager.instance();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -135,7 +139,9 @@ public class Robot extends LoggedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
 
-    RobotContainer.setClimbCameraMode(ClimbCameraMode.APRIL_TAGS);
+    RobotState.instance().setClimbCameraMode(ClimbCameraMode.APRIL_TAGS);
+    RobotState.instance().setFlywheelMode(FlywheelMode.IDLE);
+    RobotState.instance().setIntakeSpinMode(IntakeSpinMode.IDLE);
 
     if (autonomousCommand != null) {
       autonomousCommand.cancel();

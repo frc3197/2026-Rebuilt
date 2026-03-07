@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.TurretMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -100,7 +101,8 @@ public class DriveCommands {
 
           double rotSpeed = omega * drive.getMaxAngularSpeedRadPerSec();
 
-          if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING) {
+          if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+              && RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB) {
             rotSpeed =
                 MathUtil.clamp(
                     rotSpeed,

@@ -43,7 +43,7 @@
         "x": 8.408468720316131,
         "y": 2.821930814068409
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": null
     },
     {
@@ -143,7 +143,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -9.727578551401631
   },
   "reversed": false,
   "folder": "Right Bump Climb",

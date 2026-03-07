@@ -105,7 +105,7 @@ public class DefaultTurretHoodCommand extends Command {
 
         // Rotate turret based on supplier, -10 to 10 volts
       case MANUAL:
-        double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 10;
+        double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 3;
         turret.setTurretControlRequest(
             ShooterConstants.TURRET_VOLTAGE_REQUEST.withOutput(Volts.of(manualVolts)));
 

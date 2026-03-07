@@ -7,8 +7,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -60,7 +60,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.index.Index;
-import frc.robot.subsystems.index.IndexConstants;
 import frc.robot.subsystems.index.IndexIO;
 import frc.robot.subsystems.index.IndexIOSim;
 import frc.robot.subsystems.index.IndexIOTalonFX;
@@ -167,11 +166,12 @@ public class RobotContainer {
   private final Trigger startFlopping =
       new Trigger(
           () ->
-              !DriverStation.isAutonomous()
+              (!DriverStation.isAutonomous()
+                  && RobotState.instance().getClimberAngle().lt(Degrees.of(10))
                   && RobotState.instance().getRobotSpeedMPS()
                       < IntakeConstants.MAX_FLOP_VELOCITY.in(MetersPerSecond)
                   && (RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
-                      || RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING));
+                      || RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING)));
 
   public RobotContainer() {
 
@@ -346,7 +346,11 @@ public class RobotContainer {
             () -> -controlScheme.getDriveY(),
             () -> -controlScheme.getDriveRotation()));
 
-    index.setDefaultCommand(new DefaultIndexCommand(index));
+    index.setDefaultCommand(
+        new DefaultIndexCommand(
+            index,
+            controlScheme.getBackfeedManual(),
+            controlScheme.getSpindexFeedFlywheelManual()));
 
     intake.setDefaultCommand(
         new DefaultIntakeCommand(
@@ -392,24 +396,7 @@ public class RobotContainer {
                   return Rotation2d.fromDegrees(RobotContainer.isRed() ? (45 + 180) : 45);
                 }));
 
-    controlScheme
-        .getSpindexFeedFlywheelManual()
-        .onTrue(
-            index
-                .setSpindexMotorCommand(Volts.of(3.5))
-                .andThen(
-                    Commands.runOnce(
-                        () ->
-                            index.setFeedRequest(
-                                IndexConstants.FEED_TORQUE_REQUEST.withVelocity(
-                                    RotationsPerSecond.of(100))))))
-        .onFalse(
-            index
-                .setSpindexMotorCommand(Volts.of(0.0))
-                .andThen(
-                    Commands.runOnce(() -> index.setFeedRequest(new VoltageOut(Volts.of(0.0))))));
-
-    controlScheme.startFloppping().onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING));
+    // controlScheme.startFloppping().onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING));
 
     // Zeroes the robot
     controlScheme
@@ -423,6 +410,8 @@ public class RobotContainer {
                                 isRed() ? Rotation2d.k180deg : Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    controlScheme.stopTrackingNew().onTrue(setTurretMode(TurretMode.IDLE));
 
     // Driver controller bindings to spool flywheel
     controlScheme.getPrepareFlywheel().onTrue(setFlywheelMode(FlywheelMode.PREPARE));
@@ -444,15 +433,26 @@ public class RobotContainer {
                         })))
         .onFalse(
             Commands.runOnce(
-                () -> {
-                  if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
-                      || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY) {
-                    RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
-                  }
-                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
-                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
-                  }
-                }));
+                    () -> {
+                      if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+                          || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY) {
+                        RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
+                      }
+                      if (RobotState.instance().getIntakeDeployMode()
+                          == IntakeDeployMode.FLOPPING) {
+                        RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
+                      }
+                    })
+                .andThen(
+                    Commands.run(
+                            () -> {
+                              index.setFeedRequest(new VoltageOut(-3.5));
+                            },
+                            index)
+                        .withTimeout(0.3)
+                        .andThen(
+                            Commands.runOnce(
+                                () -> index.setFeedRequest(new VoltageOut(0.0)), index))));
 
     controlScheme
         .intakeDeployAndSpin()
@@ -531,6 +531,8 @@ public class RobotContainer {
         .onTrue(climber.setClimbSpeed(-1.0))
         .onFalse(climber.setClimbSpeed(0.0));
 
+    controlScheme.getTurretManual().onTrue(setTurretMode(TurretMode.MANUAL));
+
     controlScheme.getIntakeExtendPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING));
     controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
 
@@ -538,8 +540,9 @@ public class RobotContainer {
     // TURRET ROTATION CONTROLS
     // -----------------------------------------------------------------------
 
-    controlScheme.getTurretTrack().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
-    controlScheme.getTurretIdle().onTrue(setTurretMode(TurretMode.IDLE));
+    controlScheme.getTurretPass().onTrue(setTurretMode(TurretMode.PASSING));
+    controlScheme.getTurretHub().onTrue(setTurretMode(TurretMode.TRACKING_HUB));
+
     controlScheme.zeroTurret().onTrue(turret.zeroTurretPositionCommand().ignoringDisable(true));
     controlScheme.autoZeroTurret().whileTrue(new ZeroTurret(turret));
   }
@@ -591,20 +594,23 @@ public class RobotContainer {
               }
             }));
 
-    startFlopping
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (DriverStation.isTeleop())
-                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING) {
-                    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
-                  }
-                }));
+    /*
+     * startFlopping
+     * .onTrue(
+     * Commands.runOnce(
+     * () -> {
+     * if (DriverStation.isTeleop())
+     * RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
+     * }))
+     * .onFalse(
+     * Commands.runOnce(
+     * () -> {
+     * if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.FLOPPING)
+     * {
+     * RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
+     * }
+     * }));
+     */
   }
 
   /**

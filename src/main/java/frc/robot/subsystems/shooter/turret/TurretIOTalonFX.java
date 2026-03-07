@@ -30,7 +30,7 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   private final TalonFX turretRotationMotor;
 
   // Actuators
-  private final LinearServo leftHoodActuator = new LinearServo(0, 50, 32);
+  private final LinearServo leftHoodActuator = new LinearServo(4, 50, 32);
 
   private DigitalInput turretZeroLimit = new DigitalInput(ShooterConstants.TURRET_ZERO_LIMIT);
 

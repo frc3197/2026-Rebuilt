@@ -86,7 +86,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(100)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(100)
+                  .withSupplyCurrentLimit(80)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 

@@ -15,6 +15,8 @@ public interface IndexIO {
   public static class IndexInputs {
     public double indexMotorSuppliedVoltage = 0.0;
     public double feedRPS = 0.0;
+    public double spindexDrawAmps = 0.0;
+    public double feedDrawAmps = 0.0;
   }
 
   public default void updateInputs(IndexInputs inputs) {}

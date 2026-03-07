@@ -171,7 +171,7 @@ public class ShotCalculator extends VirtualSubsystem {
           poseToAimAt =
               isRed
                   ? FlippingUtil.flipFieldPose(FieldConstants.PASSING_UPPER)
-                  : FieldConstants.PASSING_UPPER;
+                  : FieldConstants.PASSING_LOWER;
         } else {
           poseToAimAt =
               isRed

@@ -41,6 +41,11 @@ public class AlignCommand extends Command {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    drive.runVelocity(new ChassisSpeeds(0.0, 0.0, 0.0));
+  }
+
+  @Override
   public boolean isFinished() {
     return Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond) < 0.1
         && Math.abs(speed.omegaRadiansPerSecond) < 0.1;

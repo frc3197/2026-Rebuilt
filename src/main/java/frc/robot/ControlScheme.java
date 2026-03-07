@@ -75,7 +75,7 @@ public class ControlScheme {
 
   // Intake
   public Trigger getIntakeSpin() {
-    return secondaryController.leftStick();
+    return new Trigger(() -> false);
   }
 
   public Trigger getIntakeSpinStop() {
@@ -103,6 +103,10 @@ public class ControlScheme {
   }
 
   public Trigger startFloppping() {
+    return new Trigger(() -> false);
+  }
+
+  public Trigger stopTrackingNew() {
     return secondaryController.rightStick();
   }
 
@@ -129,7 +133,7 @@ public class ControlScheme {
   }
 
   public Trigger getClimberStow() {
-    return secondaryController.povDown();
+    return secondaryController.leftStick();
   }
 
   public DoubleSupplier getTurretVoltageManual() {
@@ -137,11 +141,15 @@ public class ControlScheme {
         secondaryController.getLeftTriggerAxis() - secondaryController.getRightTriggerAxis();
   }
 
-  public Trigger getTurretTrack() {
+  public Trigger getTurretManual() {
+    return secondaryController.leftTrigger(0.25).or(secondaryController.rightTrigger(0.25));
+  }
+
+  public Trigger getTurretPass() {
     return secondaryController.leftBumper();
   }
 
-  public Trigger getTurretIdle() {
+  public Trigger getTurretHub() {
     return secondaryController.rightBumper();
   }
 }
