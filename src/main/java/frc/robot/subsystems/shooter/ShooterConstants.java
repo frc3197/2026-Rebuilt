@@ -140,7 +140,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   private static final double kSFlywheel = 12.5; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
-      0.35; // A velocity target of 1 rps results in 0.12 V output
+      0.3625; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
       10.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error
@@ -160,15 +160,15 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final VoltageOut FLYWHEEL_VOLTAGE_REQUEST = new VoltageOut(Volts.of(0.0));
 
   // Manual preset flywheel speed
-  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(6.50);
+  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(10.50);
 
   public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(100.0)
+                  .withStatorCurrentLimit(120.0)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(80.0)
+                  .withSupplyCurrentLimit(120.0)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()

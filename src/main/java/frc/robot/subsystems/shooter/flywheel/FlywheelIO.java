@@ -17,6 +17,7 @@ public interface FlywheelIO {
   public static class FlywheelInputs {
     public double flywheelTargetVelocityRPS = 0.0;
     public double flywheelTargetVelocity = 0.0;
+    public double flywheelVelocityActual = 0.0;
     public MutVoltage flywheelSuppliedVoltage = new MutVoltage(0.0, 0.0, Volts);
     public MutCurrent flywheelCurrentDraw = new MutCurrent(0.0, 0.0, Amps);
   }

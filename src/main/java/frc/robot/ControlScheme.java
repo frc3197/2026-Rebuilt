@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class ControlScheme {
@@ -16,8 +18,8 @@ public class ControlScheme {
 
   // Drive button mappings
 
-  public Trigger getAlignClimb() {
-    return primaryController.y().and(() -> true);
+  public BooleanSupplier manualSpool() {
+    return () -> primaryController.y().getAsBoolean();
   }
 
   public Trigger getSnap45() {
@@ -113,7 +115,7 @@ public class ControlScheme {
   // Shooter
 
   public Trigger getSpoolFlywheelManual() {
-    return new Trigger(() -> false);
+    return primaryController.povLeft();
   }
 
   public Trigger autoZeroTurret() {

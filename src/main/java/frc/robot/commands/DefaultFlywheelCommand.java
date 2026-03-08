@@ -72,6 +72,13 @@ public class DefaultFlywheelCommand extends Command {
 
     FlywheelMode currentMode = RobotState.instance().getFlywheelMode();
 
+    if (isTriggerPressed.getAsBoolean()) {
+      flywheel.setFlywheelControl(
+          ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(
+              ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN));
+      return;
+    }
+
     switch (currentMode) {
 
         // Flywheel is idle, let it naturally spool down
