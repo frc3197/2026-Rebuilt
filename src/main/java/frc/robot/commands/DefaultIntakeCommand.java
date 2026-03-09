@@ -103,11 +103,17 @@ public class DefaultIntakeCommand extends Command {
         break;
 
       case INTAKING:
-        intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        intake.setIntakeSpinRequest(
+            IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC
+                .withOutput(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE)
+                .withEnableFOC(true));
         break;
 
       case OUTTAKING:
-        intake.setIntakeSpinSpeed(-IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
+        intake.setIntakeSpinRequest(
+            IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC
+                .withOutput(-IntakeConstants.INTAKE_SPIN_DUTY_CYCLE)
+                .withEnableFOC(true));
         break;
 
       case MANUAL:

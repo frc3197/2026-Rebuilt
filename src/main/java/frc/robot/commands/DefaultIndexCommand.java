@@ -27,11 +27,16 @@ public class DefaultIndexCommand extends Command {
   private final Index index;
   private final Timer autoBackfeedTimer = new Timer();
 
-  private LoggedTunableNumber feedKS = new LoggedTunableNumber("FEED KS", IndexConstants.Feed_SLOT0_CONFIGS.kS);
-  private LoggedTunableNumber feedKA = new LoggedTunableNumber("FEED KA", IndexConstants.Feed_SLOT0_CONFIGS.kA);
-  private LoggedTunableNumber feedKP = new LoggedTunableNumber("FEED KP", IndexConstants.Feed_SLOT0_CONFIGS.kP);
-  private LoggedTunableNumber feedKV = new LoggedTunableNumber("FEED KV", IndexConstants.Feed_SLOT0_CONFIGS.kV);
-  private LoggedTunableNumber feedKD = new LoggedTunableNumber("FEED KD", IndexConstants.Feed_SLOT0_CONFIGS.kD);
+  private LoggedTunableNumber feedKS =
+      new LoggedTunableNumber("FEED KS", IndexConstants.Feed_SLOT0_CONFIGS.kS);
+  private LoggedTunableNumber feedKA =
+      new LoggedTunableNumber("FEED KA", IndexConstants.Feed_SLOT0_CONFIGS.kA);
+  private LoggedTunableNumber feedKP =
+      new LoggedTunableNumber("FEED KP", IndexConstants.Feed_SLOT0_CONFIGS.kP);
+  private LoggedTunableNumber feedKV =
+      new LoggedTunableNumber("FEED KV", IndexConstants.Feed_SLOT0_CONFIGS.kV);
+  private LoggedTunableNumber feedKD =
+      new LoggedTunableNumber("FEED KD", IndexConstants.Feed_SLOT0_CONFIGS.kD);
 
   private final BooleanSupplier backfeedManual;
   private final BooleanSupplier forwardfeedManual;
@@ -51,14 +56,13 @@ public class DefaultIndexCommand extends Command {
   }
 
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
 
     if (LoggingConstants.tuningMode
-        && (feedKA.hasChanged(hashCode()) || feedKD.hasChanged(hashCode()))
+            && (feedKA.hasChanged(hashCode()) || feedKD.hasChanged(hashCode()))
         || feedKP.hasChanged(hashCode())
         || feedKS.hasChanged(hashCode())
         || feedKV.hasChanged(hashCode())) {
@@ -89,6 +93,10 @@ public class DefaultIndexCommand extends Command {
       return;
     }
 
+    if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
+      return;
+    }
+
     switch (RobotState.instance().getFlywheelMode()) {
       case IDLE:
         index.setFeedMotor(Volts.of(0.0));
@@ -99,11 +107,6 @@ public class DefaultIndexCommand extends Command {
         index.setSpindexMotor(Volts.of(0.0));
         break;
       case FRENZY:
-        if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
-          index.setFeedRequest(IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
-          index.setSpindexMotor(Volts.of(3.5));
-          return;
-        }
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
@@ -120,7 +123,8 @@ public class DefaultIndexCommand extends Command {
         break;
       case SHOOTING:
         if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
-          index.setFeedRequest(IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
+          index.setFeedRequest(
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
           index.setSpindexMotor(Volts.of(3.5));
           return;
         }
@@ -140,6 +144,5 @@ public class DefaultIndexCommand extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 }

@@ -32,7 +32,9 @@ public class Flywheel extends SubsystemBase {
     Logger.processInputs("Shooter/Flywheel", loggedInputs);
 
     RobotState.instance()
-        .setFlywheelVelocity(RotationsPerSecond.of(loggedInputs.flywheelTargetVelocityRPS));
+        .setFlywheelVelocity(RotationsPerSecond.of(loggedInputs.flywheelVelocityActual));
+
+    RobotState.instance().setFlywheelCurrentDraw(loggedInputs.flywheelCurrentDraw);
   }
 
   public void setGains(Slot0Configs gains) {

@@ -34,7 +34,6 @@ public interface TurretIO {
     public MutAngle turretRotationError = Degrees.of(0.0).mutableCopy();
     public MutAngle turretRotation = Degrees.of(0.0).mutableCopy();
     public MutAngle turretRotationTarget = Degrees.of(0.0).mutableCopy();
-
     public MutDistance hoodActuatorExtension = Millimeters.of(0.0).mutableCopy();
     public MutDistance hoodActuatorExtensionTarget = Millimeters.of(0.0).mutableCopy();
     public MutAngle hoodAngle = Degrees.of(0.0).mutableCopy();

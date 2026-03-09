@@ -48,8 +48,8 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
   @Override
   public void updateInputs(IntakeInputs inputs) {
     inputs.spinMotorSetSpeed = getSpinMotorSpeed();
-    inputs.deployMotorSuppliedCurrent = deployMotor.getSupplyCurrent().getValueAsDouble();
-    inputs.spinMotorSuppliedCurrent = spinMotor.getSupplyCurrent().getValueAsDouble();
+    inputs.deployMotorSuppliedCurrent.mut_replace(deployMotor.getSupplyCurrent().getValue());
+    inputs.spinMotorSuppliedCurrent.mut_replace(spinMotor.getSupplyCurrent().getValue());
     inputs.deployAngleDegrees = deployMotor.getPosition().getValue().in(Degrees);
     inputs.deployMotorVelocity.mut_replace(deployEncoder.getVelocity().getValue());
   }
@@ -85,11 +85,6 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
   }
 
   @Override
-  public void setSpinMotorSpeed(double speed) {
-    spinMotor.set(speed);
-  }
-
-  @Override
   public void setDeployMotorSpeed(double speed) {
     deployMotor.set(speed);
   }
@@ -97,5 +92,15 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
   @Override
   public void setDeployGains(Slot0Configs gains) {
     deployMotor.getConfigurator().apply(gains);
+  }
+
+  @Override
+  public void setSpinMotorSpeed(double speed) {
+    spinMotor.set(speed);
+  }
+
+  @Override
+  public void setSpinMotorRequest(ControlRequest request) {
+    spinMotor.setControl(request);
   }
 }

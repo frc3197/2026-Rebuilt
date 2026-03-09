@@ -1,5 +1,6 @@
 package frc.robot.managersubsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -66,6 +68,12 @@ public class RobotState extends VirtualSubsystem {
   private Pose3d turretFieldPosition = new Pose3d();
 
   private double turretToHubMagnitude = 2.54;
+
+  private Current drivetrainCurrentDraw = Amps.of(0.0);
+  private Current flywheelCurrentDraw = Amps.of(0.0);
+  private Current indexCurrentDraw = Amps.of(0.0);
+  private Current intakeCurrentDraw = Amps.of(0.0);
+  private Current turretCurrentDraw = Amps.of(0.0);
 
   private RobotState(String key) {
     this.key = key;
@@ -242,6 +250,13 @@ public class RobotState extends VirtualSubsystem {
 
     Logger.recordOutput("RobotState/Intake fully retracted", intakeFullyRetracted);
 
+    Logger.recordOutput("RobotState/Current Draw/Total", getTotalRobotCurrentDraw());
+    Logger.recordOutput("RobotState/Current Draw/Drivetrain", getDrivetrainCurrentDraw());
+    Logger.recordOutput("RobotState/Current Draw/Flywheel", getFlywheelCurrentDraw());
+    Logger.recordOutput("RobotState/Current Draw/Index", getIndexCurrentDraw());
+    Logger.recordOutput("RobotState/Current Draw/Intake", getIntakeCurrentDraw());
+    Logger.recordOutput("RobotState/Current Draw/Turret", getTurretCurrentDraw());
+
     turretFieldPosition =
         RobotState.instance()
             .getRobotPose3d()
@@ -297,5 +312,57 @@ public class RobotState extends VirtualSubsystem {
         Math.pow(p1.getX() - p2.getX(), 2)
             + Math.pow(p1.getY() - p2.getY(), 2)
             + Math.pow(p1.getZ() - p2.getZ(), 2));
+  }
+
+  // -------------------------------------------------------------------
+  // Current Draw
+  // -------------------------------------------------------------------
+
+  public Current getDrivetrainCurrentDraw() {
+    return drivetrainCurrentDraw;
+  }
+
+  public void setDrivetrainCurrentDraw(Current drivetrainCurrentDraw) {
+    this.drivetrainCurrentDraw = drivetrainCurrentDraw;
+  }
+
+  public Current getFlywheelCurrentDraw() {
+    return flywheelCurrentDraw;
+  }
+
+  public void setFlywheelCurrentDraw(Current flywheelCurrentDraw) {
+    this.flywheelCurrentDraw = flywheelCurrentDraw;
+  }
+
+  public Current getIndexCurrentDraw() {
+    return indexCurrentDraw;
+  }
+
+  public void setIndexCurrentDraw(Current indexCurrentDraw) {
+    this.indexCurrentDraw = indexCurrentDraw;
+  }
+
+  public Current getIntakeCurrentDraw() {
+    return intakeCurrentDraw;
+  }
+
+  public void setIntakeCurrentDraw(Current intakeCurrentDraw) {
+    this.intakeCurrentDraw = intakeCurrentDraw;
+  }
+
+  public Current getTurretCurrentDraw() {
+    return turretCurrentDraw;
+  }
+
+  public void setTurretCurrentDraw(Current turretCurrentDraw) {
+    this.turretCurrentDraw = turretCurrentDraw;
+  }
+
+  public Current getTotalRobotCurrentDraw() {
+    return drivetrainCurrentDraw
+        .plus(flywheelCurrentDraw)
+        .plus(indexCurrentDraw)
+        .plus(intakeCurrentDraw)
+        .plus(turretCurrentDraw);
   }
 }

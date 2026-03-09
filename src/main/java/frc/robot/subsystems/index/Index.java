@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import org.littletonrobotics.junction.Logger;
 
 public class Index extends SubsystemBase {
@@ -26,6 +27,8 @@ public class Index extends SubsystemBase {
     indexIO.updateInputs(inputs);
 
     Logger.processInputs("Index", inputs);
+
+    RobotState.instance().setIndexCurrentDraw(inputs.feedDrawAmps.plus(inputs.spindexDrawAmps));
   }
 
   public Command setFeedMotorCommand(Voltage volts) {

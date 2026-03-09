@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems.index;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
+import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -15,8 +18,8 @@ public interface IndexIO {
   public static class IndexInputs {
     public double indexMotorSuppliedVoltage = 0.0;
     public double feedRPS = 0.0;
-    public double spindexDrawAmps = 0.0;
-    public double feedDrawAmps = 0.0;
+    public MutCurrent spindexDrawAmps = Amps.of(0.0).mutableCopy();
+    public MutCurrent feedDrawAmps = Amps.of(0.0).mutableCopy();
   }
 
   public default void updateInputs(IndexInputs inputs) {}

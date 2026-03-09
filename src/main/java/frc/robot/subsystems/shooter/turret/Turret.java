@@ -41,6 +41,8 @@ public class Turret extends SubsystemBase {
     Logger.processInputs("Shooter/Turret", loggedTurret);
 
     RobotState.instance().setTurretRotationAngle(loggedTurret.turretMotorAngle);
+
+    RobotState.instance().setTurretCurrentDraw(loggedTurret.turretMotorCurrent);
   }
 
   public TurretParameters getTurretParameters() {

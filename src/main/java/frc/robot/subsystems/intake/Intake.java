@@ -36,6 +36,10 @@ public class Intake extends SubsystemBase {
     intakeIO.setSpinMotorSpeed(speed);
   }
 
+  public void setIntakeSpinRequest(ControlRequest request) {
+    intakeIO.setSpinMotorRequest(request);
+  }
+
   public void setDeployControlRequest(ControlRequest request) {
     intakeIO.setDeployMotorRequest(request);
   }
@@ -56,6 +60,10 @@ public class Intake extends SubsystemBase {
                 loggedInputs.deployAngleDegrees,
                 IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
                 IntakeConstants.INTAKE_RETRACTED_THRESHOLD.in(Degrees)));
+
+    RobotState.instance()
+        .setIntakeCurrentDraw(
+            loggedInputs.deployMotorSuppliedCurrent.plus(loggedInputs.spinMotorSuppliedCurrent));
   }
 
   public void setDeployGains(Slot0Configs gains) {

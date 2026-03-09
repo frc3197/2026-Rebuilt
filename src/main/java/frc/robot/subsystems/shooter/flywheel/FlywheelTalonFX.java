@@ -38,7 +38,6 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   public void updateInputs(FlywheelInputs inputs) {
     inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
     inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
-    inputs.flywheelTargetVelocityRPS = (getFlywheelVelocity().in(RotationsPerSecond));
     inputs.flywheelTargetVelocity =
         (ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond));
     inputs.flywheelVelocityActual = getFlywheelVelocity().in(RotationsPerSecond);

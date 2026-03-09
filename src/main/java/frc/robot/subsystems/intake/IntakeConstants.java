@@ -30,7 +30,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
 
   public static final double INTAKE_SPIN_DUTY_CYCLE = 1.0;
 
-  public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(2.5);
+  public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(5.0);
   // public static final Angle FLOP_ANGLE = Degrees.of(-65);
   public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(0);
   public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(94);
@@ -38,6 +38,8 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
 
   public static final Time FLOP_PERIOD = Seconds.of(3.0);
   public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(0.5);
+
+  public static DutyCycleOut INTAKE_SPIN_DUTY_CYCLE_FOC = new DutyCycleOut(0.0).withEnableFOC(true);
 
   // Motion magic configs
   private static final double max_intake_rps = DegreesPerSecond.of(300).in(RotationsPerSecond);
@@ -86,7 +88,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(100)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(80)
+                  .withSupplyCurrentLimit(40)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 

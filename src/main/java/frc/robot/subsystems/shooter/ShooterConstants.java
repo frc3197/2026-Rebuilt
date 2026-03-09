@@ -48,7 +48,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   // Thresholds
   public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
-  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(4.0);
 
   public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
   public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(180);
@@ -140,9 +140,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   private static final double kSFlywheel = 12.5; // Add 0.25 V output to overcome static friction
   private static final double kVFlywheel =
-      0.3625; // A velocity target of 1 rps results in 0.12 V output
+      0.364; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
-      10.5; // A position error of 2.5 rotations results in 12 V output
+      11.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error
   private static final double kDFlywheel = 0.0;
   private static final double kAFlywheel = 1.5; // A velocity error of 1 rps results in 0.1 V output
@@ -168,11 +168,11 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(120.0)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(120.0)
+                  .withSupplyCurrentLimit(130.0)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
-                  .withNeutralMode(NeutralModeValue.Brake)
+                  .withNeutralMode(NeutralModeValue.Coast)
                   .withInverted(InvertedValue.CounterClockwise_Positive))
           .withSlot0(FLYWHEEL_SLOT0_CONFIGS);
 

@@ -4,9 +4,10 @@
   "holonomicMode": true,
   "pathFolders": [
     "Left Depot Climb",
+    "Only Preload Climb",
     "Right Bump Climb",
-    "Right Bump Outpost",
-    "Right Bump Double Swipe"
+    "Right Bump Double Swipe",
+    "Right Bump Outpost"
   ],
   "autoFolders": [],
   "defaultMaxVel": 2.0,

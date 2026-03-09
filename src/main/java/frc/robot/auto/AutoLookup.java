@@ -94,6 +94,23 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY));
   }
 
+  private Command getPreloadClimb() {
+    return new SequentialCommandGroup(
+        getCommonCommandsNew(),
+        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
+        // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setTurretMode(TurretMode.IDLE),
+        // new WaitCommand(2.0),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        loadPath("Preload-Climb"),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        new WaitCommand(5.0),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.OUTTAKING),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
+        getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_RIGHT),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
+  }
+
   private Command getRightBumpCLIMBAuto() {
     return new SequentialCommandGroup(
         getCommonCommands(),
@@ -145,6 +162,9 @@ public class AutoLookup {
     if (auto == RealAutos.Left_Depot_Climb) {
       return getLeftBumpDepotClimb();
     }
+    if (auto == RealAutos.Preload_Climb_Auto) {
+      return getPreloadClimb();
+    }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }
 
@@ -166,6 +186,16 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB));
+  }
+
+  private SequentialCommandGroup getCommonCommandsNew() {
+    return new SequentialCommandGroup(
+        turret.zeroTurretPositionCommand(),
+        RobotContainer.setClimbCameraMode(ClimbCameraMode.APRIL_TAGS),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
         RobotContainer.setTurretMode(TurretMode.TRACKING_HUB));
   }
 
