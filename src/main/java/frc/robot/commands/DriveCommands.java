@@ -99,7 +99,7 @@ public class DriveCommands {
                 robotVelocities.div(speed / ShooterConstants.MAX_SPEED_WHILE_SHOOTING_MPS);
           }
 
-          double rotSpeed = omega * drive.getMaxAngularSpeedRadPerSec();
+          double rotSpeed = omega * drive.getMaxAngularSpeedRadPerSec() * 0.8;
 
           if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
               && RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB) {

@@ -4,9 +4,11 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.LoggingConstants;
@@ -98,9 +100,34 @@ public class DefaultFlywheelCommand extends Command {
         // Flywheel is shooting in typical fashion with known recovery period intervals
         // TODO this is for testing right now, bang-bang should be replaced later
       case SHOOTING:
-        flywheel.setFlywheelControl(
-            ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
-                ShotCalculator.instance().getTargetFlywheelVelocity()));
+        if (true
+            || MathUtil.isNear(
+                Math.abs(
+                    RobotState.instance()
+                        .getFlywheelVelocity()
+                        .minus(ShotCalculator.instance().getTargetFlywheelVelocity())
+                        .in(RotationsPerSecond)),
+                0.0,
+                3.0)) {
+          flywheel.setFlywheelControl(
+              ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
+                  ShotCalculator.instance().getTargetFlywheelVelocity()));
+        } else if (MathUtil.isNear(
+            Math.abs(
+                RobotState.instance()
+                    .getFlywheelVelocity()
+                    .minus(ShotCalculator.instance().getTargetFlywheelVelocity())
+                    .in(RotationsPerSecond)),
+            0.0,
+            25.0)) {
+          flywheel.setFlywheelControl(
+              ShooterConstants.QUICK_RECOVER.withVelocity(
+                  ShotCalculator.instance().getTargetFlywheelVelocity()));
+        } else {
+          flywheel.setFlywheelControl(
+              ShooterConstants.FLYWHEEL_BANG_BANG_REQUEST.withVelocity(
+                  ShotCalculator.instance().getTargetFlywheelVelocity()));
+        }
         break;
 
         // Flywheel is frantically shooting, little to no care about recovery interval

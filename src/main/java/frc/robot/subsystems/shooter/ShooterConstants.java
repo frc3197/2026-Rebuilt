@@ -18,6 +18,8 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.Slot2Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -125,7 +127,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withFeedback(TURRET_FEEDBACK_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(50.0)
+                  .withStatorCurrentLimit(45.0)
                   .withStatorCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()
@@ -155,8 +157,33 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKA(kAFlywheel)
           .withKD(kDFlywheel);
 
+  public static Slot1Configs FLYWHEEL_SLOT1_CONFIGS =
+      new Slot1Configs()
+          .withKS(kSFlywheel)
+          .withKV(kVFlywheel)
+          .withKP(15)
+          .withKI(kIFlywheel)
+          .withKA(kAFlywheel)
+          .withKD(kDFlywheel);
+
+  public static Slot2Configs FLYWHEEL_SLOT2_CONFIGS =
+      new Slot2Configs()
+          .withKS(kSFlywheel)
+          .withKV(kVFlywheel)
+          .withKP(75)
+          .withKI(kIFlywheel)
+          .withKA(kAFlywheel)
+          .withKD(kDFlywheel);
+
   public static final VelocityTorqueCurrentFOC FLYWHEEL_TORQUE_REQUEST =
-      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0.0));
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0.0)).withSlot(0);
+
+  public static final VelocityTorqueCurrentFOC QUICK_RECOVER =
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0.0)).withSlot(1);
+
+  public static final VelocityTorqueCurrentFOC FLYWHEEL_BANG_BANG_REQUEST =
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0.0)).withSlot(2);
+
   public static final VoltageOut FLYWHEEL_VOLTAGE_REQUEST = new VoltageOut(Volts.of(0.0));
 
   // Manual preset flywheel speed
@@ -166,15 +193,17 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(120.0)
+                  .withStatorCurrentLimit(130.0)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(130.0)
+                  .withSupplyCurrentLimit(60.0)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
                   .withNeutralMode(NeutralModeValue.Coast)
                   .withInverted(InvertedValue.CounterClockwise_Positive))
-          .withSlot0(FLYWHEEL_SLOT0_CONFIGS);
+          .withSlot0(FLYWHEEL_SLOT0_CONFIGS)
+          .withSlot1(FLYWHEEL_SLOT1_CONFIGS)
+          .withSlot2(FLYWHEEL_SLOT2_CONFIGS);
 
   // HOOD --------------
   public static Angle MAX_HOOD_ANGLE = Degrees.of(45);

@@ -88,8 +88,8 @@ public class DefaultIndexCommand extends Command {
 
     if (forwardfeedManual.getAsBoolean()) {
       index.setFeedRequest(
-          IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
-      index.setSpindexMotor(Volts.of(3.5));
+          IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
+      index.setSpindexMotor(Volts.of(6.25));
       return;
     }
 
@@ -109,12 +109,12 @@ public class DefaultIndexCommand extends Command {
       case FRENZY:
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
           if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.3)) {
             index.setSpindexMotor(Volts.of(-3.5));
           } else {
             // 3.5
-            index.setSpindexMotor(Volts.of(3.5));
+            index.setSpindexMotor(Volts.of(6.25));
           }
         } else {
           index.setFeedMotor(Volts.of(0.0));
@@ -124,15 +124,15 @@ public class DefaultIndexCommand extends Command {
       case SHOOTING:
         if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
-          index.setSpindexMotor(Volts.of(3.5));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
+          index.setSpindexMotor(Volts.of(6.25));
           return;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(Volts.of(3.5));
+          index.setSpindexMotor(Volts.of(6.25));
           // index.setFeedMotor(Volts.of(10.0));
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(50)));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
         } else {
           index.setFeedMotor(Volts.of(0.0));
           index.setSpindexMotor(Volts.of(0.0));

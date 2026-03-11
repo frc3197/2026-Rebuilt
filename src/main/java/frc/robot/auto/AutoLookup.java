@@ -149,6 +149,16 @@ public class AutoLookup {
         getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_LEFT));
   }
 
+  private Command getLeftBumpDoubleSwipe() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        RobotContainer.setTurretMode(TurretMode.IDLE),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        loadPath("45-Bump-Shoot"));
+  }
+
   public Command getAuto(RealAutos auto) {
     if (auto == RealAutos.Right_Bump_Double_Swipe) {
       return getRightBumpDoubleSwipeAuto();

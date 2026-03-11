@@ -314,7 +314,7 @@ public class ShotCalculator extends VirtualSubsystem {
       } else if (RobotState.instance().getTurretMode() == TurretMode.PASSING) {
         targetHoodExtension.mut_replace(Millimeters.of(50));
         targetFlywheelVelocity.mut_replace(
-            getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
+            getTargetVeloPassing(turretToCompensatedTargetMagnitude));
       } else {
         targetHoodExtension.mut_replace(
             getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
