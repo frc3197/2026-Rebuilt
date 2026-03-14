@@ -20,7 +20,7 @@ public class MatchTimeUtil extends VirtualSubsystem {
   private Optional<Boolean> wonAuto = Optional.empty();
   private boolean isAuto = false;
 
-  private double shiftSwitchThreshold = 3.25;
+  private double shiftSwitchThreshold = 5.25;
 
   private MatchTimeUtil(String key) {
     this.key = key;

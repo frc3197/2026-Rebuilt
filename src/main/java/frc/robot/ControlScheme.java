@@ -62,7 +62,7 @@ public class ControlScheme {
 
   // Index
   public Trigger getSpindexFeedFlywheelManual() {
-    return secondaryController.a();
+    return primaryController.y();
   }
 
   public Trigger getBackfeedManual() {
@@ -107,6 +107,10 @@ public class ControlScheme {
   }
 
   // Shooter
+
+  public Trigger getHoodDownManual() {
+    return secondaryController.a();
+  }
 
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.povLeft();

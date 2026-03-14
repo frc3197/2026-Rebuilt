@@ -331,7 +331,7 @@ public class ShotCalculator extends VirtualSubsystem {
             0.0,
             RobotState.instance()
                 .getTurretRotationAngle()
-                .minus(targetTurretAngleActual)
+                .minus(targetTurretAngleWithOmegaLookahead)
                 .in(Degrees),
             ShooterConstants.TURRET_ANGLE_ERROR_THRESHOLD.in(Degrees));
 
@@ -402,7 +402,7 @@ public class ShotCalculator extends VirtualSubsystem {
     return targetHoodExtension;
   }
 
-  public Angle getTargetTurretAngle() {
+  public Angle getTargetTurretAngleWithout() {
     return targetTurretAngleActual;
   }
 

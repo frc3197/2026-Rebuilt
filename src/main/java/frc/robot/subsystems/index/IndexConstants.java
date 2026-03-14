@@ -74,7 +74,7 @@ public class IndexConstants implements IndexHardwareID {
    */
 
   // VOLTAGES
-  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(3.5);
+  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(5.0);
   public static final Voltage SPINDEX_BACKFEED_VOLTAGE = Volts.of(-3.5);
   public static final Voltage FEEDER_SHOOTING_VOLTAGE = Volts.of(4.5);
   public static final Voltage FEEDER_BACKFEED_VOLTAGE = Volts.of(-4.5);
