@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.managersubsystems.RobotState;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+// Creates a desperate attempt to retract intake
 public class DesperatelyRetractIntake extends Command {
   /** Creates a new DesperatelyRetractIntake. */
   Timer timer = new Timer();
@@ -26,7 +26,7 @@ public class DesperatelyRetractIntake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (timer.get() % 2 <= 0.3) {
+    if (timer.get() % 2 <= 0.5) {
       RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
     } else {
       RobotState.instance().setIntakeDeployMode(IntakeDeployMode.RETRACTING);

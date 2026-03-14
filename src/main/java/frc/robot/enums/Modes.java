@@ -6,7 +6,12 @@ public class Modes {
     TRACKING_HUB,
     PASSING,
     IDLE,
-    MANUAL
+    MANUAL,
+  }
+
+  public static enum HoodMode {
+    TRACKING,
+    DOWN
   }
 
   public static enum IntakeDeployMode {
@@ -15,22 +20,19 @@ public class Modes {
     IDLE_RETRACTED,
     IDLE_DEPLOYED,
     FLOPPING,
-    MANUAL
   }
 
   public static enum IntakeSpinMode {
     INTAKING,
     OUTTAKING,
     IDLE,
-    MANUAL
   }
 
   public static enum FlywheelMode {
     IDLE,
     PREPARE,
     SHOOTING,
-    FRENZY,
-    MANUAL
+    FRENZY
   }
 
   public static enum ClimbCameraMode {

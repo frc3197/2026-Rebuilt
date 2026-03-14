@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.HardwareID.IndexHardwareID;
 
@@ -73,6 +74,10 @@ public class IndexConstants implements IndexHardwareID {
    */
 
   // VOLTAGES
-  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(1.65);
-  public static final Voltage FEEDER_SHOOTING_VOLTAGE = Volts.of(12.0);
+  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(3.5);
+  public static final Voltage SPINDEX_BACKFEED_VOLTAGE = Volts.of(-3.5);
+  public static final Voltage FEEDER_SHOOTING_VOLTAGE = Volts.of(4.5);
+  public static final Voltage FEEDER_BACKFEED_VOLTAGE = Volts.of(-4.5);
+
+  public static final AngularVelocity FEEDER_SHOOTING_RPS = RotationsPerSecond.of(55);
 }

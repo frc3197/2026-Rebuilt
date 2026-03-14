@@ -17,7 +17,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
@@ -28,7 +27,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.LoggingConstants;
@@ -45,7 +43,8 @@ public class ShotCalculator extends VirtualSubsystem {
   private static ShotCalculator instance;
 
   private MutDistance targetHoodExtension = Millimeters.of(25.0).mutableCopy();
-  private MutAngle targetTurretAngle = new MutAngle(0.0, 0.0, Degrees);
+  private MutAngle targetTurretAngleWithOmegaLookahead = new MutAngle(0.0, 0.0, Degrees);
+  private MutAngle targetTurretAngleActual = new MutAngle(0.0, 0.0, Degrees);
 
   private LoggedTunableNumber targetVelocityManual =
       new LoggedTunableNumber("FLYWHEEL VELO TUNING", 44);
@@ -67,6 +66,10 @@ public class ShotCalculator extends VirtualSubsystem {
   private LoggedTunableNumber velocityConstantTuning =
       new LoggedTunableNumber(
           "VELOCITY_COMPENSATION_CONSTANT", ShooterConstants.VELOCITY_COMPENSATION_CONSTANT);
+  private LoggedTunableNumber accelerationConstantTuning =
+      new LoggedTunableNumber(
+          "ACCELERATION_COMPENSATION_CONSTANT",
+          ShooterConstants.ACCELERATION_COMPENSATION_CONSTANT);
   private LoggedTunableNumber rotationLookaheadConstantTuning =
       new LoggedTunableNumber(
           "TURRET_ROTATION_LOOKAHEAD_CONSTANT",
@@ -86,20 +89,27 @@ public class ShotCalculator extends VirtualSubsystem {
   @Override
   public void periodic() {
     calculateTargetParameters();
+    checkShotReadiness();
     log();
   }
 
   private void log() {
     Logger.recordOutput(
-        "Shot Calculator/Target Turret Field Position",
+        "Shot Calculator/Target Turret Field Position With Omega lookahead",
         RobotState.instance()
             .getRobotPose3d()
             .plus(
                 ShooterConstants.ROBOT_TO_TURRET_CENTER.plus(
                     new Transform3d(
-                        0, 0, 0, new Rotation3d(0, 0, targetTurretAngle.in(Radians))))));
+                        0,
+                        0,
+                        0,
+                        new Rotation3d(0, 0, targetTurretAngleWithOmegaLookahead.in(Radians))))));
 
-    Logger.recordOutput("Shot Calculator/Target Turret Angle", targetTurretAngle.in(Degrees));
+    Logger.recordOutput("Shot Calculator/Target Turret Angle", targetTurretAngleActual.in(Degrees));
+    Logger.recordOutput(
+        "Shot Calculator/Target Turret Angle With Omega Lookahead",
+        targetTurretAngleWithOmegaLookahead.in(Degrees));
     Logger.recordOutput("Shot Calculator/Target to shoot at", poseToAimAt);
 
     Logger.recordOutput("Shot Calculator/Shot Checks/Flywheel spooled", flywheelReadyToShoot);
@@ -111,92 +121,63 @@ public class ShotCalculator extends VirtualSubsystem {
 
   private void calculateTargetParameters() {
     boolean isRed = RobotContainer.isRed();
+    setAimingTarget(isRed);
 
-    // Vel
+    // Translational velocity of the robot
     ChassisSpeeds robotVelocity = RobotState.instance().getRobotVelocity();
-    // Robot pose
-    Pose2d robotPose =
-        RobotState.instance()
-            .getRobotPose()
-            .plus(
-                new Transform2d(
-                    Translation2d.kZero,
-                    new Rotation2d(
-                        Radians.of(
-                            robotVelocity.omegaRadiansPerSecond
-                                * (LoggingConstants.tuningMode
-                                    ? rotationLookaheadConstantTuning.getAsDouble()
-                                    : ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT)))));
-    Pose3d robotPose3D =
-        RobotState.instance()
-            .getRobotPose3d()
-            .plus(
-                new Transform3d(
-                    Translation3d.kZero,
-                    new Rotation3d(
-                        0,
-                        0,
-                        Radians.of(
-                                robotVelocity.omegaRadiansPerSecond
-                                    * (LoggingConstants.tuningMode
-                                        ? rotationLookaheadConstantTuning.getAsDouble()
-                                        : ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT))
-                            .in(Radians))));
-    // Acc
+
+    // The translational acceleration of the robot
     ChassisSpeeds robotAcceleration = RobotState.instance().getRobotAcceleration();
-    // Where the turret is relative to blue origin
-    Pose2d turretFieldLocation =
-        robotPose3D
-            .plus(ShooterConstants.ROBOT_TO_TURRET_CENTER)
-            .toPose2d()
-            .plus(
-                new Transform2d(
-                    Translation2d.kZero,
-                    new Rotation2d(
-                        Radians.of(
+
+    // Robot pose in 3d space
+    Pose3d robotPose3D = RobotState.instance().getRobotPose3d();
+
+    // Robot pose but with omaga lookahead compensation
+    Pose3d robotPose3DWithOmegaLookahead =
+        robotPose3D.plus(
+            new Transform3d(
+                Translation3d.kZero,
+                new Rotation3d(
+                    0,
+                    0,
+                    Radians.of(
                             robotVelocity.omegaRadiansPerSecond
                                 * (LoggingConstants.tuningMode
                                     ? rotationLookaheadConstantTuning.getAsDouble()
-                                    : ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT)))));
+                                    : ShooterConstants.TURRET_ROTATION_LOOKAHEAD_CONSTANT))
+                        .in(Radians))));
+
+    // Where the turret is on the field, the rotation being the robot's rotation
+    // plus the omega lookahead
+    Pose2d turretFieldLocationWithOmegaLookahead =
+        robotPose3DWithOmegaLookahead.plus(ShooterConstants.ROBOT_TO_TURRET_CENTER).toPose2d();
 
     // 384 --92
 
-    // Where the turret is aiming as pose
-    switch (RobotState.instance().getTurretMode()) {
-      case TRACKING_HUB:
-        poseToAimAt = isRed ? FieldConstants.Red.HUB_CENTER : FieldConstants.Blue.HUB_CENTER;
-        break;
-      case PASSING:
-        if (RobotState.instance().getRobotPose().getY() < FieldConstants.Blue.HUB_CENTER.getY()) {
-          poseToAimAt =
-              isRed
-                  ? FlippingUtil.flipFieldPose(FieldConstants.PASSING_UPPER)
-                  : FieldConstants.PASSING_LOWER;
-        } else {
-          poseToAimAt =
-              isRed
-                  ? FlippingUtil.flipFieldPose(FieldConstants.PASSING_LOWER)
-                  : FieldConstants.PASSING_UPPER;
-        }
-      default:
-        break;
-    }
+    // Compensate by adding the velocity of the robot to the target position (by
+    // some constants)
 
-    // Compensate for velocity
-    // Target field pose
-    // TODO it is a work in progress
+    ChassisSpeeds compensatedChassisSpeeds = RobotState.instance().getRobotVelocity();
+    compensatedChassisSpeeds =
+        compensatedChassisSpeeds.plus(
+            new ChassisSpeeds(
+                robotAcceleration.vxMetersPerSecond * accelerationConstantTuning.getAsDouble(),
+                robotAcceleration.vyMetersPerSecond * accelerationConstantTuning.getAsDouble(),
+                robotAcceleration.omegaRadiansPerSecond
+                    * accelerationConstantTuning.getAsDouble()));
+
     Pose2d velocityPose =
         new Pose2d(
-                -robotVelocity.vxMetersPerSecond
+                -compensatedChassisSpeeds.vxMetersPerSecond
                     * (LoggingConstants.tuningMode
                         ? velocityConstantTuning.getAsDouble()
                         : ShooterConstants.VELOCITY_COMPENSATION_CONSTANT),
-                -robotVelocity.vyMetersPerSecond
+                -compensatedChassisSpeeds.vyMetersPerSecond
                     * (LoggingConstants.tuningMode
                         ? velocityConstantTuning.getAsDouble()
                         : ShooterConstants.VELOCITY_COMPENSATION_CONSTANT),
                 Rotation2d.kZero)
-            .rotateBy(RobotState.instance().getRobotPose().getRotation());
+            .rotateBy(robotPose3DWithOmegaLookahead.getRotation().toRotation2d());
 
     Pose2d poseToAimAtCompensated =
         poseToAimAt.plus(
@@ -209,23 +190,19 @@ public class ShotCalculator extends VirtualSubsystem {
                     velocityPose.getRotation().times(-1)));
 
     // Now the location is compensated for robot velocity. Not good enough! Needs
-    // angular rotation
+    // angular rotation. The turret has translational velocity independent of the
+    // robot's linear velocity, requiring extra compensation
     // factored in as well
-    Vector<N3> omegaVector = VecBuilder.fill(0, 0, robotVelocity.omegaRadiansPerSecond);
-    Pose3d robotToTurretWithAngle =
-        new Pose3d(
-            ShooterConstants.ROBOT_TO_TURRET_CENTER.getTranslation(),
-            ShooterConstants.ROBOT_TO_TURRET_CENTER.getRotation());
-    robotToTurretWithAngle = robotToTurretWithAngle.rotateBy(robotPose3D.getRotation());
+    Vector<N3> omegaVector = VecBuilder.fill(0, 0, compensatedChassisSpeeds.omegaRadiansPerSecond);
 
+    // Vector format of this
     Vector<N3> robotToTurretVector =
         VecBuilder.fill(
-            robotToTurretWithAngle.getX(),
-            robotToTurretWithAngle.getY(),
-            robotToTurretWithAngle.getZ());
-    SmartDashboard.putString(
-        "ROBOT TO TURRET WITH ROT COMP",
-        "" + robotToTurretVector.get(0) + ", " + robotToTurretVector.get(1));
+            ShooterConstants.ROBOT_TO_TURRET_CENTER.getX(),
+            ShooterConstants.ROBOT_TO_TURRET_CENTER.getY(),
+            ShooterConstants.ROBOT_TO_TURRET_CENTER.getZ());
+
+    // The turret's translational velocity (independent of the robot)
     Vector<N3> turretVelocityVector = Vector.cross(omegaVector, robotToTurretVector);
     turretVelocityVector =
         turretVelocityVector.times(
@@ -241,11 +218,13 @@ public class ShotCalculator extends VirtualSubsystem {
         "Shot Calculator/VELO COMPENSATED Target to shoot at", poseToAimAtCompensated);
 
     // Vector from blue origin to robot
-    Vector<N2> vTurret = VecBuilder.fill(turretFieldLocation.getX(), turretFieldLocation.getY());
+    Vector<N2> vTurret =
+        VecBuilder.fill(
+            turretFieldLocationWithOmegaLookahead.getX(),
+            turretFieldLocationWithOmegaLookahead.getY());
     // Vector from blue origin to compensated target
     Vector<N2> vTarget =
         VecBuilder.fill(poseToAimAtCompensated.getX(), poseToAimAtCompensated.getY());
-    // Turret to
     Vector<N2> turretToCompensatedTarget = vTarget.minus(vTurret);
 
     // Cosine component from dot product
@@ -263,7 +242,7 @@ public class ShotCalculator extends VirtualSubsystem {
         Radians.of(
                 Math.atan2(sinAngle.in(Radians), cosAngle.in(Radians))
                     * (turretToCompensatedTarget.get(1) < 0 ? -1.0 : 1.0))
-            .minus(Radians.of(robotPose.getRotation().getRadians()))
+            .minus(Radians.of(robotPose3DWithOmegaLookahead.getRotation().getZ()))
             .minus(Degrees.of(180));
 
     if (turretToCompensatedTarget.get(1) < 0) {
@@ -287,18 +266,14 @@ public class ShotCalculator extends VirtualSubsystem {
                 ShooterConstants.TURRET_ROTATION_LIMIT_FORWARD.in(Degrees)));
 
     // Now we have a target to rotate to on the field. Yet, there is one issue: the
-    // turret will wither under or over rotate if the error vector is not parallel
-    // to i.
+    // turret will either under or over rotate if the error vector is not parallel
+    // to i. But that is fixed now ok?
 
-    // This is prob the problem! compensatedAngle & targetTurretAngle
-    Logger.recordOutput("Shot Calculator/compensatedAngle", potAngle.in(Degrees));
-
-    targetTurretAngle.mut_replace(potAngle);
-    // targetTurretAngle.mut_replace(Degrees.of(45));
+    targetTurretAngleWithOmegaLookahead.mut_replace(potAngle);
 
     double turretToCompensatedTargetMagnitude =
         (getDistance(
-            robotPose3D,
+            robotPose3DWithOmegaLookahead,
             new Pose3d(poseToAimAtCompensated)
                 .plus(
                     new Transform3d(
@@ -322,7 +297,9 @@ public class ShotCalculator extends VirtualSubsystem {
             getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
       }
     }
+  }
 
+  private void checkShotReadiness() {
     // ----------------------------------------------------------
     // CHECK IF WE ARE READY TO SHOOT
     // ----------------------------------------------------------
@@ -339,20 +316,23 @@ public class ShotCalculator extends VirtualSubsystem {
         MathUtil.isNear(
             0.0,
             Math.sqrt(
-                Math.pow(robotVelocity.vxMetersPerSecond, 2)
-                    + Math.pow(robotVelocity.vyMetersPerSecond, 2)),
+                Math.pow(RobotState.instance().getRobotVelocity().vxMetersPerSecond, 2)
+                    + Math.pow(RobotState.instance().getRobotVelocity().vyMetersPerSecond, 2)),
             ShooterConstants.TRANSLATIONAL_SPEED_THRESHOLD.in(MetersPerSecond));
 
     angularReadyToShoot =
         MathUtil.isNear(
             0.0,
-            robotVelocity.omegaRadiansPerSecond,
+            RobotState.instance().getRobotVelocity().omegaRadiansPerSecond,
             ShooterConstants.ANGULAR_SPEED_THRESHOLD.in(RotationsPerSecond));
 
     turretRotationReadyToShoot =
         MathUtil.isNear(
             0.0,
-            RobotState.instance().getTurretRotationAngle().minus(targetTurretAngle).in(Degrees),
+            RobotState.instance()
+                .getTurretRotationAngle()
+                .minus(targetTurretAngleActual)
+                .in(Degrees),
             ShooterConstants.TURRET_ANGLE_ERROR_THRESHOLD.in(Degrees));
 
     hoodReadyToShoot =
@@ -360,6 +340,29 @@ public class ShotCalculator extends VirtualSubsystem {
             RobotState.instance().getHoodExtension().in(Millimeters),
             targetHoodExtension.in(Millimeters),
             ShooterConstants.HOOD_EXTENSION_THRESHOLD.in(Millimeters));
+  }
+
+  private void setAimingTarget(boolean isRed) {
+    // Where the turret is aiming as pose
+    switch (RobotState.instance().getTurretMode()) {
+      case TRACKING_HUB:
+        poseToAimAt = isRed ? FieldConstants.Red.HUB_CENTER : FieldConstants.Blue.HUB_CENTER;
+        break;
+      case PASSING:
+        if (RobotState.instance().getRobotPose().getY() < FieldConstants.Blue.HUB_CENTER.getY()) {
+          poseToAimAt =
+              isRed
+                  ? FlippingUtil.flipFieldPose(FieldConstants.PASSING_UPPER)
+                  : FieldConstants.PASSING_LOWER;
+        } else {
+          poseToAimAt =
+              isRed
+                  ? FlippingUtil.flipFieldPose(FieldConstants.PASSING_LOWER)
+                  : FieldConstants.PASSING_UPPER;
+        }
+      default:
+        break;
+    }
   }
 
   private AngularVelocity getTargetVeloPassing(double distanceInMeters) {
@@ -400,7 +403,11 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   public Angle getTargetTurretAngle() {
-    return targetTurretAngle;
+    return targetTurretAngleActual;
+  }
+
+  public Angle getTargetTurretAngleWithOmegaLookahead() {
+    return targetTurretAngleWithOmegaLookahead;
   }
 
   // TODO not all values are used here for sake of testing

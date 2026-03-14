@@ -18,12 +18,10 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.util.LoggedTunableNumber;
-import java.util.function.BooleanSupplier;
 
 public class DefaultFlywheelCommand extends Command {
 
   private final Flywheel flywheel;
-  private final BooleanSupplier isTriggerPressed;
 
   private LoggedTunableNumber flywheelKS =
       new LoggedTunableNumber("FLYSHEEL KS", ShooterConstants.FLYWHEEL_SLOT0_CONFIGS.kS);
@@ -42,9 +40,8 @@ public class DefaultFlywheelCommand extends Command {
    * @param flywheel The flywheel subsystem.
    * @param isTriggerPressed Determines if manual backup button is pressed.
    */
-  public DefaultFlywheelCommand(Flywheel flywheel, BooleanSupplier isTriggerPressed) {
+  public DefaultFlywheelCommand(Flywheel flywheel) {
 
-    this.isTriggerPressed = isTriggerPressed;
     this.flywheel = flywheel;
     addRequirements(flywheel);
   }
@@ -73,13 +70,6 @@ public class DefaultFlywheelCommand extends Command {
     }
 
     FlywheelMode currentMode = RobotState.instance().getFlywheelMode();
-
-    if (isTriggerPressed.getAsBoolean()) {
-      flywheel.setFlywheelControl(
-          ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(
-              ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN));
-      return;
-    }
 
     switch (currentMode) {
 
@@ -136,20 +126,6 @@ public class DefaultFlywheelCommand extends Command {
         flywheel.setFlywheelControl(
             ShooterConstants.FLYWHEEL_TORQUE_REQUEST.withVelocity(
                 ShotCalculator.instance().getTargetFlywheelVelocity()));
-        break;
-
-        // Flywheel is operated by secondary controller, basically a true-false boolean
-        // supplier
-        // Target voltage is tuned for short shots like a popcorn-popper
-        // TODO tune this
-      case MANUAL:
-        if (isTriggerPressed.getAsBoolean())
-          flywheel.setFlywheelControl(
-              ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(
-                  ShooterConstants.FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN));
-        else
-          flywheel.setFlywheelControl(
-              ShooterConstants.FLYWHEEL_VOLTAGE_REQUEST.withOutput(Volts.of(0.0)));
         break;
 
         // Invalid mode or unassigned behavior

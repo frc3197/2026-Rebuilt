@@ -4,12 +4,14 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.LoggingConstants;
+import frc.robot.enums.Modes.HoodMode;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
@@ -74,12 +76,16 @@ public class DefaultTurretHoodCommand extends Command {
 
     // If the robot is not in shot calibration mode, then set the actuator to its
     // target extension
-    if (!LoggingConstants.shooterCalibrationMode)
-      turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
+    if (!LoggingConstants.shooterCalibrationMode) {
+      if (RobotState.instance().getHoodMode() == HoodMode.DOWN) {
+        turret.setActuatorPositionFunc(Millimeters.of(0.0));
+      } else {
+        turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
+      }
+    }
 
     // Update turret state
     switch (RobotState.instance().getTurretMode()) {
-        // TODO these need to be updated, currently they lead to same function
       case TRACKING_HUB:
         turretAutoTracking();
         // turret.setTurretControlRequest(new VelocityDutyCycle(0.2));
@@ -103,7 +109,7 @@ public class DefaultTurretHoodCommand extends Command {
          */
         break;
 
-        // Rotate turret based on supplier, -10 to 10 volts
+        // Rotate turret based on supplier, -3 to 3 volts
       case MANUAL:
         double manualVolts = turretMotorVoltageSupplier.getAsDouble() * 3;
         turret.setTurretControlRequest(

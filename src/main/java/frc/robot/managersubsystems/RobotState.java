@@ -8,12 +8,16 @@ import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -27,10 +31,12 @@ import frc.robot.RobotContainer;
 import frc.robot.constants.FieldConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.HoodMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.enums.Modes.TurretMode;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.GeometryUtil;
 import frc.robot.util.VirtualSubsystem;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -39,9 +45,10 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
+  private HoodMode hoodMode = HoodMode.TRACKING;
   private IntakeDeployMode intakeDeployMode = IntakeDeployMode.IDLE_RETRACTED;
   private IntakeSpinMode intakeSpinMode = IntakeSpinMode.IDLE;
-  private FlywheelMode flywheelMode = FlywheelMode.MANUAL;
+  private FlywheelMode flywheelMode = FlywheelMode.IDLE;
   private TurretMode turretMode = TurretMode.IDLE;
   private ClimbCameraMode climbCameraMode = ClimbCameraMode.CLIMB_RED;
 
@@ -125,13 +132,20 @@ public class RobotState extends VirtualSubsystem {
   // Robot mode getters & setters -----------------------------------------------
   // If robot is test mode, guard against automatic controls
 
+  public HoodMode getHoodMode() {
+    return hoodMode;
+  }
+
+  public void setHoodMode(HoodMode hoodMode) {
+    this.hoodMode = hoodMode;
+  }
+
   public IntakeDeployMode getIntakeDeployMode() {
     return intakeDeployMode;
   }
 
   public void setIntakeDeployMode(IntakeDeployMode intakeMode) {
-    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.intakeDeployMode = IntakeDeployMode.MANUAL;
-    else this.intakeDeployMode = intakeMode;
+    this.intakeDeployMode = intakeMode;
   }
 
   public IntakeSpinMode getIntakeSpinMode() {
@@ -139,8 +153,7 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setIntakeSpinMode(IntakeSpinMode intakeMode) {
-    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.intakeSpinMode = IntakeSpinMode.MANUAL;
-    else this.intakeSpinMode = intakeMode;
+    this.intakeSpinMode = intakeMode;
   }
 
   public FlywheelMode getFlywheelMode() {
@@ -148,8 +161,7 @@ public class RobotState extends VirtualSubsystem {
   }
 
   public void setFlywheelMode(FlywheelMode flywheelMode) {
-    if (edu.wpi.first.wpilibj.RobotState.isTest()) this.flywheelMode = FlywheelMode.MANUAL;
-    else this.flywheelMode = flywheelMode;
+    this.flywheelMode = flywheelMode;
   }
 
   public TurretMode getTurretMode() {
@@ -229,9 +241,6 @@ public class RobotState extends VirtualSubsystem {
     // If the robot is in test mode, everything needs to be manual!
     if (DriverStation.isTest()) {
       setTurretMode(TurretMode.MANUAL);
-      setFlywheelMode(FlywheelMode.MANUAL);
-      setIntakeDeployMode(IntakeDeployMode.MANUAL);
-      setIntakeSpinMode(IntakeSpinMode.MANUAL);
     }
   }
 
@@ -242,6 +251,7 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/Modes/Intake Deploy Mode", intakeDeployMode);
     Logger.recordOutput("RobotState/Modes/Intake Spin Mode", intakeSpinMode);
     Logger.recordOutput("RobotState/Modes/Turret Mode", turretMode);
+    Logger.recordOutput("RobotState/Modes/Hood Mode", hoodMode);
     Logger.recordOutput("RobotState/Modes/Climber Cam Mode", climbCameraMode);
 
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
@@ -256,6 +266,11 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/Current Draw/Index", getIndexCurrentDraw());
     Logger.recordOutput("RobotState/Current Draw/Intake", getIntakeCurrentDraw());
     Logger.recordOutput("RobotState/Current Draw/Turret", getTurretCurrentDraw());
+
+    Logger.recordOutput("RobotState/Trench/Top Red Trench", robotNearTopRedTrench());
+    Logger.recordOutput("RobotState/Trench/Bottom Red Trench", robotNearBottomRedTrench());
+    Logger.recordOutput("RobotState/Trench/Top Blue Trench", robotNearTopBlueTrench());
+    Logger.recordOutput("RobotState/Trench/Bottom Blue Trench", robotNearBottomBlueTrench());
 
     turretFieldPosition =
         RobotState.instance()
@@ -364,5 +379,49 @@ public class RobotState extends VirtualSubsystem {
         .plus(indexCurrentDraw)
         .plus(intakeCurrentDraw)
         .plus(turretCurrentDraw);
+  }
+
+  public boolean robotNearBottomBlueTrench() {
+    Pose2d velocityPose =
+        new Pose2d(
+            robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond, new Rotation2d());
+    velocityPose.rotateBy(robotFieldPose.getRotation());
+    Vector<N2> velocityVector = VecBuilder.fill(velocityPose.getX(), velocityPose.getY());
+    return GeometryUtil.intersects(
+        FieldConstants.Blue.BOTTOM_TRENCH_RECTANGLE,
+        robotFieldPose.getTranslation(),
+        velocityVector);
+  }
+
+  public boolean robotNearTopBlueTrench() {
+    Pose2d velocityPose =
+        new Pose2d(
+            robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond, new Rotation2d());
+    velocityPose.rotateBy(robotFieldPose.getRotation());
+    Vector<N2> velocityVector = VecBuilder.fill(velocityPose.getX(), velocityPose.getY());
+    return GeometryUtil.intersects(
+        FieldConstants.Blue.TOP_TRENCH_RECTANGLE, robotFieldPose.getTranslation(), velocityVector);
+  }
+
+  public boolean robotNearBottomRedTrench() {
+    Pose2d velocityPose =
+        new Pose2d(
+            robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond, new Rotation2d());
+    velocityPose.rotateBy(robotFieldPose.getRotation());
+    Vector<N2> velocityVector = VecBuilder.fill(velocityPose.getX(), velocityPose.getY());
+    return GeometryUtil.intersects(
+        FieldConstants.Red.BOTTOM_TRENCH_RECTANGLE,
+        robotFieldPose.getTranslation(),
+        velocityVector);
+  }
+
+  public boolean robotNearTopRedTrench() {
+    Pose2d velocityPose =
+        new Pose2d(
+            robotVelocity.vxMetersPerSecond, robotVelocity.vyMetersPerSecond, new Rotation2d());
+    velocityPose.rotateBy(robotFieldPose.getRotation());
+    Vector<N2> velocityVector = VecBuilder.fill(velocityPose.getX(), velocityPose.getY());
+    return GeometryUtil.intersects(
+        FieldConstants.Red.TOP_TRENCH_RECTANGLE, robotFieldPose.getTranslation(), velocityVector);
   }
 }

@@ -19,7 +19,6 @@ import frc.robot.subsystems.index.Index;
 import frc.robot.subsystems.index.IndexConstants;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.LoggedTunableNumber;
-import java.util.function.BooleanSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DefaultIndexCommand extends Command {
@@ -38,21 +37,15 @@ public class DefaultIndexCommand extends Command {
   private LoggedTunableNumber feedKD =
       new LoggedTunableNumber("FEED KD", IndexConstants.Feed_SLOT0_CONFIGS.kD);
 
-  private final BooleanSupplier backfeedManual;
-  private final BooleanSupplier forwardfeedManual;
-
   /**
    * Creates a new DefaultfeedCommand.
    *
    * @param intake The intake subsystem.
    */
-  public DefaultIndexCommand(
-      Index index, BooleanSupplier backfeedManual, BooleanSupplier forwardfeedManual) {
+  public DefaultIndexCommand(Index index) {
     this.index = index;
     addRequirements(index);
     autoBackfeedTimer.start();
-    this.backfeedManual = backfeedManual;
-    this.forwardfeedManual = forwardfeedManual;
   }
 
   @Override
@@ -75,24 +68,20 @@ public class DefaultIndexCommand extends Command {
       index.setGains(newConfigs);
     }
 
+    // If we are backfeeding, then we have to add other logic.
     if (RobotState.instance().getIntakeSpinMode() == IntakeSpinMode.OUTTAKING) {
-      index.setFeedMotor(Volts.of(DriverStation.isAutonomous() ? 4 : -4));
-      index.setSpindexMotor(Volts.of(DriverStation.isAutonomous() ? 5.35 : -5.35));
-    }
-
-    if (backfeedManual.getAsBoolean()) {
-      index.setFeedMotor(Volts.of(-3.5));
-      index.setSpindexMotor(Volts.of(-3.5));
+      index.setFeedMotor(
+          DriverStation.isAutonomous()
+              ? IndexConstants.FEEDER_SHOOTING_VOLTAGE
+              : IndexConstants.FEEDER_BACKFEED_VOLTAGE);
+      index.setSpindexMotor(
+          DriverStation.isAutonomous()
+              ? IndexConstants.SPINDEX_SHOOTING_VOLTAGE
+              : IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
       return;
     }
 
-    if (forwardfeedManual.getAsBoolean()) {
-      index.setFeedRequest(
-          IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
-      index.setSpindexMotor(Volts.of(6.25));
-      return;
-    }
-
+    // If we are in manual mode, we just do no index logic
     if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
       return;
     }
@@ -109,12 +98,11 @@ public class DefaultIndexCommand extends Command {
       case FRENZY:
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
           if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.3)) {
-            index.setSpindexMotor(Volts.of(-3.5));
+            index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
           } else {
-            // 3.5
-            index.setSpindexMotor(Volts.of(6.25));
+            index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           }
         } else {
           index.setFeedMotor(Volts.of(0.0));
@@ -125,11 +113,11 @@ public class DefaultIndexCommand extends Command {
         if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
-          index.setSpindexMotor(Volts.of(6.25));
+          index.setSpindexMotor(Volts.of(3.5));
           return;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(Volts.of(6.25));
+          index.setSpindexMotor(Volts.of(3.5));
           // index.setFeedMotor(Volts.of(10.0));
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));

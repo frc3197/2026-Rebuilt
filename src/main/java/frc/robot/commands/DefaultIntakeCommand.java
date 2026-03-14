@@ -4,11 +4,9 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,16 +17,10 @@ import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.util.LoggedTunableNumber;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
 public class DefaultIntakeCommand extends Command {
   /** Creates a new DefaultIntakeCommand. */
   private final Intake intake;
-
-  private final BooleanSupplier spinManual;
-  private final BooleanSupplier backfeedManual;
-  private final DoubleSupplier deployManual;
 
   private Timer flopTImer = new Timer();
 
@@ -48,14 +40,7 @@ public class DefaultIntakeCommand extends Command {
    * @param spinManual Determines if manual intake spin button is pressed.
    * @param deployManual Determines if manual intake deploy button is pressed.
    */
-  public DefaultIntakeCommand(
-      Intake intake,
-      BooleanSupplier spinManual,
-      DoubleSupplier deployManual,
-      BooleanSupplier backfeedManual) {
-    this.spinManual = spinManual;
-    this.deployManual = deployManual;
-    this.backfeedManual = backfeedManual;
+  public DefaultIntakeCommand(Intake intake) {
 
     this.intake = intake;
 
@@ -116,17 +101,6 @@ public class DefaultIntakeCommand extends Command {
                 .withEnableFOC(true));
         break;
 
-      case MANUAL:
-        if (spinManual.getAsBoolean()) {
-
-          intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
-        } else if (backfeedManual.getAsBoolean()) {
-          intake.setIntakeSpinSpeed(-IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
-        } else {
-          intake.setIntakeSpinSpeed(0.0);
-        }
-        break;
-
       default:
         DriverStation.reportError(
             "Invalid intake spin mode: " + RobotState.instance().getIntakeSpinMode(), false);
@@ -137,24 +111,6 @@ public class DefaultIntakeCommand extends Command {
   private void intakeDeployLogic() {
 
     IntakeDeployMode mode = RobotState.instance().getIntakeDeployMode();
-
-    if (mode == IntakeDeployMode.DEPLOYING
-        && MathUtil.isNear(
-            IntakeConstants.FULLY_DEPLOYED_ANGLE.in(Degrees),
-            intake.getDeployAngle().in(Degrees),
-            5.0)) {
-      // RobotState.instance().setIntakeDeployMode(IntakeDeployMode.IDLE_DEPLOYED);
-      // mode = IntakeDeployMode.IDLE_DEPLOYED;
-    }
-
-    if (mode == IntakeDeployMode.RETRACTING
-        && MathUtil.isNear(
-            IntakeConstants.FULLY_RETRACTED_ANGLE.in(Degrees),
-            intake.getDeployAngle().in(Degrees),
-            5.0)) {
-      // RobotState.instance().setIntakeDeployMode(IntakeDeployMode.IDLE_RETRACTED);
-      // mode = IntakeDeployMode.IDLE_RETRACTED;
-    }
 
     switch (mode) {
       case DEPLOYING:
@@ -189,11 +145,6 @@ public class DefaultIntakeCommand extends Command {
 
       case IDLE_RETRACTED:
         intake.setDeployControlRequest(IntakeConstants.DEPLOY_DUTY_CYCLE_REQUEST.withOutput(0.0));
-        break;
-
-      case MANUAL:
-        intake.setDeployControlRequest(
-            IntakeConstants.DEPLOY_DUTY_CYCLE_REQUEST.withOutput(deployManual.getAsDouble()));
         break;
 
       default:

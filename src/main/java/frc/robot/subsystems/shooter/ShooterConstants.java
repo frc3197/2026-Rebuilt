@@ -53,13 +53,15 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(4.0);
 
   public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
-  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(180);
-  public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(10.0);
-  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(14.0);
+  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(360);
+  public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(15.0);
+  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(18.0);
 
+  // Lookahead & compensation
   public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.14;
   public static final double TURRET_OMEGA_COMPENSATION_CONSTANT = 1.7;
   public static final double VELOCITY_COMPENSATION_CONSTANT = 1.24;
+  public static final double ACCELERATION_COMPENSATION_CONSTANT = 0.0;
 
   private static final Distance ROBOT_TO_TURRET_X = Inches.of(18.25 - 13);
   private static final Distance ROBOT_TO_TURRET_Y = Inches.of(13 - 7.5);
@@ -74,7 +76,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           new Rotation3d(0, 0, Degrees.of(180).in(Radians)));
 
   // TURRET ----------------------------------------------------------------------
-  public static final double FX_TO_TURRET_RATIO = (1 * 12 * (100 / 20));
+  public static final double FX_TO_TURRET_RATIO = (1 * 4 * (100 / 20));
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
   // Turret rotation PID controller
@@ -187,7 +189,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final VoltageOut FLYWHEEL_VOLTAGE_REQUEST = new VoltageOut(Volts.of(0.0));
 
   // Manual preset flywheel speed
-  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(10.50);
+  public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(3.50);
 
   public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
       new TalonFXConfiguration()
