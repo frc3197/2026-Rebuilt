@@ -22,6 +22,7 @@ import frc.robot.commands.DesperatelyRetractIntake;
 import frc.robot.constants.FieldConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.HoodMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.enums.Modes.TurretMode;
@@ -149,14 +150,29 @@ public class AutoLookup {
         getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_LEFT));
   }
 
-  private Command getLeftBumpDoubleSwipe() {
+  private Command getLeftTrenchDoubleSwipe() {
     return new SequentialCommandGroup(
         getCommonCommands(),
-        RobotContainer.setTurretMode(TurretMode.IDLE),
+        setRobotPoseWithFlipping(new Pose2d(4.414, 7.431, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        loadPath("45-Bump-Shoot"));
+        new WaitCommand(0.2),
+        new ParallelCommandGroup(
+            loadPath("Left-Trench-Center-Shoot"),
+            new SequentialCommandGroup(
+                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+        new WaitCommand(4.0),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        loadPath("Left-Trench-Shoot-Center-Shoot"),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
   }
 
   public Command getAuto(RealAutos auto) {
@@ -174,6 +190,9 @@ public class AutoLookup {
     }
     if (auto == RealAutos.Preload_Climb_Auto) {
       return getPreloadClimb();
+    }
+    if (auto == RealAutos.Left_Trench_Double_Swipe) {
+      return getLeftTrenchDoubleSwipe();
     }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }

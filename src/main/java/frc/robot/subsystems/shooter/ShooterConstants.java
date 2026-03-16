@@ -49,8 +49,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static final double MAX_OMEGA_WHILE_SHOOTING_RADPS = 2.0;
 
   // Thresholds
-  public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(8.0);
-  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
+  public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(5.0);
 
   public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
   public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(360);
@@ -83,7 +83,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   private static final double kSTurret = 0.0253;
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      2000; // A position error of 2.5 rotations results in 12 V output
+      3500; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
   private static final double kDTurret = 100;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
@@ -95,9 +95,9 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withKD(kDTurret);
 
   // Motion magic configs
-  private static final double max_turret_rps = RadiansPerSecond.of(10).in(RotationsPerSecond);
+  private static final double max_turret_rps = RadiansPerSecond.of(30).in(RotationsPerSecond);
   private static final double max_turret_acceleration =
-      RadiansPerSecondPerSecond.of(20).in(RotationsPerSecondPerSecond);
+      RadiansPerSecondPerSecond.of(30).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs TURRET_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicAcceleration(max_turret_acceleration)
@@ -146,7 +146,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   private static final double kVFlywheel =
       0.364; // A velocity target of 1 rps results in 0.12 V output
   private static final double kPFlywheel =
-      11.5; // A position error of 2.5 rotations results in 12 V output
+      12.5; // A position error of 2.5 rotations results in 12 V output
   private static final double kIFlywheel = 0; // no output for integrated error
   private static final double kDFlywheel = 0.0;
   private static final double kAFlywheel = 1.5; // A velocity error of 1 rps results in 0.1 V output

@@ -98,12 +98,12 @@ public class ControlScheme {
     return primaryController.leftTrigger();
   }
 
-  public Trigger startFloppping() {
-    return new Trigger(() -> false);
-  }
-
   public Trigger stopTrackingNew() {
     return secondaryController.rightStick();
+  }
+
+  public Trigger runFlop() {
+    return primaryController.x();
   }
 
   // Shooter

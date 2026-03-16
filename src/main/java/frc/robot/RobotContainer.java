@@ -310,6 +310,8 @@ public class RobotContainer {
     autoChooser.addOption("Right Bump Outpost", autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
     autoChooser.addOption("Right Bump CLIMB", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
     autoChooser.addOption("Preload Climb", autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
+    autoChooser.addOption(
+        "Left Trench Double Swipe", autoLookup.getAuto(RealAutos.Left_Trench_Double_Swipe));
 
     seedRightAutoRed.onTrue(
         autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));
@@ -376,13 +378,15 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     // .onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    controlScheme
-        .getBackfeedManual()
-        .onTrue(setIntakeSpinMode(IntakeSpinMode.OUTTAKING))
-        .onFalse(
-            index
-                .setSpindexMotorCommand(Volts.of(0.0))
-                .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
+    /*
+     * controlScheme
+     * .getBackfeedManual()
+     * .onTrue(setIntakeSpinMode(IntakeSpinMode.OUTTAKING))
+     * .onFalse(
+     * index
+     * .setSpindexMotorCommand(Volts.of(0.0))
+     * .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
+     */
 
     controlScheme
         .getSnap45()
@@ -546,18 +550,32 @@ public class RobotContainer {
         .getBackfeedManual()
         .whileTrue(
             Commands.run(
-                () -> {
-                  index.setFeedMotor(IndexConstants.FEEDER_BACKFEED_VOLTAGE);
-                  index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
-                },
-                index))
+                    () -> {
+                      index.setFeedMotor(IndexConstants.FEEDER_BACKFEED_VOLTAGE);
+                      index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
+                    },
+                    index)
+                .alongWith(
+                    Commands.run(
+                        () -> {
+                          intake.setIntakeSpinRequest(
+                              IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(-0.1));
+                        },
+                        intake)))
         .onFalse(
             Commands.runOnce(
-                () -> {
-                  index.setFeedMotor(Volts.of(0.0));
-                  index.setSpindexMotor(Volts.of(0.0));
-                },
-                index));
+                    () -> {
+                      index.setFeedMotor(Volts.of(0.0));
+                      index.setSpindexMotor(Volts.of(0.0));
+                    },
+                    index)
+                .andThen(
+                    Commands.runOnce(
+                        () -> {
+                          intake.setIntakeSpinRequest(
+                              IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(0.0));
+                        },
+                        intake)));
 
     controlScheme
         .getSpindexFeedFlywheelManual()
@@ -639,6 +657,21 @@ public class RobotContainer {
               }
             }));
 
+    controlScheme
+        .runFlop()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
+                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.INTAKING);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
+                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.IDLE);
+                }));
+
     /*
      * startFlopping
      * .onTrue(
@@ -685,6 +718,10 @@ public class RobotContainer {
 
   public static Command setClimbCameraMode(ClimbCameraMode mode) {
     return Commands.runOnce(() -> RobotState.instance().setClimbCameraMode(mode));
+  }
+
+  public static Command setHoodMode(HoodMode mode) {
+    return Commands.runOnce(() -> RobotState.instance().setHoodMode(mode));
   }
 
   public static boolean isRed() {
