@@ -99,8 +99,8 @@ public class DefaultIndexCommand extends Command {
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
-          if (false && (DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.3)) {
-            index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
+          if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.2)) {
+            index.setSpindexMotor(Volts.of(-6));
           } else {
             index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           }

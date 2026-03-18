@@ -25,6 +25,7 @@ public class Modes {
   public static enum IntakeSpinMode {
     INTAKING,
     OUTTAKING,
+    MEDIUM,
     IDLE,
   }
 

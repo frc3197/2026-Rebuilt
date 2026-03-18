@@ -34,10 +34,10 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   // public static final Angle FLOP_ANGLE = Degrees.of(-65);
   public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(0);
   public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(117);
-  public static final Angle FLOP_ANGLE = Degrees.of(50);
+  public static final Angle FLOP_ANGLE = Degrees.of(30);
 
-  public static final Time FLOP_PERIOD = Seconds.of(2.0);
-  public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(0.5);
+  public static final Time FLOP_PERIOD = Seconds.of(1.2);
+  public static LinearVelocity MAX_FLOP_VELOCITY = MetersPerSecond.of(5.5);
 
   public static DutyCycleOut INTAKE_SPIN_DUTY_CYCLE_FOC = new DutyCycleOut(0.0).withEnableFOC(true);
 

@@ -95,6 +95,11 @@ public class DefaultIntakeCommand extends Command {
                 .withEnableFOC(true));
         break;
 
+      case MEDIUM:
+        intake.setIntakeSpinRequest(
+            IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(0.45).withEnableFOC(true));
+        break;
+
       case OUTTAKING:
         intake.setIntakeSpinRequest(
             IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC

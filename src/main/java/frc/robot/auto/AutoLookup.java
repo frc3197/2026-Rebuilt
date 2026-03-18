@@ -166,7 +166,7 @@ public class AutoLookup {
                 new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
         new WaitCommand(3.1),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
@@ -175,7 +175,7 @@ public class AutoLookup {
         loadPath("Left-Trench-Shoot-Center-Shoot"),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
   }
 
