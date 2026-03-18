@@ -50,7 +50,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   // Thresholds
   public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
-  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(5.0);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(4.25);
 
   public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
   public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(360);
@@ -76,14 +76,14 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           new Rotation3d(0, 0, Degrees.of(180).in(Radians)));
 
   // TURRET ----------------------------------------------------------------------
-  public static final double FX_TO_TURRET_RATIO = (1 * 4 * (100 / 20));
+  public static final double FX_TO_TURRET_RATIO = (4 * (105 / 25));
   public static final Voltage MAX_TURRET_ROTATION_MOTOR_VOLTS = Volts.of(12.0);
 
   // Turret rotation PID controller
   private static final double kSTurret = 0.0253;
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      3500; // A position error of 2.5 rotations results in 12 V output
+      3800; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
   private static final double kDTurret = 100;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
@@ -129,7 +129,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withFeedback(TURRET_FEEDBACK_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(45.0)
+                  .withStatorCurrentLimit(65.0)
                   .withStatorCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()

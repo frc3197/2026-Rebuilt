@@ -159,19 +159,51 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.2),
+        new WaitCommand(0.15),
         new ParallelCommandGroup(
-            loadPath("Left-Trench-Center-Shoot"),
+            loadPath("Left-Trench-Center-Shoot-Diamond"),
             new SequentialCommandGroup(
                 new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
-        new WaitCommand(4.0),
+        new WaitCommand(3.1),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
         loadPath("Left-Trench-Shoot-Center-Shoot"),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
+  }
+
+  private Command getLeftTrenchDepot() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(4.414, 7.431, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.1),
+        new ParallelCommandGroup(
+            loadPath("Left-Trench-Center-Shoot-Diamond"),
+            new SequentialCommandGroup(
+                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+        new WaitCommand(5.0),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        loadPath("Left-Trench-Depot"),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
   }
 
@@ -193,6 +225,9 @@ public class AutoLookup {
     }
     if (auto == RealAutos.Left_Trench_Double_Swipe) {
       return getLeftTrenchDoubleSwipe();
+    }
+    if (auto == RealAutos.Left_Trench_Swipe_Depot) {
+      return getLeftTrenchDepot();
     }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }

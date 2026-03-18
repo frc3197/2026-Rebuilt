@@ -84,6 +84,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOClimberLimelight;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.KeyboardController;
 import frc.robot.util.MatchTimeUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -94,6 +95,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  private KeyboardController keyboardController = new KeyboardController();
+
   // Subsystems
   private final Align align;
   private final Climber climber;
@@ -312,6 +316,8 @@ public class RobotContainer {
     autoChooser.addOption("Preload Climb", autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
     autoChooser.addOption(
         "Left Trench Double Swipe", autoLookup.getAuto(RealAutos.Left_Trench_Double_Swipe));
+    autoChooser.addOption(
+        "Left Trench Swipt Depot", autoLookup.getAuto(RealAutos.Left_Trench_Swipe_Depot));
 
     seedRightAutoRed.onTrue(
         autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));
@@ -513,7 +519,11 @@ public class RobotContainer {
         .onFalse(climber.setClimbSpeed(0.0));
 
     controlScheme.getIntakeExtendPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.DEPLOYING));
-    controlScheme.getIntakeRetractPreset().onTrue(setIntakeDeployMode(IntakeDeployMode.RETRACTING));
+    controlScheme
+        .getIntakeRetractPreset()
+        .onTrue(
+            setIntakeDeployMode(IntakeDeployMode.RETRACTING)
+                .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
 
     // ------------------------------------------------------------------------
     // TURRET ROTATION CONTROLS
@@ -657,13 +667,14 @@ public class RobotContainer {
               }
             }));
 
-    controlScheme
-        .runFlop()
+    keyboardController
+        .b()
         .whileTrue(
             Commands.run(
                 () -> {
                   RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
-                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.INTAKING);
+                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.IDLE);
+                  RobotState.instance().setHoodMode(HoodMode.TRACKING);
                 }))
         .onFalse(
             Commands.runOnce(

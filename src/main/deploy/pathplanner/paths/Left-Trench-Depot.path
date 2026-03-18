@@ -8,52 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2213975903614456,
-        "y": 5.040349397590362
+        "x": 2.2160481927710847,
+        "y": 7.105686746987953
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.128168674698795,
-        "y": 5.503537803138374
+        "x": 0.8719397590361446,
+        "y": 6.668578313253013
       },
       "prevControl": {
-        "x": 5.804702198236599,
-        "y": 5.748910128388019
+        "x": 0.9783938365523612,
+        "y": 6.9879405458016635
       },
       "nextControl": {
-        "x": 6.986243134589018,
-        "y": 4.852627304581024
+        "x": 0.7735903614457831,
+        "y": 6.373530120481928
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 4.089638554216867
+        "x": 0.6206024096385543,
+        "y": 4.854578313253012
       },
       "prevControl": {
-        "x": 8.062069164182233,
-        "y": 3.9911587295720743
-      },
-      "nextControl": {
-        "x": 8.521641679191264,
-        "y": 4.1881183788616605
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.7840085592011405,
-        "y": 5.503537803138374
-      },
-      "prevControl": {
-        "x": 5.374156626506024,
-        "y": 6.06755421686747
+        "x": 0.5878192771084337,
+        "y": 5.171481927710842
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,25 +46,17 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.33262260127932425,
-      "rotationDegrees": 154.58973806047874
-    },
-    {
-      "waypointRelativePos": 1.15,
-      "rotationDegrees": -39.05815044519409
-    },
-    {
-      "waypointRelativePos": 2.1215351812366308,
-      "rotationDegrees": -32.818680820304536
+      "waypointRelativePos": 1.16,
+      "rotationDegrees": -135.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.640694789081878,
-      "maxWaypointRelativePos": 1.789578163771727,
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.4069478908188703,
       "constraints": {
-        "maxVelocity": 0.8,
+        "maxVelocity": 1.0,
         "maxAcceleration": 2.0,
         "maxAngularVelocity": 360.0,
         "maxAngularAcceleration": 360.0,
@@ -92,8 +68,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -101,7 +77,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Left Trench Double Swipe",

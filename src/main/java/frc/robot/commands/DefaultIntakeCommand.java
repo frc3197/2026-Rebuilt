@@ -79,8 +79,9 @@ public class DefaultIntakeCommand extends Command {
   private void intakeSpinLogic() {
     switch (RobotState.instance().getIntakeSpinMode()) {
       case IDLE:
-        if (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
-            || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY) {
+        if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.DEPLOYING
+            && (RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING
+                || RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY)) {
           intake.setIntakeSpinSpeed(IntakeConstants.INTAKE_SPIN_DUTY_CYCLE);
         } else {
           intake.setIntakeSpinSpeed(0.0);
