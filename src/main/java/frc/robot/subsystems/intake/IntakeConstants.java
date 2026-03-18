@@ -86,9 +86,9 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(100)
+                  .withStatorCurrentLimit(50)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(40)
+                  .withSupplyCurrentLimit(30)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
