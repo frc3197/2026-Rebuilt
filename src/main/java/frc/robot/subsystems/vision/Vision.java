@@ -173,7 +173,6 @@ public class Vision extends SubsystemBase {
             && observation.averageTagDistance() <= 5.0
             && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5) {
           lastQuestUpdateTimestamp = observation.timestamp();
-          System.out.println("YEAH");
           questVisionConsumer.accept(
               observation.pose().toPose2d(),
               observation.timestamp(),
@@ -201,12 +200,12 @@ public class Vision extends SubsystemBase {
     }
 
     // Log summary data
-    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
+    /*Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
     Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
-        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));*/
   }
 
   @FunctionalInterface

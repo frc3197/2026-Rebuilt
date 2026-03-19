@@ -53,7 +53,6 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   }
 
   public void setFeedMotorRequest(ControlRequest request) {
-    System.out.println("HDJA");
     feedMotor.setControl(request);
   }
 }

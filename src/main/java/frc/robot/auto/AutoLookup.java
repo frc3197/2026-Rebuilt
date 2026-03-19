@@ -159,7 +159,7 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.15),
+        new WaitCommand(0.0),
         new ParallelCommandGroup(
             loadPath("Left-Trench-Center-Shoot-Diamond"),
             new SequentialCommandGroup(
