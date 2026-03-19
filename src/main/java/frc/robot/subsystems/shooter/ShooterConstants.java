@@ -50,12 +50,12 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   // Thresholds
   public static final AngularVelocity FRENZY_FEED_THRESHOLD = RotationsPerSecond.of(6.0);
-  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(4.25);
+  public static final AngularVelocity NORMAL_FEED_THRESHOLD = RotationsPerSecond.of(5.25);
 
-  public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.25);
-  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(360);
-  public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(15.0);
-  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(25.0);
+  public static final LinearVelocity TRANSLATIONAL_SPEED_THRESHOLD = MetersPerSecond.of(2.5);
+  public static final AngularVelocity ANGULAR_SPEED_THRESHOLD = DegreesPerSecond.of(450);
+  public static final Distance HOOD_EXTENSION_THRESHOLD = Millimeters.of(20.0);
+  public static final Angle TURRET_ANGLE_ERROR_THRESHOLD = Degrees.of(30.0);
 
   // Lookahead & compensation
   public static final double TURRET_ROTATION_LOOKAHEAD_CONSTANT = 0.14;
