@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,6 +30,8 @@ public class Quest extends SubsystemBase {
     questIO.questPeriodic();
 
     questIO.updateInputs(inputs);
+
+    RobotState.instance().setQuestConnected(inputs.isConnected);
 
     Logger.processInputs("Quest", inputs);
 
