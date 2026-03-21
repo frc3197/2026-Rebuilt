@@ -17,7 +17,6 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.managersubsystems.RobotState;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,22 +56,26 @@ public class VisionIOClimberLimelight implements VisionIO {
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
+    pipelineSetter.setNumber(VisionConstants.CLIMBER_BLUE_ALIGN_PIPELINE);
 
-    switch (RobotState.instance().getClimbCameraMode()) {
-      case CLIMB_BLUE:
-        pipelineSetter.setNumber(VisionConstants.CLIMBER_BLUE_ALIGN_PIPELINE);
-        break;
-      case CLIMB_RED:
-        pipelineSetter.setNumber(VisionConstants.CLIMBER_RED_ALIGN_PIPELINE);
-        break;
-      case APRIL_TAGS:
-        pipelineSetter.setNumber(VisionConstants.CLIMBER_APRIL_TAG_PIPELINE);
-        break;
-      default:
-        System.out.println(
-            "INVALID CLIMBER CAMERA MODE: " + RobotState.instance().getClimbCameraMode());
-        break;
-    }
+    /*
+     * switch (RobotState.instance().getClimbCameraMode()) {
+     * case CLIMB_BLUE:
+     * pipelineSetter.setNumber(VisionConstants.CLIMBER_BLUE_ALIGN_PIPELINE);
+     * break;
+     * case CLIMB_RED:
+     * pipelineSetter.setNumber(VisionConstants.CLIMBER_RED_ALIGN_PIPELINE);
+     * break;
+     * case APRIL_TAGS:
+     * pipelineSetter.setNumber(VisionConstants.CLIMBER_APRIL_TAG_PIPELINE);
+     * break;
+     * default:
+     * System.out.println(
+     * "INVALID CLIMBER CAMERA MODE: " +
+     * RobotState.instance().getClimbCameraMode());
+     * break;
+     * }
+     */
 
     // Update connection status based on whether an update has been seen in the last
     // 250ms
@@ -87,8 +90,13 @@ public class VisionIOClimberLimelight implements VisionIO {
     // Update orientation for MegaTag 2
     orientationPublisher.accept(
         new double[] {rotationSupplier.get().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0});
-    NetworkTableInstance.getDefault()
-        .flush(); // Increases network traffic but recommended by Limelight
+    NetworkTableInstance.getDefault().flush(); // Increases
+    // network
+    // traffic
+    // but
+    // recommended
+    // by
+    // Limelight
 
     // Read new pose observations from NetworkTables
     Set<Integer> tagIds = new HashSet<>();

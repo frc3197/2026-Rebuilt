@@ -171,7 +171,7 @@ public class Vision extends SubsystemBase {
         if (isQuestConnected.getAsBoolean()
             && observation.averageTagDistance() >= 0.5
             && observation.averageTagDistance() <= 5.0
-            && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 1.5) {
+            && Math.abs(lastQuestUpdateTimestamp - observation.timestamp()) > 0.5) {
           lastQuestUpdateTimestamp = observation.timestamp();
           questVisionConsumer.accept(
               observation.pose().toPose2d(),

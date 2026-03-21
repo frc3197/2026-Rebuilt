@@ -570,7 +570,7 @@ public class RobotContainer {
                     Commands.run(
                         () -> {
                           intake.setIntakeSpinRequest(
-                              IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(-0.1));
+                              IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(-1));
                         },
                         intake)))
         .onFalse(
