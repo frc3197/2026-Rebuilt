@@ -122,7 +122,9 @@ public class DefaultIndexCommand extends Command {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
         } else {
-          index.setFeedMotor(Volts.of(0.0));
+          // index.setFeedMotor(Volts.of(0.0));
+          index.setFeedRequest(
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
           index.setSpindexMotor(Volts.of(0.0));
         }
         break;

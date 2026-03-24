@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
@@ -157,10 +158,13 @@ public class Vision extends SubsystemBase {
 
         // Send vision observation
         if (!isQuestConnected.getAsBoolean()) {
+          SmartDashboard.putBoolean("No quest", true);
           driveVisionConsumer.accept(
               observation.pose().toPose2d(),
               observation.timestamp(),
               VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        } else {
+          SmartDashboard.putBoolean("No quest", false);
         }
 
         Logger.recordOutput(

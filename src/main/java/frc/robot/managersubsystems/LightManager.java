@@ -51,7 +51,7 @@ public class LightManager extends VirtualSubsystem {
   @Override
   public void periodic() {
 
-    if (DriverStation.isFMSAttached()) {
+    if (DriverStation.isFMSAttached() || DriverStation.isEnabled()) {
       if (DriverStation.isEnabled()) {
         enabledChecks();
         return;
@@ -135,7 +135,7 @@ public class LightManager extends VirtualSubsystem {
     candle.setControl(
         new LarsonAnimation(0, numLights)
             .withColor(orangeColor)
-            .withFrameRate(50)
+            .withFrameRate(17)
             .withBounceMode(LarsonBounceValue.Front)
             .withSize(10)
             .withSlot(0));
