@@ -191,7 +191,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   // Manual preset flywheel speed
   public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(3.50);
 
-  public static final TalonFXConfiguration FLYWHEEL_TALON_FX_CONFIG =
+  public static final TalonFXConfiguration FLYWHEEL_LEFT_TALON_FX_CONFIG =
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
@@ -207,7 +207,26 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
           .withSlot1(FLYWHEEL_SLOT1_CONFIGS)
           .withSlot2(FLYWHEEL_SLOT2_CONFIGS);
 
+  public static final TalonFXConfiguration FLYWHEEL_RIGHT_TALON_FX_CONFIG =
+      new TalonFXConfiguration()
+          .withCurrentLimits(
+              new CurrentLimitsConfigs()
+                  .withStatorCurrentLimit(130.0)
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimit(60.0)
+                  .withSupplyCurrentLimitEnable(true))
+          .withMotorOutput(
+              new MotorOutputConfigs()
+                  .withNeutralMode(NeutralModeValue.Coast)
+                  .withInverted(InvertedValue.Clockwise_Positive))
+          .withSlot0(FLYWHEEL_SLOT0_CONFIGS)
+          .withSlot1(FLYWHEEL_SLOT1_CONFIGS)
+          .withSlot2(FLYWHEEL_SLOT2_CONFIGS);
+
   // HOOD --------------
   public static Angle MAX_HOOD_ANGLE = Degrees.of(45);
   public static Angle MIN_HOOD_ANGLE = Degrees.of(20);
+
+  public static double HOOD_LOW = 10;
+  public static double HOOD_HIGH = 30;
 }

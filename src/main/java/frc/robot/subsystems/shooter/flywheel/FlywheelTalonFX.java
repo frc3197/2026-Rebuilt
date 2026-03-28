@@ -13,31 +13,34 @@ import frc.robot.util.RealSubsystem;
 
 public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
 
-  private final TalonFX flywheelMotor;
-  private AngularVelocity targetFlywheelAngularVelocity = RotationsPerSecond.of(0.0);
-
-  private FlywheelParameters params = new FlywheelParameters();
+  private final TalonFX flywheelLeftMotor;
+  private final TalonFX flywheelRightMotor;
 
   public FlywheelTalonFX() {
-    this.flywheelMotor = new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    this.flywheelLeftMotor =
+        new TalonFX(ShooterConstants.FLYWHEEL_LEFT_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    this.flywheelRightMotor =
+        new TalonFX(ShooterConstants.FLYWHEEL_RIGHT_MOTOR_ID, HardwareID.MAIN_CANBUS);
 
     configureHardware();
   }
 
   @Override
   protected void configureHardware() {
-    flywheelMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_TALON_FX_CONFIG);
+    flywheelLeftMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_LEFT_TALON_FX_CONFIG);
+    flywheelRightMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_RIGHT_TALON_FX_CONFIG);
   }
 
   @Override
   public void setFlywheelOutput(ControlRequest request) {
-    flywheelMotor.setControl(request);
+    flywheelLeftMotor.setControl(request);
+    flywheelRightMotor.setControl(request);
   }
 
   @Override
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.flywheelCurrentDraw.mut_replace(flywheelMotor.getSupplyCurrent().getValue());
-    inputs.flywheelSuppliedVoltage.mut_replace(flywheelMotor.getSupplyVoltage().getValue());
+    inputs.flywheelCurrentDraw.mut_replace(flywheelLeftMotor.getSupplyCurrent().getValue());
+    inputs.flywheelSuppliedVoltage.mut_replace(flywheelLeftMotor.getSupplyVoltage().getValue());
     inputs.flywheelTargetVelocity =
         (ShotCalculator.instance().getTargetFlywheelVelocity().in(RotationsPerSecond));
     inputs.flywheelVelocityActual = getFlywheelVelocity().in(RotationsPerSecond);
@@ -45,11 +48,12 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
 
   // Helper functions
   private AngularVelocity getFlywheelVelocity() {
-    return flywheelMotor.getVelocity().getValue();
+    return flywheelLeftMotor.getVelocity().getValue();
   }
 
   @Override
   public void updateFlywheelSlot0Configs(Slot0Configs newConfig) {
-    flywheelMotor.getConfigurator().apply(newConfig);
+    flywheelLeftMotor.getConfigurator().apply(newConfig);
+    flywheelRightMotor.getConfigurator().apply(newConfig);
   }
 }

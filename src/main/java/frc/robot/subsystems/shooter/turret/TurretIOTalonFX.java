@@ -72,7 +72,9 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   @Override
   public void setHoodActuatorMM(Distance distance) {
     hoodExtensionTarget = distance;
-    leftHoodActuator.setPosition(distance.in(Millimeters));
+    leftHoodActuator.setPosition(
+        MathUtil.clamp(
+            distance.in(Millimeters), ShooterConstants.HOOD_LOW, ShooterConstants.HOOD_HIGH));
   }
 
   @Override

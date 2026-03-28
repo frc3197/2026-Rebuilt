@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -100,7 +99,7 @@ public class DefaultIndexCommand extends Command {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
           if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.2)) {
-            index.setSpindexMotor(Volts.of(-6));
+            index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
           } else {
             index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           }
@@ -112,19 +111,19 @@ public class DefaultIndexCommand extends Command {
       case SHOOTING:
         if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
-          index.setSpindexMotor(Volts.of(3.5));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
+          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           return;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setSpindexMotor(Volts.of(3.5));
           // index.setFeedMotor(Volts.of(10.0));
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
         } else {
           // index.setFeedMotor(Volts.of(0.0));
           index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(RotationsPerSecond.of(55)));
+              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
           index.setSpindexMotor(Volts.of(0.0));
         }
         break;

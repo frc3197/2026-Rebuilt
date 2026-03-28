@@ -62,6 +62,27 @@ public class AutoLookup {
     this.vision = vision;
   }
 
+  private Command getLeftTrenchTrenchDCMP() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(4.414, 7.431, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.0),
+        new ParallelCommandGroup(
+            loadPath("Left-Trench-Center-Trench-Shoot"),
+            new SequentialCommandGroup(
+                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+        new WaitCommand(6.5));
+  }
+
   private Command getRightBumpOutpostAuto() {
     return new SequentialCommandGroup(
         getCommonCommands(),

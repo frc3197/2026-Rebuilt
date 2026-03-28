@@ -397,6 +397,7 @@ public class ShotCalculator extends VirtualSubsystem {
 
     if (LoggingConstants.shooterCalibrationMode && hoodDistanceTunable.hasChanged(hashCode())) {
       this.targetHoodExtension.mut_replace(Millimeters.of(hoodDistanceTunable.getAsDouble()));
+      return Millimeters.of(hoodDistanceTunable.getAsDouble());
     }
 
     return targetHoodExtension;

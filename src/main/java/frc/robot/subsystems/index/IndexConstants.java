@@ -55,7 +55,7 @@ public class IndexConstants implements IndexHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(100)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(50)
+                  .withSupplyCurrentLimit(75)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
@@ -74,10 +74,10 @@ public class IndexConstants implements IndexHardwareID {
    */
 
   // VOLTAGES
-  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(5.0);
+  public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(3.0);
   public static final Voltage SPINDEX_BACKFEED_VOLTAGE = Volts.of(-3.5);
   public static final Voltage FEEDER_SHOOTING_VOLTAGE = Volts.of(4.5);
   public static final Voltage FEEDER_BACKFEED_VOLTAGE = Volts.of(-4.5);
 
-  public static final AngularVelocity FEEDER_SHOOTING_RPS = RotationsPerSecond.of(55);
+  public static final AngularVelocity FEEDER_SHOOTING_RPS = RotationsPerSecond.of(100);
 }

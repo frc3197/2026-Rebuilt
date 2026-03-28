@@ -76,8 +76,9 @@ public class DefaultTurretHoodCommand extends Command {
 
     // If the robot is not in shot calibration mode, then set the actuator to its
     // target extension
-    if (!LoggingConstants.shooterCalibrationMode) {
-      if (RobotState.instance().getHoodMode() == HoodMode.DOWN) {
+    if (true) {
+      if (!LoggingConstants.shooterCalibrationMode
+          && RobotState.instance().getHoodMode() == HoodMode.DOWN) {
         turret.setActuatorPositionFunc(Millimeters.of(0.0));
       } else {
         turret.setActuatorPositionFunc(ShotCalculator.instance().getTargetHoodExtension());
