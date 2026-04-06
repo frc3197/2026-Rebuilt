@@ -22,7 +22,8 @@ public class HardwareID {
     public static final int DEPLOY_MOTOR_ID = 13;
     public static final int DEPLOY_CANCODER_ID = 17;
 
-    public static final int SPIN_MOTOR_ID = 14;
+    public static final int LEFT_SPIN_MOTOR_ID = 14;
+    public static final int RIGHT_SPIN_MOTOR_ID = 30;
   }
 
   public interface ClimberHardwareID {

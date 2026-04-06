@@ -5,9 +5,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import frc.robot.HardwareID;
@@ -16,7 +18,8 @@ import frc.robot.util.RealSubsystem;
 public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
 
   private final TalonFX deployMotor;
-  private final TalonFX spinMotor;
+  private final TalonFX leftSpinMotor;
+  private final TalonFX rightSpinMotor;
 
   private MutAngle targetDeployAngle = IntakeConstants.FULLY_RETRACTED_ANGLE.mutableCopy();
 
@@ -24,7 +27,8 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
 
   public IntakeIOTalonFX() {
     deployMotor = new TalonFX(IntakeConstants.DEPLOY_MOTOR_ID, HardwareID.MAIN_CANBUS);
-    spinMotor = new TalonFX(IntakeConstants.SPIN_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    leftSpinMotor = new TalonFX(IntakeConstants.LEFT_SPIN_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    rightSpinMotor = new TalonFX(IntakeConstants.RIGHT_SPIN_MOTOR_ID, HardwareID.MAIN_CANBUS);
     deployEncoder = new CANcoder(IntakeConstants.DEPLOY_CANCODER_ID, HardwareID.MAIN_CANBUS);
 
     configureHardware();
@@ -42,21 +46,25 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
                     .withSensorToMechanismRatio(1.0)
                     .withRotorToSensorRatio(1)));
 
-    spinMotor.getConfigurator().apply(IntakeConstants.SPIN_MOTOR_CONFIG);
+    leftSpinMotor.getConfigurator().apply(IntakeConstants.SPIN_MOTOR_CONFIG);
+    rightSpinMotor.getConfigurator().apply(IntakeConstants.SPIN_MOTOR_CONFIG);
   }
 
   @Override
   public void updateInputs(IntakeInputs inputs) {
     inputs.spinMotorSetSpeed = getSpinMotorSpeed();
     inputs.deployMotorSuppliedCurrent.mut_replace(deployMotor.getSupplyCurrent().getValue());
-    inputs.spinMotorSuppliedCurrent.mut_replace(spinMotor.getSupplyCurrent().getValue());
+
+    inputs.leftSpinMotorSuppliedCurrent.mut_replace(leftSpinMotor.getSupplyCurrent().getValue());
+    inputs.rightSpinMotorSuppliedCurrent.mut_replace(rightSpinMotor.getSupplyCurrent().getValue());
+
     inputs.deployAngleDegrees = deployMotor.getPosition().getValue().in(Degrees);
     inputs.deployMotorVelocity.mut_replace(deployEncoder.getVelocity().getValue());
   }
 
   @Override
   public double getSpinMotorSpeed() {
-    return spinMotor.get();
+    return rightSpinMotor.get();
   }
 
   @Override
@@ -96,11 +104,14 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
 
   @Override
   public void setSpinMotorSpeed(double speed) {
-    spinMotor.set(speed);
+    leftSpinMotor.set(speed);
+    rightSpinMotor.set(-speed);
   }
 
   @Override
   public void setSpinMotorRequest(ControlRequest request) {
-    spinMotor.setControl(request);
+    rightSpinMotor.setControl(request);
+    leftSpinMotor.setControl(
+        new Follower(IntakeConstants.RIGHT_SPIN_MOTOR_ID, MotorAlignmentValue.Opposed));
   }
 }

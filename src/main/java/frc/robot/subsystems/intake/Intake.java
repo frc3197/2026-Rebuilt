@@ -26,12 +26,6 @@ public class Intake extends SubsystemBase {
     intakeIO.configureMotors();
   }
 
-  /**
-   * Starts the intaker at the desired params
-   *
-   * @param speed (DoubleSupplier) The speed to run the intaker
-   * @return none There is no return
-   */
   public void setIntakeSpinSpeed(double speed) {
     intakeIO.setSpinMotorSpeed(speed);
   }
@@ -63,7 +57,10 @@ public class Intake extends SubsystemBase {
 
     RobotState.instance()
         .setIntakeCurrentDraw(
-            loggedInputs.deployMotorSuppliedCurrent.plus(loggedInputs.spinMotorSuppliedCurrent));
+            loggedInputs
+                .deployMotorSuppliedCurrent
+                .plus(loggedInputs.leftSpinMotorSuppliedCurrent)
+                .plus(loggedInputs.rightSpinMotorSuppliedCurrent));
   }
 
   public void setDeployGains(Slot0Configs gains) {

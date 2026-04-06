@@ -17,7 +17,8 @@ public interface IntakeIO {
   public static class IntakeInputs {
     public double spinMotorSetSpeed = 0.0;
     public MutCurrent deployMotorSuppliedCurrent = Amps.of(0.0).mutableCopy();
-    public MutCurrent spinMotorSuppliedCurrent = Amps.of(0.0).mutableCopy();
+    public MutCurrent leftSpinMotorSuppliedCurrent = Amps.of(0.0).mutableCopy();
+    public MutCurrent rightSpinMotorSuppliedCurrent = Amps.of(0.0).mutableCopy();
     public double deployAngleDegrees = 0.0;
     public MutAngularVelocity deployMotorVelocity = RotationsPerSecond.of(0.0).mutableCopy();
   }
