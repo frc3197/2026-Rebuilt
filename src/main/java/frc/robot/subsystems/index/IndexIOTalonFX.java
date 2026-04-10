@@ -34,6 +34,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   public void updateInputs(IndexInputs inputs) {
     inputs.feedRPS = feedMotor.getVelocity().getValue().in(RotationsPerSecond);
     inputs.feedDrawAmps.mut_replace(feedMotor.getSupplyCurrent().getValue());
+    inputs.feedVolts.mut_replace(feedMotor.getMotorVoltage().getValue());
     inputs.spindexDrawAmps.mut_replace(spindexMotorController.getSupplyCurrent().getValue());
   }
 

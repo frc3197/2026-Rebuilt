@@ -97,7 +97,7 @@ public class DefaultIntakeCommand extends Command {
 
       case MEDIUM:
         intake.setIntakeSpinRequest(
-            IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(-0.1).withEnableFOC(true));
+            IntakeConstants.INTAKE_SPIN_DUTY_CYCLE_FOC.withOutput(0.1).withEnableFOC(true));
         break;
 
       case OUTTAKING:

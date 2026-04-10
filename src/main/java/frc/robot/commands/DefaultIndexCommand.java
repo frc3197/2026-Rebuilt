@@ -116,14 +116,16 @@ public class DefaultIndexCommand extends Command {
           return;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(Volts.of(3.5));
+          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           // index.setFeedMotor(Volts.of(10.0));
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
         } else {
-          // index.setFeedMotor(Volts.of(0.0));
+          index.setFeedMotor(Volts.of(0.0));
+          /*
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
+              */
           index.setSpindexMotor(Volts.of(0.0));
         }
         break;

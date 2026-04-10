@@ -104,8 +104,8 @@ public class IntakeIOTalonFX extends RealSubsystem implements IntakeIO {
 
   @Override
   public void setSpinMotorSpeed(double speed) {
-    leftSpinMotor.set(speed);
-    rightSpinMotor.set(-speed);
+    leftSpinMotor.set(-speed);
+    rightSpinMotor.set(speed);
   }
 
   @Override

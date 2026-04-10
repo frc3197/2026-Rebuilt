@@ -371,12 +371,20 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   private AngularVelocity getTargetVeloLongHoodLow(double distanceInMeters) {
+    // For appleton
+    // double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
+
     double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
+
     return RotationsPerSecond.of(rps);
   }
 
   private Distance getTargetExtensionLongHoodLow(double distanceInMeters) {
-    double mm = (1.9 * distanceInMeters) + 33.9;
+    // For appleton
+    // double mm = (1.9 * distanceInMeters) + 33.9;
+
+    // DCMP
+    double mm = (4.7 * distanceInMeters) + (-0.345 * (Math.pow(distanceInMeters, 2))) + 3.41;
     return Millimeters.of(MathUtil.clamp(mm, 0, 50));
   }
 
@@ -395,7 +403,9 @@ public class ShotCalculator extends VirtualSubsystem {
 
   public Distance getTargetHoodExtension() {
 
-    if (LoggingConstants.shooterCalibrationMode && hoodDistanceTunable.hasChanged(hashCode())) {
+    if (false
+        && LoggingConstants.shooterCalibrationMode
+        && hoodDistanceTunable.hasChanged(hashCode())) {
       this.targetHoodExtension.mut_replace(Millimeters.of(hoodDistanceTunable.getAsDouble()));
       return Millimeters.of(hoodDistanceTunable.getAsDouble());
     }

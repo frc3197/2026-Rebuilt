@@ -596,7 +596,7 @@ public class RobotContainer {
                   index.setFeedRequest(
                       IndexConstants.FEED_TORQUE_REQUEST.withVelocity(
                           IndexConstants.FEEDER_SHOOTING_RPS));
-                  index.setSpindexMotor(IndexConstants.FEEDER_SHOOTING_VOLTAGE);
+                  index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
                 },
                 index))
         .onFalse(
