@@ -296,6 +296,10 @@ public class ShotCalculator extends VirtualSubsystem {
         targetFlywheelVelocity.mut_replace(
             getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
       }
+    } else {
+      // TODO FIX LATER
+      targetHoodExtension.mut_replace(
+            getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
     }
   }
 

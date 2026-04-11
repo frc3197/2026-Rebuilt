@@ -7,6 +7,7 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -118,8 +119,8 @@ public class DefaultIndexCommand extends Command {
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           // index.setFeedMotor(Volts.of(10.0));
-          index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
+          // index.setFeedRequest(IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
+          index.setFeedRequest(new VoltageOut(12.0));
         } else {
           index.setFeedMotor(Volts.of(0.0));
           /*
