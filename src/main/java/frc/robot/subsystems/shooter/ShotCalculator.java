@@ -299,7 +299,7 @@ public class ShotCalculator extends VirtualSubsystem {
     } else {
       // TODO FIX LATER
       targetHoodExtension.mut_replace(
-            getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
+          getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
     }
   }
 
@@ -378,7 +378,7 @@ public class ShotCalculator extends VirtualSubsystem {
     // For appleton
     // double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
 
-    double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
+    double rps = MathUtil.clamp(((4.15 * distanceInMeters) + 25.7), 5, 80);
 
     return RotationsPerSecond.of(rps);
   }

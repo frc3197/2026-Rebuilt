@@ -250,6 +250,9 @@ public class AutoLookup {
     if (auto == RealAutos.Left_Trench_Swipe_Depot) {
       return getLeftTrenchDepot();
     }
+    if (auto == RealAutos.LEFT_TRENCH_DCMP) {
+      return getLeftTrenchTrenchDCMP();
+    }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }
 

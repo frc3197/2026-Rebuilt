@@ -1,6 +1,7 @@
 package frc.robot.enums;
 
 public enum RealAutos {
+  LEFT_TRENCH_DCMP,
   Right_Bump_Double_Swipe,
   Right_Bump_Climb,
   Right_Bump_Outpost,

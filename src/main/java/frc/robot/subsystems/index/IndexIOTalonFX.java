@@ -40,12 +40,12 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
 
   @Override
   public void setFeedMotorVoltage(Voltage volts) {
-    feedMotor.setVoltage(volts.magnitude());
+    feedMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
   }
 
   @Override
   public void setSpindexMotorVoltage(Voltage volts) {
-    spindexMotorController.setControl(new VoltageOut(volts));
+    spindexMotorController.setControl(new VoltageOut(volts).withEnableFOC(true));
   }
 
   @Override

@@ -120,7 +120,7 @@ public class DefaultIndexCommand extends Command {
           index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           // index.setFeedMotor(Volts.of(10.0));
           // index.setFeedRequest(IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
-          index.setFeedRequest(new VoltageOut(12.0));
+          index.setFeedRequest(new VoltageOut(12.0).withEnableFOC(true));
         } else {
           index.setFeedMotor(Volts.of(0.0));
           /*

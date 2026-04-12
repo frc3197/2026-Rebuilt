@@ -227,6 +227,6 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   public static Angle MAX_HOOD_ANGLE = Degrees.of(45);
   public static Angle MIN_HOOD_ANGLE = Degrees.of(20);
 
-  public static double HOOD_LOW = 5;
+  public static double HOOD_LOW = 2.5;
   public static double HOOD_HIGH = 35;
 }

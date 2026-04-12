@@ -14,7 +14,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -33,6 +35,8 @@ public class VisionIOLimelight implements VisionIO {
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
 
+  private final NetworkTableEntry pipelineSetter;
+
   /**
    * Creates a new VisionIOLimelight.
    *
@@ -49,6 +53,7 @@ public class VisionIOLimelight implements VisionIO {
     megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    pipelineSetter = NetworkTableInstance.getDefault().getTable(name).getEntry("pipeline");
   }
 
   @Override
@@ -57,6 +62,12 @@ public class VisionIOLimelight implements VisionIO {
     // 250ms
     inputs.connected =
         ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+
+    if (DriverStation.isEnabled()) {
+      pipelineSetter.setNumber(0);
+    } else {
+      pipelineSetter.setNumber(1);
+    }
 
     // Update target observation
     inputs.latestTargetObservation =
