@@ -23,6 +23,7 @@ public interface IndexIO {
     public MutCurrent spindexDrawAmps = Amps.of(0.0).mutableCopy();
     public MutVoltage feedVolts = Volts.of(0.0).mutableCopy();
     public MutCurrent feedDrawAmps = Amps.of(0.0).mutableCopy();
+    public double secondsSinceLastFeed = 0.0;
   }
 
   public default void updateInputs(IndexInputs inputs) {}
@@ -34,4 +35,8 @@ public interface IndexIO {
   public default void setGains(Slot0Configs gains) {}
 
   public default void setFeedMotorRequest(ControlRequest request) {}
+
+  public default double getSecondsSinceLastFeed() {
+    return 0.0;
+  }
 }

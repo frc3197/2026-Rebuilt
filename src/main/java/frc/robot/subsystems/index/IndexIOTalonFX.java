@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.HardwareID;
 import frc.robot.util.RealSubsystem;
 
@@ -18,14 +20,17 @@ import frc.robot.util.RealSubsystem;
 public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
 
   private final TalonFXS feedMotor;
-  private final TalonFXS spindexMotorController;
+  private final TalonFX spindexMotor;
+  private Timer feedTimer = new Timer();
 
   public IndexIOTalonFX() {
     feedMotor = new TalonFXS(IndexConstants.FEED_MOTOR_ID, HardwareID.MAIN_CANBUS);
     feedMotor.getConfigurator().apply(IndexConstants.FEED_CONFIG);
 
-    spindexMotorController = new TalonFXS(IndexConstants.SPINDEX_MOTOR_ID, HardwareID.MAIN_CANBUS);
-    spindexMotorController.getConfigurator().apply(IndexConstants.SPINDEX_CONFIG);
+    spindexMotor = new TalonFX(IndexConstants.SPINDEX_MOTOR_ID, HardwareID.MAIN_CANBUS);
+    spindexMotor.getConfigurator().apply(IndexConstants.SPINDEX_CONFIG);
+
+    feedTimer.start();
   }
 
   protected void configureHardware() {}
@@ -35,7 +40,12 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
     inputs.feedRPS = feedMotor.getVelocity().getValue().in(RotationsPerSecond);
     inputs.feedDrawAmps.mut_replace(feedMotor.getSupplyCurrent().getValue());
     inputs.feedVolts.mut_replace(feedMotor.getMotorVoltage().getValue());
-    inputs.spindexDrawAmps.mut_replace(spindexMotorController.getSupplyCurrent().getValue());
+    inputs.spindexDrawAmps.mut_replace(spindexMotor.getSupplyCurrent().getValue());
+    inputs.secondsSinceLastFeed = feedTimer.get();
+
+    if (feedMotor.getVelocity().getValue().lt(RotationsPerSecond.of(105))) {
+      feedTimer.reset();
+    }
   }
 
   @Override
@@ -45,7 +55,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
 
   @Override
   public void setSpindexMotorVoltage(Voltage volts) {
-    spindexMotorController.setControl(new VoltageOut(volts).withEnableFOC(true));
+    spindexMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
   }
 
   @Override
@@ -55,5 +65,10 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
 
   public void setFeedMotorRequest(ControlRequest request) {
     feedMotor.setControl(request);
+  }
+
+  @Override
+  public double getSecondsSinceLastFeed() {
+    return feedTimer.get();
   }
 }

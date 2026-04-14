@@ -287,7 +287,7 @@ public class ShotCalculator extends VirtualSubsystem {
         targetFlywheelVelocity.mut_replace(
             getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
       } else if (RobotState.instance().getTurretMode() == TurretMode.PASSING) {
-        targetHoodExtension.mut_replace(Millimeters.of(50));
+        targetHoodExtension.mut_replace(Millimeters.of(24));
         targetFlywheelVelocity.mut_replace(
             getTargetVeloPassing(turretToCompensatedTargetMagnitude));
       } else {
@@ -298,8 +298,10 @@ public class ShotCalculator extends VirtualSubsystem {
       }
     } else {
       // TODO FIX LATER
+      /*
       targetHoodExtension.mut_replace(
           getTargetExtensionLongHoodLow(turretToCompensatedTargetMagnitude));
+          */
     }
   }
 
@@ -370,7 +372,7 @@ public class ShotCalculator extends VirtualSubsystem {
   }
 
   private AngularVelocity getTargetVeloPassing(double distanceInMeters) {
-    double rps = MathUtil.clamp(((5.0 * distanceInMeters) + 15), 15, 50);
+    double rps = MathUtil.clamp(((5.0 * distanceInMeters) + 25), 15, 50);
     return RotationsPerSecond.of(rps);
   }
 
@@ -407,7 +409,7 @@ public class ShotCalculator extends VirtualSubsystem {
 
   public Distance getTargetHoodExtension() {
 
-    if (false
+    if (true
         && LoggingConstants.shooterCalibrationMode
         && hoodDistanceTunable.hasChanged(hashCode())) {
       this.targetHoodExtension.mut_replace(Millimeters.of(hoodDistanceTunable.getAsDouble()));

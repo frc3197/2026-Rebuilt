@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AlignClimb;
 import frc.robot.commands.AlignCommand;
+import frc.robot.commands.AutoUnbeach;
 import frc.robot.commands.DesperatelyRetractIntake;
 import frc.robot.constants.FieldConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
@@ -75,7 +76,8 @@ public class AutoLookup {
         new ParallelCommandGroup(
             loadPath("Left-Trench-Center-Trench-Shoot"),
             new SequentialCommandGroup(
-                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
+                // new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING)
+                )),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
@@ -180,16 +182,20 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.0),
+        new WaitCommand(0.35),
         new ParallelCommandGroup(
             loadPath("Left-Trench-Center-Shoot-Diamond"),
             new SequentialCommandGroup(
-                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
+                new WaitCommand(2.0),
+                // RobotContainer.setTurretMode(TurretMode.PASSING),
+                // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+                RobotContainer.setHoodMode(HoodMode.TRACKING))),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
-        new WaitCommand(3.1),
+        new WaitCommand(4.1).raceWith(new AutoUnbeach(drive)),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
@@ -198,6 +204,31 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
+  }
+
+  private Command getRightTrenchMegaDump() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(4.388, 0.664, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.35),
+        new ParallelCommandGroup(
+            loadPath("Right Trench Load Dump"),
+            new SequentialCommandGroup(
+                new WaitCommand(2.0),
+                // RobotContainer.setTurretMode(TurretMode.PASSING),
+                // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+                RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+        new AutoUnbeach(drive));
   }
 
   private Command getLeftTrenchDepot() {
@@ -252,6 +283,9 @@ public class AutoLookup {
     }
     if (auto == RealAutos.LEFT_TRENCH_DCMP) {
       return getLeftTrenchTrenchDCMP();
+    }
+    if (auto == RealAutos.Right_Trench_Mega_Dump) {
+      return getRightTrenchMegaDump();
     }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }

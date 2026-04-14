@@ -9,6 +9,7 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -29,6 +30,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -350,7 +352,8 @@ public class Drive extends SubsystemBase {
   }
 
   public Pose3d getPose3d() {
-    return new Pose3d(poseEstimator.getEstimatedPosition());
+    return new Pose3d(poseEstimator.getEstimatedPosition())
+        .rotateBy(new Rotation3d(gyroInputs.roll, gyroInputs.pitch, Radians.zero()));
   }
 
   /** Returns the current odometry rotation. */

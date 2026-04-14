@@ -54,4 +54,8 @@ public class Index extends SubsystemBase {
   public void setFeedRequest(ControlRequest request) {
     indexIO.setFeedMotorRequest(request);
   }
+
+  public double secondsSinceLastFeed() {
+    return indexIO.getSecondsSinceLastFeed();
+  }
 }

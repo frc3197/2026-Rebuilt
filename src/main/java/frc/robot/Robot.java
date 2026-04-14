@@ -13,6 +13,7 @@ import frc.robot.constants.BuildConstants;
 import frc.robot.constants.LoggingConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
+import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.IntakeSpinMode;
 import frc.robot.managersubsystems.LightManager;
 import frc.robot.managersubsystems.RobotState;
@@ -119,7 +120,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
 
-    RobotContainer.setClimbCameraMode(ClimbCameraMode.APRIL_TAGS);
+    RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {

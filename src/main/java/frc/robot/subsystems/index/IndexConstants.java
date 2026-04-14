@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -18,10 +19,17 @@ import frc.robot.HardwareID.IndexHardwareID;
 
 public class IndexConstants implements IndexHardwareID {
 
-  public static final TalonFXSConfiguration SPINDEX_CONFIG =
-      new TalonFXSConfiguration()
-          .withCommutation(
-              new CommutationConfigs().withMotorArrangement(MotorArrangementValue.Minion_JST))
+  /*
+   * public static final TalonFXSConfiguration SPINDEX_CONFIG =
+   * new TalonFXSConfiguration()
+   * .withCommutation(
+   * new
+   * CommutationConfigs().withMotorArrangement(MotorArrangementValue.Minion_JST))
+   * .withMotorOutput(new
+   * MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+   */
+  public static final TalonFXConfiguration SPINDEX_CONFIG =
+      new TalonFXConfiguration()
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
   public static final VelocityDutyCycle FEED_TORQUE_REQUEST =
@@ -75,7 +83,7 @@ public class IndexConstants implements IndexHardwareID {
 
   // VOLTAGES
   public static final Voltage SPINDEX_SHOOTING_VOLTAGE = Volts.of(8.0);
-  public static final Voltage SPINDEX_BACKFEED_VOLTAGE = Volts.of(-3.5);
+  public static final Voltage SPINDEX_BACKFEED_VOLTAGE = Volts.of(-7.0);
   public static final Voltage FEEDER_SHOOTING_VOLTAGE = Volts.of(4.5);
   public static final Voltage FEEDER_BACKFEED_VOLTAGE = Volts.of(-4.5);
 

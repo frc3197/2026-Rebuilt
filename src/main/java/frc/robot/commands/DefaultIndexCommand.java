@@ -96,10 +96,17 @@ public class DefaultIndexCommand extends Command {
         index.setSpindexMotor(Volts.of(0.0));
         break;
       case FRENZY:
+        if (DriverStation.isAutonomous()
+            && RobotState.instance().getTurretMode() == TurretMode.PASSING) {
+          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+          break;
+        }
         if (ShotCalculator.instance().getReadyToFeed()) {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
-          if ((DriverStation.isAutonomous() && autoBackfeedTimer.get() % 2 < 0.2)) {
+          if ((DriverStation.isAutonomous()
+              && autoBackfeedTimer.get() % 2 < 0.7
+              && index.secondsSinceLastFeed() > 0.67)) {
             index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
           } else {
             index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
@@ -124,9 +131,10 @@ public class DefaultIndexCommand extends Command {
         } else {
           index.setFeedMotor(Volts.of(0.0));
           /*
-          index.setFeedRequest(
-              IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
-              */
+           * index.setFeedRequest(
+           * IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.
+           * FEEDER_SHOOTING_RPS));
+           */
           index.setSpindexMotor(Volts.of(0.0));
         }
         break;

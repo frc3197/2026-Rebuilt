@@ -6,8 +6,10 @@ public enum RealAutos {
   Right_Bump_Climb,
   Right_Bump_Outpost,
   Left_Depot_Climb,
+  Right_Trench_Mega_Dump,
   Preload_Climb_Auto,
   Left_Bump_Double_Swipe,
   Left_Trench_Double_Swipe,
+  Left_Trench_Mega_Pass_Single,
   Left_Trench_Swipe_Depot
 }

@@ -308,17 +308,20 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Real auto routines
-    autoChooser.addOption("LEFT_TRENCH_DCMP", autoLookup.getAuto(RealAutos.LEFT_TRENCH_DCMP));
+    // autoChooser.addOption("LEFT_TRENCH_DCMP", autoLookup.getAuto(RealAutos.LEFT_TRENCH_DCMP));
     // autoChooser.addOption("Left Depot CLIMB", autoLookup.getAuto(RealAutos.Left_Depot_Climb));
+    // autoChooser.addOption("Right Bump Twice",
+    // autoLookup.getAuto(RealAutos.Right_Bump_Double_Swipe));
+    // autoChooser.addOption("Right Bump Outpost",
+    // autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
     autoChooser.addOption(
-        "Right Bump Twice", autoLookup.getAuto(RealAutos.Right_Bump_Double_Swipe));
-    autoChooser.addOption("Right Bump Outpost", autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
+        "Right Trench Mega Dump", autoLookup.getAuto(RealAutos.Right_Trench_Mega_Dump));
     // autoChooser.addOption("Right Bump CLIMB", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
     // autoChooser.addOption("Preload Climb", autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
     autoChooser.addOption(
         "Left Trench Double Swipe", autoLookup.getAuto(RealAutos.Left_Trench_Double_Swipe));
-    autoChooser.addOption(
-        "Left Trench Swipt Depot", autoLookup.getAuto(RealAutos.Left_Trench_Swipe_Depot));
+    // autoChooser.addOption("Left Trench Swipt Depot",
+    // autoLookup.getAuto(RealAutos.Left_Trench_Swipe_Depot));
 
     seedRightAutoRed.onTrue(
         autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));
