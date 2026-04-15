@@ -99,11 +99,11 @@ public class Turret extends SubsystemBase {
         .gt(ShooterConstants.TURRET_SPRING_ANGLE_ZERO)) {
       double rot = turretIO.getTurretParameters().turretRotation.in(Radians);
       double value = 9.21 + (4.17 * rot) - (2.66 * Math.pow(rot, 2));
-      return Amps.of(MathUtil.clamp(value * 7.1, 0, 71.0));
+      return Amps.of(MathUtil.clamp(value * 3.2, 0, 71.0));
     } else {
       double rot = turretIO.getTurretParameters().turretRotation.in(Radians);
       double value = 0.3 + (61.9 * rot) + (14.5 * Math.pow(rot, 2));
-      return Amps.of(MathUtil.clamp(value * 7.1, -105.5, 0));
+      return Amps.of(MathUtil.clamp(value * 1.25, -105.5, 0));
     }
   }
 

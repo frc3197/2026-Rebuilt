@@ -35,16 +35,16 @@ public class Index extends SubsystemBase {
     return Commands.runOnce(() -> indexIO.setFeedMotorVoltage(volts), this);
   }
 
-  public Command setSpindexMotorCommand(Voltage volts) {
-    return Commands.runOnce(() -> indexIO.setSpindexMotorVoltage(volts), this);
+  public Command setSpindexMotorTargetCommand(Voltage volts) {
+    return Commands.runOnce(() -> indexIO.setSpindexMotorTargetVoltage(volts), this);
   }
 
   public void setFeedMotor(Voltage volts) {
     indexIO.setFeedMotorVoltage(volts);
   }
 
-  public void setSpindexMotor(Voltage volts) {
-    indexIO.setSpindexMotorVoltage(volts);
+  public void setSpindexMotorTargetVoltage(Voltage volts) {
+    indexIO.setSpindexMotorTargetVoltage(volts);
   }
 
   public void setGains(Slot0Configs gains) {

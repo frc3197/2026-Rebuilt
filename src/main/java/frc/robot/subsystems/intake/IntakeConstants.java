@@ -52,7 +52,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final MotionMagicTorqueCurrentFOC INTAKE_MOTION_MAGIC_REQUEST =
       new MotionMagicTorqueCurrentFOC(Degrees.of(0.0));
 
-  private static final double kP_DEPLOY = 250;
+  private static final double kP_DEPLOY = 400;
   private static final double kG_DEPLOY = 2;
   public static final Slot0Configs DEPLOY_MOTOR_GAINS =
       new Slot0Configs()

@@ -11,6 +11,8 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.HardwareID;
@@ -23,6 +25,9 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   private final TalonFX spindexMotor;
   private Timer feedTimer = new Timer();
 
+  private final SlewRateLimiter spindexVoltageLimiter = new SlewRateLimiter(0.2);
+  private double targetSpindexVoltage = 0.0;
+
   public IndexIOTalonFX() {
     feedMotor = new TalonFXS(IndexConstants.FEED_MOTOR_ID, HardwareID.MAIN_CANBUS);
     feedMotor.getConfigurator().apply(IndexConstants.FEED_CONFIG);
@@ -33,7 +38,8 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
     feedTimer.start();
   }
 
-  protected void configureHardware() {}
+  protected void configureHardware() {
+  }
 
   @Override
   public void updateInputs(IndexInputs inputs) {
@@ -46,6 +52,8 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
     if (feedMotor.getVelocity().getValue().lt(RotationsPerSecond.of(105))) {
       feedTimer.reset();
     }
+
+    spindexMotor.setControl(new VoltageOut(spindexVoltageLimiter.calculate(targetSpindexVoltage)).withEnableFOC(true));
   }
 
   @Override
@@ -54,8 +62,13 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   }
 
   @Override
-  public void setSpindexMotorVoltage(Voltage volts) {
-    spindexMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
+  public void setSpindexMotorVoltageOld(Voltage volts) {
+    // spindexMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
+  }
+
+  @Override
+  public void setSpindexMotorTargetVoltage(Voltage volts) {
+    targetSpindexVoltage = volts.magnitude();
   }
 
   @Override
@@ -63,6 +76,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
     feedMotor.getConfigurator().apply(gains);
   }
 
+  @Override
   public void setFeedMotorRequest(ControlRequest request) {
     feedMotor.setControl(request);
   }

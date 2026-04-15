@@ -74,7 +74,7 @@ public class DefaultIndexCommand extends Command {
           DriverStation.isAutonomous()
               ? IndexConstants.FEEDER_SHOOTING_VOLTAGE
               : IndexConstants.FEEDER_BACKFEED_VOLTAGE);
-      index.setSpindexMotor(
+      index.setSpindexMotorTargetVoltage(
           DriverStation.isAutonomous()
               ? IndexConstants.SPINDEX_SHOOTING_VOLTAGE
               : IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
@@ -89,16 +89,16 @@ public class DefaultIndexCommand extends Command {
     switch (RobotState.instance().getFlywheelMode()) {
       case IDLE:
         index.setFeedMotor(Volts.of(0.0));
-        index.setSpindexMotor(Volts.of(0.0));
+        index.setSpindexMotorTargetVoltage(Volts.of(0.0));
         break;
       case PREPARE:
         index.setFeedMotor(Volts.of(0.0));
-        index.setSpindexMotor(Volts.of(0.0));
+        index.setSpindexMotorTargetVoltage(Volts.of(0.0));
         break;
       case FRENZY:
         if (DriverStation.isAutonomous()
             && RobotState.instance().getTurretMode() == TurretMode.PASSING) {
-          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+          index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           break;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
@@ -107,24 +107,24 @@ public class DefaultIndexCommand extends Command {
           if ((DriverStation.isAutonomous()
               && autoBackfeedTimer.get() % 2 < 0.7
               && index.secondsSinceLastFeed() > 0.67)) {
-            index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
+            index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
           } else {
-            index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+            index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           }
         } else {
           index.setFeedMotor(Volts.of(0.0));
-          index.setSpindexMotor(Volts.of(0.0));
+          index.setSpindexMotorTargetVoltage(Volts.of(0.0));
         }
         break;
       case SHOOTING:
         if (RobotState.instance().getTurretMode() == TurretMode.MANUAL) {
           index.setFeedRequest(
               IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
-          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+          index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           return;
         }
         if (ShotCalculator.instance().getReadyToFeed()) {
-          index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+          index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
           // index.setFeedMotor(Volts.of(10.0));
           // index.setFeedRequest(IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.FEEDER_SHOOTING_RPS));
           index.setFeedRequest(new VoltageOut(12.0).withEnableFOC(true));
@@ -135,7 +135,7 @@ public class DefaultIndexCommand extends Command {
            * IndexConstants.FEED_TORQUE_REQUEST.withVelocity(IndexConstants.
            * FEEDER_SHOOTING_RPS));
            */
-          index.setSpindexMotor(Volts.of(0.0));
+          index.setSpindexMotorTargetVoltage(Volts.of(0.0));
         }
         break;
       default:

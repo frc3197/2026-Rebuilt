@@ -30,7 +30,9 @@ public interface IndexIO {
 
   public default void setFeedMotorVoltage(Voltage volts) {}
 
-  public default void setSpindexMotorVoltage(Voltage volts) {}
+  public default void setSpindexMotorVoltageOld(Voltage volts) {}
+
+  public default void setSpindexMotorTargetVoltage(Voltage volts) {}
 
   public default void setGains(Slot0Configs gains) {}
 

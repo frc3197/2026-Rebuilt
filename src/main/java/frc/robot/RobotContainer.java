@@ -567,7 +567,7 @@ public class RobotContainer {
             Commands.run(
                     () -> {
                       index.setFeedMotor(IndexConstants.FEEDER_BACKFEED_VOLTAGE);
-                      index.setSpindexMotor(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
+                      index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_BACKFEED_VOLTAGE);
                     },
                     index)
                 .alongWith(
@@ -581,7 +581,7 @@ public class RobotContainer {
             Commands.runOnce(
                     () -> {
                       index.setFeedMotor(Volts.of(0.0));
-                      index.setSpindexMotor(Volts.of(0.0));
+                      index.setSpindexMotorTargetVoltage(Volts.of(0.0));
                     },
                     index)
                 .andThen(
@@ -600,14 +600,14 @@ public class RobotContainer {
                   index.setFeedRequest(
                       IndexConstants.FEED_TORQUE_REQUEST.withVelocity(
                           IndexConstants.FEEDER_SHOOTING_RPS));
-                  index.setSpindexMotor(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
+                  index.setSpindexMotorTargetVoltage(IndexConstants.SPINDEX_SHOOTING_VOLTAGE);
                 },
                 index))
         .onFalse(
             Commands.runOnce(
                 () -> {
                   index.setFeedMotor(Volts.of(0.0));
-                  index.setSpindexMotor(Volts.of(0.0));
+                  index.setSpindexMotorTargetVoltage(Volts.of(0.0));
                 },
                 index));
   }
