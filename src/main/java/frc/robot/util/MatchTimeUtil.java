@@ -120,6 +120,10 @@ public class MatchTimeUtil extends VirtualSubsystem {
   }
 
   public BooleanSupplier aboutToBecomeActiveSupplier() {
-    return () -> matchPeriod == MatchPeriod.ABOUT_TO_BE_ACTIVE && !DriverStation.isTest();
+    return () -> (matchPeriod == MatchPeriod.ABOUT_TO_BE_ACTIVE) && !DriverStation.isTest();
+  }
+
+  public BooleanSupplier inactiveSupplier() {
+    return () -> matchPeriod == MatchPeriod.INACTIVE && !DriverStation.isTest();
   }
 }

@@ -103,7 +103,7 @@ public class Turret extends SubsystemBase {
     } else {
       double rot = turretIO.getTurretParameters().turretRotation.in(Radians);
       double value = 0.3 + (61.9 * rot) + (14.5 * Math.pow(rot, 2));
-      return Amps.of(MathUtil.clamp(value * 1.25, -105.5, 0));
+      return Amps.of(MathUtil.clamp(value * 1.0, -105.5, 0));
     }
   }
 

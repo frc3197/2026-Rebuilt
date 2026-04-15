@@ -287,7 +287,7 @@ public class ShotCalculator extends VirtualSubsystem {
         targetFlywheelVelocity.mut_replace(
             getTargetVeloLongHoodLow(turretToCompensatedTargetMagnitude));
       } else if (RobotState.instance().getTurretMode() == TurretMode.PASSING) {
-        targetHoodExtension.mut_replace(Millimeters.of(24));
+        targetHoodExtension.mut_replace(Millimeters.of(22));
         targetFlywheelVelocity.mut_replace(
             getTargetVeloPassing(turretToCompensatedTargetMagnitude));
       } else {
@@ -380,7 +380,7 @@ public class ShotCalculator extends VirtualSubsystem {
     // For appleton
     // double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
 
-    double rps = MathUtil.clamp(((4.15 * distanceInMeters) + 26.7), 5, 80);
+    double rps = MathUtil.clamp(((4.15 * distanceInMeters) + 26.3), 5, 80);
 
     return RotationsPerSecond.of(rps);
   }

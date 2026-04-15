@@ -27,8 +27,16 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
 
   @Override
   protected void configureHardware() {
-    flywheelLeftMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_LEFT_TALON_FX_CONFIG);
-    flywheelRightMotor.getConfigurator().apply(ShooterConstants.FLYWHEEL_RIGHT_TALON_FX_CONFIG);
+    flywheelLeftMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_LEFT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.ACTIVE_FLYWHEEL_LIMITS));
+    flywheelRightMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_RIGHT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.ACTIVE_FLYWHEEL_LIMITS));
   }
 
   @Override
@@ -55,5 +63,33 @@ public class FlywheelTalonFX extends RealSubsystem implements FlywheelIO {
   public void updateFlywheelSlot0Configs(Slot0Configs newConfig) {
     flywheelLeftMotor.getConfigurator().apply(newConfig);
     flywheelRightMotor.getConfigurator().apply(newConfig);
+  }
+
+  @Override
+  public void setActive() {
+    flywheelLeftMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_LEFT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.ACTIVE_FLYWHEEL_LIMITS));
+    flywheelRightMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_RIGHT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.ACTIVE_FLYWHEEL_LIMITS));
+  }
+
+  @Override
+  public void setInactive() {
+    flywheelLeftMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_LEFT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.INACTIVE_FLYWHEEL_LIMITS));
+    flywheelRightMotor
+        .getConfigurator()
+        .apply(
+            ShooterConstants.FLYWHEEL_RIGHT_TALON_FX_CONFIG.withCurrentLimits(
+                ShooterConstants.INACTIVE_FLYWHEEL_LIMITS));
   }
 }

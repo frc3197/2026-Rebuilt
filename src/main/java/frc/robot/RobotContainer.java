@@ -164,6 +164,8 @@ public class RobotContainer {
   private final Trigger aboutToBeActive =
       new Trigger(MatchTimeUtil.instance().aboutToBecomeActiveSupplier());
 
+  private final Trigger nowInactive = new Trigger(MatchTimeUtil.instance().inactiveSupplier());
+
   // Start flopping the intake when the shooter is spooling and the robot is below
   // a certain speed
   private final Trigger startFlopping =
@@ -302,22 +304,26 @@ public class RobotContainer {
     }
 
     // Initialize auto lookup with appropriate subsystems
-    this.autoLookup = new AutoLookup(align, climber, drive, turret, quest, vision);
+    this.autoLookup = new AutoLookup(align, climber, drive, turret, quest, vision, flywheel);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Real auto routines
-    // autoChooser.addOption("LEFT_TRENCH_DCMP", autoLookup.getAuto(RealAutos.LEFT_TRENCH_DCMP));
-    // autoChooser.addOption("Left Depot CLIMB", autoLookup.getAuto(RealAutos.Left_Depot_Climb));
+    // autoChooser.addOption("LEFT_TRENCH_DCMP",
+    // autoLookup.getAuto(RealAutos.LEFT_TRENCH_DCMP));
+    // autoChooser.addOption("Left Depot CLIMB",
+    // autoLookup.getAuto(RealAutos.Left_Depot_Climb));
     // autoChooser.addOption("Right Bump Twice",
     // autoLookup.getAuto(RealAutos.Right_Bump_Double_Swipe));
     // autoChooser.addOption("Right Bump Outpost",
     // autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
     autoChooser.addOption(
         "Right Trench Mega Dump", autoLookup.getAuto(RealAutos.Right_Trench_Mega_Dump));
-    // autoChooser.addOption("Right Bump CLIMB", autoLookup.getAuto(RealAutos.Right_Bump_Climb));
-    // autoChooser.addOption("Preload Climb", autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
+    // autoChooser.addOption("Right Bump CLIMB",
+    // autoLookup.getAuto(RealAutos.Right_Bump_Climb));
+    // autoChooser.addOption("Preload Climb",
+    // autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
     autoChooser.addOption(
         "Left Trench Double Swipe", autoLookup.getAuto(RealAutos.Left_Trench_Double_Swipe));
     // autoChooser.addOption("Left Trench Swipt Depot",
@@ -655,14 +661,18 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     () -> {
-                      if (RobotState.instance().getFlywheelMode() == FlywheelMode.IDLE) {
-                        // RobotState.instance().setFlywheelMode(FlywheelMode.PREPARE);
-                      }
+                      flywheel.setActive();
                     })
                 .andThen(
                     Commands.runOnce(
                         () -> driveController.setRumble(RumbleType.kBothRumble, 0.67))))
         .onFalse(Commands.runOnce(() -> driveController.setRumble(RumbleType.kBothRumble, 0.0)));
+
+    nowInactive.onTrue(
+        Commands.runOnce(
+            () -> {
+              flywheel.setInactive();
+            }));
 
     hoodDownTrigger.onTrue(
         Commands.runOnce(

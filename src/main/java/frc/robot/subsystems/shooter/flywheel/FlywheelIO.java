@@ -36,4 +36,8 @@ public interface FlywheelIO {
   public default void setFlywheelOutput(ControlRequest request) {}
 
   public default void updateInputs(FlywheelInputs inputs) {}
+
+  public default void setActive() {}
+
+  public default void setInactive() {}
 }

@@ -191,14 +191,22 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   // Manual preset flywheel speed
   public static final Voltage FLYWHEEL_VOLTAGE_SHORT_SHOT_POPCORN = Volts.of(3.50);
 
+  public static final CurrentLimitsConfigs ACTIVE_FLYWHEEL_LIMITS =
+      new CurrentLimitsConfigs()
+          .withStatorCurrentLimit(110.0)
+          .withStatorCurrentLimitEnable(true)
+          .withSupplyCurrentLimit(55.0)
+          .withSupplyCurrentLimitEnable(true);
+
+  public static final CurrentLimitsConfigs INACTIVE_FLYWHEEL_LIMITS =
+      new CurrentLimitsConfigs()
+          .withStatorCurrentLimit(100.0)
+          .withStatorCurrentLimitEnable(true)
+          .withSupplyCurrentLimit(30.0)
+          .withSupplyCurrentLimitEnable(true);
+
   public static final TalonFXConfiguration FLYWHEEL_LEFT_TALON_FX_CONFIG =
       new TalonFXConfiguration()
-          .withCurrentLimits(
-              new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(130.0)
-                  .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(60.0)
-                  .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
                   .withNeutralMode(NeutralModeValue.Coast)
@@ -209,12 +217,6 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final TalonFXConfiguration FLYWHEEL_RIGHT_TALON_FX_CONFIG =
       new TalonFXConfiguration()
-          .withCurrentLimits(
-              new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(130.0)
-                  .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(60.0)
-                  .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()
                   .withNeutralMode(NeutralModeValue.Coast)

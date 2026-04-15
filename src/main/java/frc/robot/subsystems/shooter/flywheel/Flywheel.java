@@ -40,4 +40,12 @@ public class Flywheel extends SubsystemBase {
   public void setGains(Slot0Configs gains) {
     flywheelIO.updateFlywheelSlot0Configs(gains);
   }
+
+  public void setActive() {
+    flywheelIO.setActive();
+  }
+
+  public void setInactive() {
+    flywheelIO.setInactive();
+  }
 }

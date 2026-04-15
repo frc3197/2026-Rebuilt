@@ -77,6 +77,7 @@ public class DefaultIntakeCommand extends Command {
   }
 
   private void intakeSpinLogic() {
+
     switch (RobotState.instance().getIntakeSpinMode()) {
       case IDLE:
         if (RobotState.instance().getIntakeDeployMode() == IntakeDeployMode.DEPLOYING

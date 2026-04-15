@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,7 +24,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   private final TalonFX spindexMotor;
   private Timer feedTimer = new Timer();
 
-  private final SlewRateLimiter spindexVoltageLimiter = new SlewRateLimiter(0.2);
+  private final SlewRateLimiter spindexVoltageLimiter = new SlewRateLimiter(8.0);
   private double targetSpindexVoltage = 0.0;
 
   public IndexIOTalonFX() {
@@ -38,8 +37,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
     feedTimer.start();
   }
 
-  protected void configureHardware() {
-  }
+  protected void configureHardware() {}
 
   @Override
   public void updateInputs(IndexInputs inputs) {
@@ -53,7 +51,8 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
       feedTimer.reset();
     }
 
-    spindexMotor.setControl(new VoltageOut(spindexVoltageLimiter.calculate(targetSpindexVoltage)).withEnableFOC(true));
+    spindexMotor.setControl(
+        new VoltageOut(spindexVoltageLimiter.calculate(targetSpindexVoltage)).withEnableFOC(true));
   }
 
   @Override

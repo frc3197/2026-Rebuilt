@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.quest.Quest;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.turret.Turret;
 import frc.robot.subsystems.vision.Vision;
 import java.io.IOException;
@@ -52,15 +54,23 @@ public class AutoLookup {
   private final Turret turret;
   private final Quest quest;
   private final Vision vision;
+  private final Flywheel flywheel;
 
   public AutoLookup(
-      Align align, Climber climber, Drive drive, Turret turret, Quest quest, Vision vision) {
+      Align align,
+      Climber climber,
+      Drive drive,
+      Turret turret,
+      Quest quest,
+      Vision vision,
+      Flywheel flywheel) {
     this.align = align;
     this.climber = climber;
     this.drive = drive;
     this.turret = turret;
     this.quest = quest;
     this.vision = vision;
+    this.flywheel = flywheel;
   }
 
   private Command getLeftTrenchTrenchDCMP() {
@@ -304,6 +314,10 @@ public class AutoLookup {
   private SequentialCommandGroup getCommonCommands() {
     return new SequentialCommandGroup(
         turret.zeroTurretPositionCommand(),
+        new InstantCommand(
+            () -> {
+              flywheel.setActive();
+            }),
         RobotContainer.setClimbCameraMode(ClimbCameraMode.APRIL_TAGS),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
