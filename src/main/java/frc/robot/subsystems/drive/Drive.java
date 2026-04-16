@@ -229,8 +229,8 @@ public class Drive extends SubsystemBase {
       }
 
       // Apply update & update robot state
-      Pose2d updatedPose =
-          poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+
+      poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     RobotState.instance().setRobotPose(poseEstimator.getEstimatedPosition());

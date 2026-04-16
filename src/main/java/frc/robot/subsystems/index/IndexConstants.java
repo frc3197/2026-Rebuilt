@@ -63,7 +63,7 @@ public class IndexConstants implements IndexHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(100)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(100)
+                  .withSupplyCurrentLimit(55)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()

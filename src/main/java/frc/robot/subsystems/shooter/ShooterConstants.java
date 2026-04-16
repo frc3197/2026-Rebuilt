@@ -193,14 +193,14 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
 
   public static final CurrentLimitsConfigs ACTIVE_FLYWHEEL_LIMITS =
       new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(110.0)
+          .withStatorCurrentLimit(100.0)
           .withStatorCurrentLimitEnable(true)
-          .withSupplyCurrentLimit(55.0)
+          .withSupplyCurrentLimit(45.0)
           .withSupplyCurrentLimitEnable(true);
 
   public static final CurrentLimitsConfigs INACTIVE_FLYWHEEL_LIMITS =
       new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(100.0)
+          .withStatorCurrentLimit(90.0)
           .withStatorCurrentLimitEnable(true)
           .withSupplyCurrentLimit(30.0)
           .withSupplyCurrentLimitEnable(true);

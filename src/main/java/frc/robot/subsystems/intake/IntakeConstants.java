@@ -66,7 +66,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(45)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(45)
+                  .withSupplyCurrentLimit(35)
                   .withSupplyCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()
@@ -86,7 +86,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(70)
+                  .withStatorCurrentLimit(50)
                   .withStatorCurrentLimitEnable(true)
                   .withSupplyCurrentLimit(30)
                   .withSupplyCurrentLimitEnable(true))
