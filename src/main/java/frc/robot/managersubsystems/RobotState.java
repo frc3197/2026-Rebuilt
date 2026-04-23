@@ -84,6 +84,16 @@ public class RobotState extends VirtualSubsystem {
 
   private boolean questConnected = false;
 
+  private Pose3d robotPose3D = new Pose3d();
+
+  public Pose3d getRobotPose3D() {
+    return robotPose3D;
+  }
+
+  public void setRobotPose3D(Pose3d robotPose3D) {
+    this.robotPose3D = robotPose3D;
+  }
+
   private RobotState(String key) {
     this.key = key;
   }
@@ -256,6 +266,7 @@ public class RobotState extends VirtualSubsystem {
     Logger.recordOutput("RobotState/Modes/Hood Mode", hoodMode);
     Logger.recordOutput("RobotState/Modes/Climber Cam Mode", climbCameraMode);
 
+    Logger.recordOutput("RobotState/Drivetrain/Robot Pose 3D", robotPose3D);
     Logger.recordOutput("RobotState/Drivetrain/Robot Pose", robotFieldPose);
     Logger.recordOutput("RobotState/Drivetrain/Robot Velocity", robotVelocity);
     Logger.recordOutput("RobotState/Drivetrain/Robot Acceleration", robotAcceleration);

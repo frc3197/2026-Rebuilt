@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.LimelightHelpers;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,8 @@ public class VisionIOLimelight implements VisionIO {
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
     pipelineSetter = NetworkTableInstance.getDefault().getTable(name).getEntry("pipeline");
+
+    LimelightHelpers.SetIMUMode("", 4);
   }
 
   @Override

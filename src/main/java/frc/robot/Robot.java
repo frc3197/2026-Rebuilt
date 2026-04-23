@@ -15,7 +15,6 @@ import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.IntakeDeployMode;
 import frc.robot.enums.Modes.IntakeSpinMode;
-import frc.robot.managersubsystems.LightManager;
 import frc.robot.managersubsystems.RobotState;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.MatchTimeUtil;
@@ -80,7 +79,7 @@ public class Robot extends LoggedRobot {
     ShotCalculator.instance();
     RobotState.instance();
     MatchTimeUtil.instance();
-    LightManager.instance();
+    // LightManager.instance();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.

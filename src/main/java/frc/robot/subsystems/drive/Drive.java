@@ -233,7 +233,9 @@ public class Drive extends SubsystemBase {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
-    RobotState.instance().setRobotPose(poseEstimator.getEstimatedPosition());
+    Pose3d tempPose = getPose3d();
+    RobotState.instance().setRobotPose3D(tempPose);
+    RobotState.instance().setRobotPose(tempPose.toPose2d());
     RobotState.instance().setRobotVelocity(getChassisSpeeds());
     RobotState.instance().setRobotAccelerations(gyroInputs.accelerations);
 
