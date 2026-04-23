@@ -192,7 +192,7 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.2),
+        new WaitCommand(0.05),
         new ParallelCommandGroup(
             loadPath("Left-Trench-Center-Shoot-Diamond"),
             new SequentialCommandGroup(
@@ -209,7 +209,9 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        loadPath("Left-Trench-Shoot-Center-Shoot"),
+        // loadPath("Left-Trench-Shoot-Center-Shoot"),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        loadPath("Left-Trench-Made-DCMP"),
         RobotContainer.setHoodMode(HoodMode.TRACKING),
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
@@ -225,7 +227,7 @@ public class AutoLookup {
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.25),
+        new WaitCommand(0.05),
         new ParallelCommandGroup(
             loadPath("Right Trench Load Dump"),
             new SequentialCommandGroup(
