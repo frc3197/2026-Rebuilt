@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
@@ -21,8 +23,8 @@ public interface GyroIO {
     public double[] odometryYawTimestamps = new double[] {};
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
     public ChassisSpeeds accelerations = new ChassisSpeeds(0, 0, 0);
-    public Angle pitch;
-    public Angle roll;
+    public Angle pitch = Degrees.zero();
+    public Angle roll = Degrees.zero();
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
