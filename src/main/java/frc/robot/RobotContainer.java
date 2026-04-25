@@ -181,10 +181,12 @@ public class RobotContainer {
   private final Trigger hoodDownTrigger =
       new Trigger(
           () -> {
+            if (isRed()) {
+              return RobotState.instance().robotNearBottomRedTrench()
+                  || RobotState.instance().robotNearTopRedTrench();
+            }
             return RobotState.instance().robotNearBottomBlueTrench()
-                || RobotState.instance().robotNearTopBlueTrench()
-                || RobotState.instance().robotNearBottomRedTrench()
-                || RobotState.instance().robotNearTopRedTrench();
+                || RobotState.instance().robotNearTopBlueTrench();
           });
 
   public RobotContainer() {
@@ -310,24 +312,19 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Real auto routines
-    // autoChooser.addOption("LEFT_TRENCH_DCMP",
-    // autoLookup.getAuto(RealAutos.LEFT_TRENCH_DCMP));
-    // autoChooser.addOption("Left Depot CLIMB",
-    // autoLookup.getAuto(RealAutos.Left_Depot_Climb));
-    // autoChooser.addOption("Right Bump Twice",
-    // autoLookup.getAuto(RealAutos.Right_Bump_Double_Swipe));
-    // autoChooser.addOption("Right Bump Outpost",
-    // autoLookup.getAuto(RealAutos.Right_Bump_Outpost));
     autoChooser.addOption(
         "Right Trench Mega Dump", autoLookup.getAuto(RealAutos.Right_Trench_Mega_Dump));
-    // autoChooser.addOption("Right Bump CLIMB",
-    // autoLookup.getAuto(RealAutos.Right_Bump_Climb));
-    // autoChooser.addOption("Preload Climb",
-    // autoLookup.getAuto(RealAutos.Preload_Climb_Auto));
+
     autoChooser.addOption(
         "Left Trench Double Swipe", autoLookup.getAuto(RealAutos.Left_Trench_Double_Swipe));
-    // autoChooser.addOption("Left Trench Swipt Depot",
-    // autoLookup.getAuto(RealAutos.Left_Trench_Swipe_Depot));
+
+    autoChooser.addOption(
+        "Center Hub Left Trench Flex",
+        autoLookup.getAuto(RealAutos.CMP_Center_Left_Trench_Hub_Bump_Shoot));
+
+    autoChooser.addOption(
+        "Center Hub RIGHT Trench Flex",
+        autoLookup.getAuto(RealAutos.CMP_Center_Right_Trench_Hub_Bump_Shoot));
 
     seedRightAutoRed.onTrue(
         autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));

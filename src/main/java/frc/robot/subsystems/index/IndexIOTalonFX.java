@@ -24,7 +24,7 @@ public class IndexIOTalonFX extends RealSubsystem implements IndexIO {
   private final TalonFX spindexMotor;
   private Timer feedTimer = new Timer();
 
-  private final SlewRateLimiter spindexVoltageLimiter = new SlewRateLimiter(10.0);
+  private final SlewRateLimiter spindexVoltageLimiter = new SlewRateLimiter(15.0);
   private double targetSpindexVoltage = 0.0;
 
   public IndexIOTalonFX() {

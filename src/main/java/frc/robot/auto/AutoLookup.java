@@ -143,7 +143,55 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
         new WaitCommand(0.05),
         new ParallelCommandGroup(
-            loadPath("CMP-Center-Trench-Bump-Shoot"),
+            loadPath("CMP-Center-Left-Trench-Bump-Shoot"),
+            new SequentialCommandGroup(
+                new WaitCommand(8.0),
+                // RobotContainer.setTurretMode(TurretMode.PASSING),
+                // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+                RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.OUTTAKING),
+        // RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+
+        // Flexible delay
+        new AutoUnbeach(drive).raceWith(new WaitCommand(7.0)),
+
+        // Flexible trench
+        new SequentialCommandGroup(
+                RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+                RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+                RobotContainer.setHoodMode(HoodMode.DOWN),
+                RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+                loadPath("Center-Left-Trench-Flex-Part-2"))
+            .onlyIf(() -> false),
+        new WaitCommand(0.0),
+
+        // Flexible depot
+        new SequentialCommandGroup(
+                RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+                RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+                RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+                loadPath("Center-Left-Depot-Flex-Part-2"),
+                RobotContainer.setFlywheelMode(FlywheelMode.PREPARE))
+            .onlyIf(() -> false),
+        new WaitCommand(0.0));
+  }
+
+  private Command getCenterRightTrenchHubBumpShoot() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(3.534, 4.054, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.05),
+        new ParallelCommandGroup(
+            loadPath("CMP-Center-Right-Trench-Bump-Shoot"),
             new SequentialCommandGroup(
                 new WaitCommand(8.0),
                 // RobotContainer.setTurretMode(TurretMode.PASSING),
@@ -154,7 +202,12 @@ public class AutoLookup {
         RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
         RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
         RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
-        new AutoUnbeach(drive));
+
+        // Flexible delay
+        new AutoUnbeach(drive).raceWith(new WaitCommand(7.0)),
+
+        // Flexible trench
+        new WaitCommand(0.0));
   }
 
   public Command getAuto(RealAutos auto) {
@@ -166,6 +219,9 @@ public class AutoLookup {
     }
     if (auto == RealAutos.Right_Trench_Mega_Dump) {
       return getRightTrenchMegaDump();
+    }
+    if (auto == RealAutos.CMP_Center_Right_Trench_Hub_Bump_Shoot) {
+      return getCenterRightTrenchHubBumpShoot();
     }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }

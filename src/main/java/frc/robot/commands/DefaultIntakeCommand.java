@@ -23,6 +23,7 @@ public class DefaultIntakeCommand extends Command {
   private final Intake intake;
 
   private Timer flopTImer = new Timer();
+  // private Timer backfeedTimer = new Timer();
 
   private final LoggedTunableNumber deployKs =
       new LoggedTunableNumber("Intake deploy ks", IntakeConstants.DEPLOY_MOTOR_GAINS.kS);

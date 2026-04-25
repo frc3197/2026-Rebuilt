@@ -45,7 +45,8 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   // Physical
   public static final Distance FUEL_RELEASE_HEIGHT = Inches.of(20);
 
-  public static final double MAX_SPEED_WHILE_SHOOTING_MPS = 1.0;
+  // Was 1 before CMP
+  public static final double MAX_SPEED_WHILE_SHOOTING_MPS = 1.5;
   public static final double MAX_OMEGA_WHILE_SHOOTING_RADPS = 2.0;
 
   // Thresholds
