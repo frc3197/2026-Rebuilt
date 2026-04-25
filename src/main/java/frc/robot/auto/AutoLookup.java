@@ -21,7 +21,6 @@ import frc.robot.commands.AlignClimb;
 import frc.robot.commands.AlignCommand;
 import frc.robot.commands.AutoUnbeach;
 import frc.robot.commands.DesperatelyRetractIntake;
-import frc.robot.constants.FieldConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
 import frc.robot.enums.Modes.HoodMode;
@@ -71,116 +70,6 @@ public class AutoLookup {
     this.quest = quest;
     this.vision = vision;
     this.flywheel = flywheel;
-  }
-
-  private Command getLeftTrenchTrenchDCMP() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(4.414, 7.431, Rotation2d.k180deg)),
-        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        RobotContainer.setHoodMode(HoodMode.DOWN),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.0),
-        new ParallelCommandGroup(
-            loadPath("Left-Trench-Center-Trench-Shoot"),
-            new SequentialCommandGroup(
-                // new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING)
-                )),
-        RobotContainer.setHoodMode(HoodMode.TRACKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
-        new WaitCommand(6.5));
-  }
-
-  private Command getRightBumpOutpostAuto() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        new WaitCommand(2.0),
-        loadPath("Start-Neutral-Shoot-Outpost"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(0.8),
-        loadPath("Right-Outpost"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY));
-  }
-
-  private Command getRightBumpDoubleSwipeAuto() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        new WaitCommand(2.0),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        loadPath("Start-Neutral-Right-Double"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(3.75),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
-        loadPath("Neutral-Shoot-2"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY));
-  }
-
-  private Command getPreloadClimb() {
-    return new SequentialCommandGroup(
-        getCommonCommandsNew(),
-        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
-        // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setTurretMode(TurretMode.IDLE),
-        // new WaitCommand(2.0),
-        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        loadPath("Preload-Climb"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(5.0),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.OUTTAKING),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
-        getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_RIGHT),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
-  }
-
-  private Command getRightBumpCLIMBAuto() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)),
-        // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setTurretMode(TurretMode.IDLE),
-        // new WaitCommand(2.0),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        loadPath("Start-Neutral-Shoot-Climb"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(5.25),
-        // RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.OUTTAKING),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.RETRACTING),
-        getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_RIGHT),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE));
-  }
-
-  private Command getLeftBumpDepotClimb() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(3.625, 5.594, Rotation2d.kZero)),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        new WaitCommand(2.0),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
-        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
-        loadPath("Left Bump Depot"),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        new WaitCommand(3.0),
-        getAutoClimb(FieldConstants.CLIMB_ALIGN_POSE_LEFT));
   }
 
   private Command getLeftTrenchDoubleSwipe() {
@@ -268,61 +157,12 @@ public class AutoLookup {
         new AutoUnbeach(drive));
   }
 
-  private Command getLeftTrenchDepot() {
-    return new SequentialCommandGroup(
-        getCommonCommands(),
-        setRobotPoseWithFlipping(new Pose2d(4.414, 7.431, Rotation2d.k180deg)),
-        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
-        RobotContainer.setHoodMode(HoodMode.DOWN),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
-        new WaitCommand(0.1),
-        new ParallelCommandGroup(
-            loadPath("Left-Trench-Center-Shoot-Diamond"),
-            new SequentialCommandGroup(
-                new WaitCommand(5.0), RobotContainer.setHoodMode(HoodMode.TRACKING))),
-        RobotContainer.setHoodMode(HoodMode.TRACKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
-        new WaitCommand(5.0),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
-        loadPath("Left-Trench-Depot"),
-        RobotContainer.setHoodMode(HoodMode.TRACKING),
-        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
-        RobotContainer.setIntakeSpinMode(IntakeSpinMode.IDLE),
-        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING));
-  }
-
   public Command getAuto(RealAutos auto) {
     if (auto == RealAutos.CMP_Center_Left_Trench_Hub_Bump_Shoot) {
       return getCenterLeftTrenchHubBumpShoot();
     }
-    if (auto == RealAutos.Right_Bump_Double_Swipe) {
-      return getRightBumpDoubleSwipeAuto();
-    }
-    if (auto == RealAutos.Right_Bump_Climb) {
-      return getRightBumpCLIMBAuto();
-    }
-    if (auto == RealAutos.Right_Bump_Outpost) {
-      return getRightBumpOutpostAuto();
-    }
-    if (auto == RealAutos.Left_Depot_Climb) {
-      return getLeftBumpDepotClimb();
-    }
-    if (auto == RealAutos.Preload_Climb_Auto) {
-      return getPreloadClimb();
-    }
     if (auto == RealAutos.Left_Trench_Double_Swipe) {
       return getLeftTrenchDoubleSwipe();
-    }
-    if (auto == RealAutos.Left_Trench_Swipe_Depot) {
-      return getLeftTrenchDepot();
-    }
-    if (auto == RealAutos.LEFT_TRENCH_DCMP) {
-      return getLeftTrenchTrenchDCMP();
     }
     if (auto == RealAutos.Right_Trench_Mega_Dump) {
       return getRightTrenchMegaDump();

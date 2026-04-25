@@ -35,5 +35,11 @@ public interface QuestIO {
 
   public default void setRobotPosition(Pose2d pose) {}
 
+  public default void setRawQuestPosition(Pose3d pose) {}
+
   public default void acceptVisionPose(Pose2d pose) {}
+
+  public default Pose3d getRawQuestPose() {
+    return Pose3d.kZero;
+  }
 }

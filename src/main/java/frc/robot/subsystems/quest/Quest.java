@@ -7,6 +7,7 @@ package frc.robot.subsystems.quest;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,7 +53,15 @@ public class Quest extends SubsystemBase {
     questIO.setRobotPosition(pose);
   }
 
+  public void setRawQuestPose(Pose3d pose) {
+    questIO.setRawQuestPosition(pose);
+  }
+
   public boolean isQuestConnected() {
     return inputs.isConnected;
+  }
+
+  public Pose3d getRawQuestPose() {
+    return questIO.getRawQuestPose();
   }
 }

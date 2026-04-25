@@ -3,14 +3,8 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "DCMP PREP",
-    "Left Depot Climb",
-    "Left Trench Double Swipe",
     "CMP Center Flex",
-    "Only Preload Climb",
-    "Right Bump Climb",
-    "Right Bump Double Swipe",
-    "Right Bump Outpost",
+    "Left Trench Double Swipe",
     "Right Trench Full Unload"
   ],
   "autoFolders": [],

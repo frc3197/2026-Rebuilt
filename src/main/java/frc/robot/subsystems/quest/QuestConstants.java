@@ -11,9 +11,9 @@ import edu.wpi.first.units.measure.Distance;
 
 public class QuestConstants {
 
-  private static final Distance ROBOT_TO_QUEST_X = Inches.of(-11.75);
-  private static final Distance ROBOT_TO_QUEST_Y = Inches.of(-11.75);
-  private static final Distance ROBOT_TO_QUEST_Z = Inches.of(12);
+  private static final Distance ROBOT_TO_QUEST_X = Inches.of(-8.6);
+  private static final Distance ROBOT_TO_QUEST_Y = Inches.of(-8.3);
+  private static final Distance ROBOT_TO_QUEST_Z = Inches.of(12.125);
   private static final Rotation3d ROBOT_TO_QUEST_ROTATION =
       new Rotation3d(0, 0, Degrees.of(-45 + 180).in(Radians));
 

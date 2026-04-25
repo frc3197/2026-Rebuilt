@@ -16,7 +16,7 @@ public class ControlScheme {
 
   // Drive button mappings
 
-  public Trigger getSnap45() {
+  public Trigger getLocalizeQuest() {
     return primaryController.leftStick();
   }
 

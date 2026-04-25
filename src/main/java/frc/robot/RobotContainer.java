@@ -404,16 +404,7 @@ public class RobotContainer {
      * .andThen(setIntakeSpinMode(IntakeSpinMode.IDLE)));
      */
 
-    controlScheme
-        .getSnap45()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controlScheme.getDriveX(),
-                () -> -controlScheme.getDriveY(),
-                () -> {
-                  return Rotation2d.fromDegrees(RobotContainer.isRed() ? (45 + 180) : 45);
-                }));
+    // controlScheme.getLocalizeQuest().onTrue(new QnavCalibrationCommand(quest));
 
     // controlScheme.startFloppping().onTrue(setIntakeDeployMode(IntakeDeployMode.FLOPPING));
 

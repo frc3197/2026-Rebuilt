@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -85,7 +86,25 @@ public class Vision extends SubsystemBase {
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
-    if (RobotState.instance().getRobotVelocity().omegaRadiansPerSecond > 2.25
+    // Rotation checks
+    if (!RobotState.instance()
+            .getRobotPose3D()
+            .getRotation()
+            .getMeasureX()
+            .isNear(Degrees.of(0), Degrees.of(5))
+        || !RobotState.instance()
+            .getRobotPose3D()
+            .getRotation()
+            .getMeasureY()
+            .isNear(Degrees.of(0), Degrees.of(5))) {
+      SmartDashboard.putBoolean("Bump", true);
+      return;
+    } else {
+      SmartDashboard.putBoolean("Bump", false);
+    }
+
+    // Velocity checks
+    if (RobotState.instance().getRobotVelocity().omegaRadiansPerSecond > 2.0
         || Math.sqrt(
                 Math.pow(RobotState.instance().getRobotVelocity().vxMetersPerSecond, 2)
                     + Math.pow(RobotState.instance().getRobotVelocity().vxMetersPerSecond, 2))
