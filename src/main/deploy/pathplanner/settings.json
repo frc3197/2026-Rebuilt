@@ -6,11 +6,12 @@
     "DCMP PREP",
     "Left Depot Climb",
     "Left Trench Double Swipe",
-    "Right Trench Full Unload",
+    "CMP Center Flex",
     "Only Preload Climb",
     "Right Bump Climb",
     "Right Bump Double Swipe",
-    "Right Bump Outpost"
+    "Right Bump Outpost",
+    "Right Trench Full Unload"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.0,

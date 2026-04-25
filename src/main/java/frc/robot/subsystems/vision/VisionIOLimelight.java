@@ -56,7 +56,7 @@ public class VisionIOLimelight implements VisionIO {
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
     pipelineSetter = NetworkTableInstance.getDefault().getTable(name).getEntry("pipeline");
 
-    LimelightHelpers.SetIMUMode("", 4);
+    LimelightHelpers.SetIMUMode("", 0);
   }
 
   @Override

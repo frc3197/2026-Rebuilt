@@ -11,5 +11,6 @@ public enum RealAutos {
   Left_Bump_Double_Swipe,
   Left_Trench_Double_Swipe,
   Left_Trench_Mega_Pass_Single,
-  Left_Trench_Swipe_Depot
+  Left_Trench_Swipe_Depot,
+  CMP_Center_Left_Trench_Hub_Bump_Shoot
 }

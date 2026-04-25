@@ -83,7 +83,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   private static final double kSTurret = 0.0253;
   private static final double kVTurret = 0.00;
   private static final double kPTurret =
-      3800; // A position error of 2.5 rotations results in 12 V output
+      5800; // A position error of 2.5 rotations results in 12 V output
   private static final double kITurret = 0;
   private static final double kDTurret = 100;
   public static Slot0Configs TURRET_SLOT0_CONFIGS =
@@ -97,7 +97,7 @@ public class ShooterConstants implements HardwareID.ShooterHardwareID {
   // Motion magic configs
   private static final double max_turret_rps = RadiansPerSecond.of(30).in(RotationsPerSecond);
   private static final double max_turret_acceleration =
-      RadiansPerSecondPerSecond.of(30).in(RotationsPerSecondPerSecond);
+      RadiansPerSecondPerSecond.of(60).in(RotationsPerSecondPerSecond);
   private static final MotionMagicConfigs TURRET_MM_CONFIGS =
       new MotionMagicConfigs()
           .withMotionMagicAcceleration(max_turret_acceleration)

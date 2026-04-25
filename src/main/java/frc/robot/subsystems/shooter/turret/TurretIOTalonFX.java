@@ -30,7 +30,8 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   private final TalonFX turretRotationMotor;
 
   // Actuators
-  private final LinearServo leftHoodActuator = new LinearServo(4, 50, 32);
+  private final LinearServo leftHoodActuator = new LinearServo(9, 50, 32);
+  private final LinearServo rightHoodActuator = new LinearServo(0, 50, 32);
 
   private DigitalInput turretZeroLimit = new DigitalInput(ShooterConstants.TURRET_ZERO_LIMIT);
 
@@ -53,6 +54,7 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   public void updateInputs(TurretInputs inputs) {
 
     leftHoodActuator.updateCurPos();
+    rightHoodActuator.updateCurPos();
 
     inputs.turretMotorAngle.mut_replace(getTurretAngularPosition());
     inputs.turretMotorCurrent.mut_replace(turretRotationMotor.getSupplyCurrent().getValue());
@@ -73,6 +75,9 @@ public class TurretIOTalonFX extends RealSubsystem implements TurretIO {
   public void setHoodActuatorMM(Distance distance) {
     hoodExtensionTarget = distance;
     leftHoodActuator.setPosition(
+        MathUtil.clamp(
+            distance.in(Millimeters), ShooterConstants.HOOD_LOW, ShooterConstants.HOOD_HIGH));
+    rightHoodActuator.setPosition(
         MathUtil.clamp(
             distance.in(Millimeters), ShooterConstants.HOOD_LOW, ShooterConstants.HOOD_HIGH));
   }

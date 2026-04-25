@@ -243,6 +243,31 @@ public class AutoLookup {
         new AutoUnbeach(drive));
   }
 
+  private Command getCenterLeftTrenchHubBumpShoot() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(3.534, 4.054, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.05),
+        new ParallelCommandGroup(
+            loadPath("CMP-Center-Trench-Bump-Shoot"),
+            new SequentialCommandGroup(
+                new WaitCommand(8.0),
+                // RobotContainer.setTurretMode(TurretMode.PASSING),
+                // RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+                RobotContainer.setHoodMode(HoodMode.TRACKING))),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+        new AutoUnbeach(drive));
+  }
+
   private Command getLeftTrenchDepot() {
     return new SequentialCommandGroup(
         getCommonCommands(),
@@ -272,6 +297,9 @@ public class AutoLookup {
   }
 
   public Command getAuto(RealAutos auto) {
+    if (auto == RealAutos.CMP_Center_Left_Trench_Hub_Bump_Shoot) {
+      return getCenterLeftTrenchHubBumpShoot();
+    }
     if (auto == RealAutos.Right_Bump_Double_Swipe) {
       return getRightBumpDoubleSwipeAuto();
     }
