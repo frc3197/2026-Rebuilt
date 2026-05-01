@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class LoggingConstants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-  public static final boolean tuningMode = true;
+  public static final boolean tuningMode = false;
   public static final boolean shooterCalibrationMode = false;
 
   public static enum Mode {
