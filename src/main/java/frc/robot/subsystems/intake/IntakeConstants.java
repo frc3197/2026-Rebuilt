@@ -33,7 +33,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
   public static final Angle INTAKE_RETRACTED_THRESHOLD = Degrees.of(5.0);
   // public static final Angle FLOP_ANGLE = Degrees.of(-65);
   public static final Angle FULLY_RETRACTED_ANGLE = Degrees.of(0);
-  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(110);
+  public static final Angle FULLY_DEPLOYED_ANGLE = Degrees.of(107);
   public static final Angle FLOP_ANGLE = Degrees.of(30);
 
   public static final Time FLOP_PERIOD = Seconds.of(1.2);
@@ -66,7 +66,7 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
               new CurrentLimitsConfigs()
                   .withStatorCurrentLimit(45)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(35)
+                  .withSupplyCurrentLimit(30)
                   .withSupplyCurrentLimitEnable(true))
           .withSoftwareLimitSwitch(
               new SoftwareLimitSwitchConfigs()
@@ -86,9 +86,9 @@ public class IntakeConstants implements HardwareID.IntakeHardwareID {
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(80)
+                  .withStatorCurrentLimit(77)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(30)
+                  .withSupplyCurrentLimit(28)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 

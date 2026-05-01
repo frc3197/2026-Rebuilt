@@ -61,9 +61,9 @@ public class IndexConstants implements IndexHardwareID {
           .withSlot0(Feed_SLOT0_CONFIGS)
           .withCurrentLimits(
               new CurrentLimitsConfigs()
-                  .withStatorCurrentLimit(85)
+                  .withStatorCurrentLimit(80)
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(37)
+                  .withSupplyCurrentLimit(33)
                   .withSupplyCurrentLimitEnable(true))
           .withMotorOutput(
               new MotorOutputConfigs()

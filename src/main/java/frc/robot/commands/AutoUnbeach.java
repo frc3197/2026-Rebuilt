@@ -30,8 +30,8 @@ public class AutoUnbeach extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(drive.getPose3d().getRotation().getMeasureX().in(Degrees)) > 12.0
-        || Math.abs(drive.getPose3d().getRotation().getMeasureX().in(Degrees)) > 12.0) {
+    if (Math.abs(drive.getPose3d().getRotation().getMeasureX().in(Degrees)) > 9.0
+        || Math.abs(drive.getPose3d().getRotation().getMeasureX().in(Degrees)) > 9.0) {
       drive.runVelocity(new ChassisSpeeds(-1.2, 0, 0));
     } else {
       drive.runVelocity(new ChassisSpeeds(0, 0, 0));

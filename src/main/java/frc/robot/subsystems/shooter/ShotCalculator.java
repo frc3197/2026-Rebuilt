@@ -380,7 +380,7 @@ public class ShotCalculator extends VirtualSubsystem {
     // For appleton
     // double rps = MathUtil.clamp(((4.12 * distanceInMeters) + 26), 5, 80);
 
-    double rps = MathUtil.clamp(((4.15 * distanceInMeters) + 26.3), 5, 80);
+    double rps = MathUtil.clamp(((4.15 * distanceInMeters) + 27.0), 5, 82);
 
     return RotationsPerSecond.of(rps);
   }
