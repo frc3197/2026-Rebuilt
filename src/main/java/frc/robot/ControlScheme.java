@@ -112,6 +112,14 @@ public class ControlScheme {
     return secondaryController.a();
   }
 
+  public Trigger hoodUpManual() {
+    return primaryController.rightBumper();
+  }
+
+  public Trigger hoodDownManual() {
+    return primaryController.leftBumper();
+  }
+
   public Trigger getSpoolFlywheelManual() {
     return secondaryController.povLeft();
   }

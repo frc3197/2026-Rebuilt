@@ -7,8 +7,8 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Centimeter;
+import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -19,22 +19,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.NetworkButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoLookup;
 import frc.robot.commands.DefaultFlywheelCommand;
 import frc.robot.commands.DefaultIndexCommand;
 import frc.robot.commands.DefaultIntakeCommand;
-import frc.robot.commands.DefaultTurretHoodCommand;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.Sim.SimTurretCommand;
 import frc.robot.commands.ZeroTurret;
 import frc.robot.constants.LoggingConstants;
-import frc.robot.constants.LoggingConstants.Mode;
 import frc.robot.constants.TunerConstants;
 import frc.robot.enums.Modes.ClimbCameraMode;
 import frc.robot.enums.Modes.FlywheelMode;
@@ -85,7 +80,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOClimberLimelight;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.KeyboardController;
-import frc.robot.util.MatchTimeUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -124,70 +118,6 @@ public class RobotContainer {
 
   private final NetworkButton seedRightAutoRed =
       new NetworkButton(NetworkTableInstance.getDefault(), "SmartDashboard", "Seed right red");
-
-  // Triggers
-  // -------------------------------------------------------------------------
-  // Trigger for when robot enters the alliance zone, used to automatically begin
-  // tracking hub
-  private final Trigger enteredAllianceZoneAuto =
-      new Trigger(
-          () ->
-              RobotState.instance().inAllianceZone()
-                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())
-                  && !DriverStation.isTest());
-
-  // Triggers only during autonomous period, deploys intake and begins spinning
-  // when robot enters neutral zone
-  private final Trigger enteredNeutralZoneAuto =
-      new Trigger(
-          () ->
-              (RobotState.instance().inNeutralZone()
-                  && (LoggingConstants.currentMode != Mode.REAL || DriverStation.isAutonomous())
-                  && !DriverStation.isTest()));
-
-  // Triggers during the tele period, will turn off auto tracking and spooling
-  // conditionally, only fires when the robot is real
-  private final Trigger enteredNeurtalZoneTele =
-      new Trigger(
-          () ->
-              (RobotState.instance().inNeutralZone()
-                  && (LoggingConstants.currentMode == Mode.REAL && !DriverStation.isAutonomous())
-                  && !DriverStation.isTest()));
-
-  private final Trigger enteredAllianceZoneTele =
-      new Trigger(
-          () ->
-              (RobotState.instance().inAllianceZone()
-                  && (LoggingConstants.currentMode == Mode.REAL && !DriverStation.isAutonomous())
-                  && !DriverStation.isTest()));
-
-  private final Trigger aboutToBeActive =
-      new Trigger(MatchTimeUtil.instance().aboutToBecomeActiveSupplier());
-
-  private final Trigger nowInactive = new Trigger(MatchTimeUtil.instance().inactiveSupplier());
-
-  // Start flopping the intake when the shooter is spooling and the robot is below
-  // a certain speed
-  private final Trigger startFlopping =
-      new Trigger(
-          () ->
-              (!DriverStation.isAutonomous()
-                  && RobotState.instance().getClimberAngle().lt(Degrees.of(10))
-                  && RobotState.instance().getRobotSpeedMPS()
-                      < IntakeConstants.MAX_FLOP_VELOCITY.in(MetersPerSecond)
-                  && (RobotState.instance().getFlywheelMode() == FlywheelMode.FRENZY
-                      || RobotState.instance().getFlywheelMode() == FlywheelMode.SHOOTING)));
-
-  private final Trigger hoodDownTrigger =
-      new Trigger(
-          () -> {
-            if (isRed()) {
-              return RobotState.instance().robotNearBottomRedTrench()
-                  || RobotState.instance().robotNearTopRedTrench();
-            }
-            return RobotState.instance().robotNearBottomBlueTrench()
-                || RobotState.instance().robotNearTopBlueTrench();
-          });
 
   public RobotContainer() {
 
@@ -356,9 +286,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-
-    // Configure trigger callbacks
-    configureTriggerCallbacks();
   }
 
   private void configureDefaultCommands() {
@@ -376,14 +303,6 @@ public class RobotContainer {
 
     // Flywheel is controlled based on FlywheelMode with manual override buttons
     flywheel.setDefaultCommand(new DefaultFlywheelCommand(flywheel));
-
-    // Turret is controlled by TurretMode with manual overrides
-    if (LoggingConstants.currentMode != Mode.SIM)
-      turret.setDefaultCommand(
-          new DefaultTurretHoodCommand(turret, controlScheme.getTurretVoltageManual()));
-    else
-      turret.setDefaultCommand(
-          new SimTurretCommand(turret, controlScheme.getTurretVoltageManual()));
   }
 
   private void configureButtonBindings() {
@@ -470,12 +389,6 @@ public class RobotContainer {
 
     controlScheme.getIntakeSpin().onTrue(setIntakeSpinMode(IntakeSpinMode.INTAKING));
     controlScheme.getIntakeSpinStop().onTrue(setIntakeSpinMode(IntakeSpinMode.IDLE));
-
-    controlScheme
-        .getHoodDownManual()
-        .onTrue(
-            Commands.runOnce(() -> RobotState.instance().setHoodMode(HoodMode.DOWN))
-                .andThen(setFlywheelMode(FlywheelMode.IDLE)));
 
     // ------------------------------------------------------------------------
     // CLIMBER CONTROLS
@@ -604,87 +517,10 @@ public class RobotContainer {
                   index.setSpindexMotorTargetVoltage(Volts.of(0.0));
                 },
                 index));
-  }
 
-  private void configureTriggerCallbacks() {
-    enteredAllianceZoneAuto
-        .onTrue(
-            // RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
-            // .andThen(
-            setTurretMode(TurretMode.TRACKING_HUB)
-                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL)) // )
-        .onFalse(
-            setTurretMode(TurretMode.IDLE)
-                .onlyIf(() -> RobotState.instance().getTurretMode() != TurretMode.MANUAL));
+    controlScheme.hoodUpManual().onTrue(turret.setActuatorPosition(Inch.of(0.675)));
 
-    enteredNeutralZoneAuto
-        .onTrue(
-            setIntakeDeployMode(IntakeDeployMode.DEPLOYING)
-                .andThen(setIntakeSpinMode(IntakeSpinMode.INTAKING))
-                .andThen(setFlywheelMode(FlywheelMode.IDLE)))
-        .onFalse(
-            setIntakeSpinMode(IntakeSpinMode.INTAKING)
-                .andThen(setFlywheelMode(FlywheelMode.PREPARE)));
-
-    enteredNeurtalZoneTele.onTrue(
-        Commands.runOnce(
-            () -> {
-              if (RobotState.instance().getTurretMode() == TurretMode.TRACKING_HUB) {
-                RobotState.instance().setTurretMode(TurretMode.IDLE);
-              }
-            }));
-
-    enteredAllianceZoneTele.onTrue(
-        Commands.runOnce(
-            () -> {
-              if (RobotState.instance().getTurretMode() == TurretMode.IDLE) {
-                RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
-              }
-              if (RobotState.instance().getTurretMode() == TurretMode.PASSING) {
-                RobotState.instance().setTurretMode(TurretMode.TRACKING_HUB);
-              }
-            }));
-
-    aboutToBeActive
-        .onTrue(
-            Commands.runOnce(
-                    () -> {
-                      flywheel.setActive();
-                    })
-                .andThen(
-                    Commands.runOnce(
-                        () -> driveController.setRumble(RumbleType.kBothRumble, 0.67))))
-        .onFalse(Commands.runOnce(() -> driveController.setRumble(RumbleType.kBothRumble, 0.0)));
-
-    nowInactive.onTrue(
-        Commands.runOnce(
-            () -> {
-              flywheel.setInactive();
-            }));
-
-    hoodDownTrigger.onTrue(
-        Commands.runOnce(
-            () -> {
-              if (RobotState.instance().getFlywheelMode() != FlywheelMode.SHOOTING) {
-                RobotState.instance().setHoodMode(HoodMode.DOWN);
-              }
-            }));
-
-    keyboardController
-        .b()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  RobotState.instance().setIntakeDeployMode(IntakeDeployMode.FLOPPING);
-                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.IDLE);
-                  RobotState.instance().setHoodMode(HoodMode.TRACKING);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  RobotState.instance().setIntakeDeployMode(IntakeDeployMode.DEPLOYING);
-                  RobotState.instance().setIntakeSpinMode(IntakeSpinMode.IDLE);
-                }));
+    controlScheme.hoodDownManual().onTrue(turret.setActuatorPosition(Centimeter.of(-10)));
 
     /*
      * startFlopping

@@ -45,7 +45,7 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState extends VirtualSubsystem {
 
   // Robot Modes
-  private HoodMode hoodMode = HoodMode.TRACKING;
+  private HoodMode hoodMode = HoodMode.DOWN;
   private IntakeDeployMode intakeDeployMode = IntakeDeployMode.IDLE_RETRACTED;
   private IntakeSpinMode intakeSpinMode = IntakeSpinMode.IDLE;
   private FlywheelMode flywheelMode = FlywheelMode.IDLE;
