@@ -1,0 +1,29 @@
+Primary - Automatic:
+	Left Y - getDriveX - Drives [TEST]
+	Left X - getDriveY - Drives [TEST]
+	Right X - getRightX - Rotates
+	Start - getZeroGyro - Zeros Gyro
+	A - getPrepareFlywheel - Sets flywheel mode to "PREPARE"
+	Y - getSpindexFeedFlywheelManual - Runs flywheel to Shooting Speed
+	B - getIdleFlywheel - Sets flywheel mode to "IDLE"
+	Right Trigger - getShootingFlywheel - Runs flywheel to Shooting Speed, Sets turret to track hub
+	Back (Two Squares) - getBackfeedManual - Runs Spindexer, intake to backfeed
+	Right Stick - getIntakeSpinStop - Sets intake to idle
+	POV Up - getIntakeExtendPreset - Deploy Intake
+	POV Down - getIntakeRetractPreset - Retracts intake, disables spinning of intake
+	Left Trigger - intakeDeployAndSpin - Deploys intake if not deployed, Spins intake
+	
+
+Foot Pedal: Flops Intake
+	
+Secondary - Manual Fallbacks:
+	Y - getBackfeedManual - Runs Spindexer, intake to backfeed
+	Right Stick - stopTrackingNew - Stops tracking anything
+	A - getHoodDownManual - Forces hood down [FOR TRENCH!!!]
+	POV Left - getSpoolFlywheelManual - Spools the flywheell
+	Back (Two Squares) - Auto Zero Turret - Creates new Zero
+	Start - Zero Turret - Zeros Turret
+	Left Trigger Axis minus Right Trigger Axis - getTurretVoltageManual - Manually sets turret voltage dependant on Trigger Axis (Left - Right)
+	Left Trigger / Right Trigger - getTurretManual - Controls the turret manually, left trigger turns left, right trigger turns right
+	Left Bumper - getTurretPass - Sets turret to aim for passing manually
+	Right Bumper - getTurretHub - Sets turret to aim for hub manually
