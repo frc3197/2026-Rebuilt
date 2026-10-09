@@ -6,4 +6,5 @@ public enum RealAutos {
   CMP_Center_Left_Trench_Hub_Bump_Shoot,
   CMP_Center_Right_Trench_Hub_Bump_Shoot,
   CMP_CENTER_LEFT_TRENCH_CENTERLINE,
+  CMP_DEPOT,
 }

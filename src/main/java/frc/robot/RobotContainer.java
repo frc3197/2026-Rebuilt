@@ -330,6 +330,8 @@ public class RobotContainer {
         "Center Hub LEFT Trench CENTERLINE",
         autoLookup.getAuto(RealAutos.CMP_CENTER_LEFT_TRENCH_CENTERLINE));
 
+    autoChooser.addOption("CMP Depot", autoLookup.getAuto(RealAutos.CMP_DEPOT));
+
     seedRightAutoRed.onTrue(
         autoLookup.setRobotPoseWithFlipping(new Pose2d(3.612, 2.398, Rotation2d.kZero)));
 

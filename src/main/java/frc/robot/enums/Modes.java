@@ -5,6 +5,7 @@ public class Modes {
   public static enum TurretMode {
     TRACKING_HUB,
     PASSING,
+    LONG_PASS,
     IDLE,
     MANUAL,
   }

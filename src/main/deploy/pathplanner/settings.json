@@ -4,8 +4,9 @@
   "holonomicMode": true,
   "pathFolders": [
     "CMP Center Left Flex",
-    "Left Trench Double Swipe",
     "CMP Center Right Flex",
+    "Left Trench Double Swipe",
+    "Depot CMP",
     "Right Trench Full Unload"
   ],
   "autoFolders": [],

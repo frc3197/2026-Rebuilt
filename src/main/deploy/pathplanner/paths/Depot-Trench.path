@@ -1,0 +1,99 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.581,
+        "y": 5.051
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5289586305278173,
+        "y": 7.974821683309559
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.8837945791726103,
+        "y": 7.4572753209700435
+      },
+      "prevControl": {
+        "x": 2.8837945791726103,
+        "y": 7.4572753209700435
+      },
+      "nextControl": {
+        "x": 4.88379457917261,
+        "y": 7.4572753209700435
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.575035663338087,
+        "y": 7.4572753209700435
+      },
+      "prevControl": {
+        "x": 5.154238096051207,
+        "y": 7.500329792706009
+      },
+      "nextControl": {
+        "x": 7.855962910128387,
+        "y": 7.41845934379458
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.153552068473608,
+        "y": 5.516476462196862
+      },
+      "prevControl": {
+        "x": 8.166490727532096,
+        "y": 7.35376604850214
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2814498933902022,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 0.8614072494669403,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 2.027718550106571,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -87.20729763428672
+  },
+  "reversed": false,
+  "folder": "Depot CMP",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 147.8
+  },
+  "useDefaultConstraints": true
+}

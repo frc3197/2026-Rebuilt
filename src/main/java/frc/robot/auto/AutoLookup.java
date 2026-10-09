@@ -240,6 +240,34 @@ public class AutoLookup {
         new WaitCommand(0.0));
   }
 
+  private Command getDepotCMP() {
+    return new SequentialCommandGroup(
+        getCommonCommands(),
+        setRobotPoseWithFlipping(new Pose2d(3.534, 4.054, Rotation2d.k180deg)),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.INTAKING),
+        RobotContainer.setFlywheelMode(FlywheelMode.PREPARE),
+        new WaitCommand(0.05),
+        new ParallelCommandGroup(loadPath("Depot-CMP")),
+        RobotContainer.setHoodMode(HoodMode.TRACKING),
+        RobotContainer.setTurretMode(TurretMode.TRACKING_HUB),
+        RobotContainer.setFlywheelMode(FlywheelMode.FRENZY),
+        RobotContainer.setIntakeSpinMode(IntakeSpinMode.MEDIUM),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.FLOPPING),
+
+        // Flexible delay
+        new AutoUnbeach(drive).withTimeout(15.0),
+        RobotContainer.setHoodMode(HoodMode.DOWN),
+        RobotContainer.setIntakeDeployMode(IntakeDeployMode.DEPLOYING),
+        RobotContainer.setFlywheelMode(FlywheelMode.IDLE),
+        // loadPath("Depot-Trench"),
+
+        // Flexible trench
+        new WaitCommand(0.0));
+  }
+
   public Command getAuto(RealAutos auto) {
     if (auto == RealAutos.CMP_Center_Left_Trench_Hub_Bump_Shoot) {
       return getCenterLeftTrenchHubBumpShoot();
@@ -255,6 +283,9 @@ public class AutoLookup {
     }
     if (auto == RealAutos.CMP_CENTER_LEFT_TRENCH_CENTERLINE) {
       return getCenterLeftTrenchCENTERLINE();
+    }
+    if (auto == RealAutos.CMP_DEPOT) {
+      return getDepotCMP();
     }
     return Commands.print("NO/INVALID AUTO COMMAND SELECTED: " + auto);
   }
