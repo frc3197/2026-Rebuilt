@@ -42,19 +42,14 @@ public class ControlScheme {
   }
 
   public Trigger getShootingFlywheel() {
-    return primaryController.rightTrigger();
+    return secondaryController.rightTrigger();
   }
 
   public Trigger getIdleFlywheel() {
-    return primaryController.b();
+    return secondaryController.b();
   }
 
   // Manual fallbacks ---------------------------------------------------------
-
-  // Climber
-  public Trigger getClimberRotateCW() {
-    return secondaryController.b();
-  }
 
   public Trigger getClimberRotateCWW() {
     return secondaryController.x();
@@ -142,7 +137,7 @@ public class ControlScheme {
   }
 
   public Trigger getTurretManual() {
-    return secondaryController.leftTrigger(0.25).or(secondaryController.rightTrigger(0.25));
+    return secondaryController.leftTrigger(0.25);
   }
 
   public Trigger getTurretPass() {
